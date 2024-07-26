@@ -38,7 +38,7 @@ class Feed(models.Model):
     feed_data = models.JSONField("Feed Data")
 
     def __str__(self):
-        return self.feedname
+        return self.issuingorganization
 
 
 class FeedError(models.Model):
@@ -55,7 +55,7 @@ class APIKey(models.Model):
     key = models.TextField()
 
     def __str__(self):
-        return self.key
+        return f"{self.feed.feedname.upper()}={self.key}"
 
 
 # Upload class from ReVal. TODO: Modify to fit WZDx use case

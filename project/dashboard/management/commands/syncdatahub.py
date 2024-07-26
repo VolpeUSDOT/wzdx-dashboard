@@ -12,7 +12,7 @@ from django.core.management.base import BaseCommand, CommandError
 def get_feed_full_url(feed_name: str, feed_url: Union[str, None]):
 
     try:
-        api_key = APIKey.objects.get(pk=feed_name).key
+        api_key = APIKey.objects.get(feed__pk=feed_name).key
     except APIKey.DoesNotExist:
         api_key = os.environ.get(feed_name)
         if api_key is None:
