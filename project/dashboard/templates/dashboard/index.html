@@ -5,7 +5,7 @@
 {% block title %}Home{% endblock %}
 
 {% block pagecontent %}
-<div style="overflow-x: scroll">
+<div style="overflow-x: auto">
     <table class="data-table">
         <thead>
             <tr>
@@ -18,7 +18,7 @@
             {% for feed in feeds %}
                 <tr>
                     {% for col_name, col_val in feed.items  %}
-                        {% if col_name not in "feed_data+url+apikeyurl+geocoded_column" %}
+                        {% if col_name not in "feed_data+url+apikeyurl+geocoded_column" and col_val is not None %}
                             <td>{{ col_val|naturaltime }}</td>
                         {% else %}
                             <td></td>

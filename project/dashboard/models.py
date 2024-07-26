@@ -15,7 +15,9 @@ class Feed(models.Model):
     url = models.URLField("URL")
     format = models.TextField("Format")
     active = models.BooleanField("Active")
-    datafeed_frequency_update = models.TextField("Datafeed Update Frequency")
+    datafeed_frequency_update = models.DurationField(
+        "Datafeed Update Frequency", null=True
+    )
     version = models.TextField("Version")
     sdate = models.DateTimeField("Start Date")
     edate = models.DateTimeField("End Date", null=True)

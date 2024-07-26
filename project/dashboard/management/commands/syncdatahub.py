@@ -1,4 +1,6 @@
 import os
+import re
+from datetime import datetime, timedelta, timezone
 from typing import Union
 
 import requests
@@ -10,16 +12,36 @@ from django.core.management.base import BaseCommand, CommandError
 def get_feed_full_url(feed_name: str, feed_url: Union[str, None]):
 
     try:
-        api_key = APIKey.objects.get(pk=feed_name)
+        api_key = APIKey.objects.get(pk=feed_name).key
     except APIKey.DoesNotExist:
-        return None
+        api_key = os.environ.get(feed_name)
+        if api_key is None:
+            return None
 
     if feed_url is None:
         return None
 
-    new_url = "=".join(feed_url.split("=")[:-1]) + "=" + api_key.key
+    new_url = "=".join(feed_url.split("=")[:-1]) + "=" + api_key
 
     return new_url
+
+
+regex = re.compile(r"((?P<hours>\d+?)h)?((?P<minutes>\d+?)m)?((?P<seconds>\d+?)s)?")
+
+
+def parse_time(time_str: Union[str, None]):
+    if time_str is None:
+        return None
+
+    parts = regex.match(time_str)
+    if not parts:
+        return
+    parts = parts.groupdict()
+    time_params = {}
+    for name, param in parts.items():
+        if param:
+            time_params[name] = int(param)
+    return timedelta(**time_params)
 
 
 class Command(BaseCommand):
@@ -29,7 +51,7 @@ class Command(BaseCommand):
 
         try:
             datahub_request = requests.get(
-                "https://data.transportation.gov/resource/69qe-yiui.json"
+                "https://data.transportation.gov/resource/69qe-yiui.json", timeout=20
             )
         except requests.exceptions.RequestException as e:
             raise CommandError(f"DataHub request failed: {e}")
@@ -61,8 +83,8 @@ class Command(BaseCommand):
             feed.url = feed_requested.get("url").get("url")
             feed.format = feed_requested.get("format")
             feed.active = feed_requested.get("active")
-            feed.datafeed_frequency_update = feed_requested.get(
-                "datafeed_frequency_update"
+            feed.datafeed_frequency_update = parse_time(
+                feed_requested.get("datafeed_frequency_update")
             )
             feed.version = feed_requested.get("version")
             feed.sdate = feed_requested.get("sdate")
@@ -74,7 +96,13 @@ class Command(BaseCommand):
                 else None
             )
             feed.pipedtosandbox = feed_requested.get("pipedtosandbox")
-            feed.lastingestedtosandbox = feed_requested.get("lastingestedtosandbox")
+            feed.lastingestedtosandbox = (
+                datetime.fromisoformat(
+                    feed_requested.get("lastingestedtosandbox")
+                ).replace(tzinfo=timezone.utc)
+                if feed_requested.get("lastingestedtosandbox")
+                else None
+            )
             feed.pipedtosocrata = feed_requested.get("pipedtosocrata")
             feed.socratadatasetid = feed_requested.get("socratadatasetid", "")
             feed.geocoded_column = feed_requested.get("geocoded_column")
@@ -96,7 +124,7 @@ class Command(BaseCommand):
                 continue
 
             try:
-                feed_data_request = requests.get(feed_data_url)
+                feed_data_request = requests.get(feed_data_url, timeout=20)
             except requests.exceptions.RequestException as e:
                 self.stdout.write(
                     self.style.ERROR(
@@ -118,7 +146,7 @@ class Command(BaseCommand):
             feed.save()
 
             try:
-                feeds_prior.remove(feed.issuingorganization)
+                feeds_prior.remove(feed_requested.get("feedname"))
             except ValueError:
                 pass
 
@@ -132,6 +160,7 @@ class Command(BaseCommand):
                 )
 
             feed_to_delete.delete()
+            self.stdout.write(self.style.WARNING(f"Feed {feed_not_found} deleted."))
 
         self.stdout.write(
             self.style.SUCCESS("Successfully synced feed list with DataHub!")
