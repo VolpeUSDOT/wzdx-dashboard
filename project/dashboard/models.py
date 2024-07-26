@@ -26,7 +26,7 @@ class Feed(models.Model):
         "Last Ingested To Sandbox (UTC)", null=True
     )
     pipedtosocrata = models.BooleanField("Piped to Socrata")
-    socratadatasetid = models.TextField("Socrata Dataset ID", null=True)
+    socratadatasetid = models.TextField("Socrata Dataset ID", blank=True)
     geocoded_column = models.JSONField(
         "State Coordinate"
     )  # Change to field time once GeoDjango is set up
