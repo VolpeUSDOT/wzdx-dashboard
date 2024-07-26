@@ -3,7 +3,7 @@
 This project aims to have a variety of moving parts, which makes creating one unified system complex. Furthermore, throughout development, the lingering question of how to deploy it using the tools available at Volpe/DOT remains unanswered.
 
 ## What we're using
-Early on, it was decided to use something already familiar to people and relatively well-known, to ensure that this project could be maintained long-term. As of writing, this project is being made in Python using [Django](https://www.djangoproject.com/), due to its dynamic rendering nature, ability to connect easily to a database and send emails, easy authentication integration, web geographic capabilities (through [GeoDjango](https://docs.djangoproject.com/en/5.0/ref/contrib/gis/)), and people's general familiarity with Python.
+Early on, it was decided to use something already familiar to people and relatively well-known, to ensure that this project could be maintained long-term. As of writing, this project is being made in Python using [Django](https://www.djangoproject.com/), due to its dynamic rendering nature, ability to connect easily to a database and send emails, easy authentication integration, web geographic capabilities (through [GeoDjango](https://docs.djangoproject.com/en/4.2/ref/contrib/gis/)), and people's general familiarity with Python.
 
 A lingering question is how to deploy this using resources already available.
 
