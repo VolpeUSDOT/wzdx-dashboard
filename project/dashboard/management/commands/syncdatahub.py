@@ -1,4 +1,5 @@
 import os
+from typing import Union
 
 import requests
 from dashboard.models import Feed
@@ -6,11 +7,15 @@ from django.core.management.base import BaseCommand, CommandError
 
 
 # load_dotenv()
-def get_feed_full_url(feed_name: str, feed_url: str):
+def get_feed_full_url(feed_name: str, feed_url: Union[str, None]):
 
     api_key = os.environ.get(feed_name.upper())
+
     if api_key is None:
         return None
+    if feed_url is None:
+        return None
+    
     new_url = "=".join(feed_url.split("=")[:-1]) + "=" + api_key
 
     return new_url
@@ -83,14 +88,14 @@ class Command(BaseCommand):
                     (
                         feed_requested.get("url").get("url")
                         if feed_requested.get("url")
-                        else ""
+                        else None
                     ),
                 )
             else:
                 feed_data_url = (
                     feed_requested.get("url").get("url")
                     if feed_requested.get("url")
-                    else ""
+                    else None
                 )
 
             if feed_data_url is None:
@@ -109,6 +114,7 @@ class Command(BaseCommand):
                         f"Feed {feed_requested.get('feedname')} request failed: {e}"
                     )
                 )
+                continue
 
             if feed_data_request.status_code != requests.codes.ok:
                 self.stdout.write(
@@ -141,3 +147,4 @@ class Command(BaseCommand):
         self.stdout.write(
             self.style.SUCCESS("Successfully synced feed list with DataHub!")
         )
+        
