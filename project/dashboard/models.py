@@ -1,4 +1,4 @@
-from django.db import models
+from django.contrib.gis.db import models
 
 # Create your models here.
 
@@ -22,16 +22,14 @@ class Feed(models.Model):
     sdate = models.DateTimeField("Start Date")
     edate = models.DateTimeField("End Date", null=True)
     needapikey = models.BooleanField("Need API Key")
-    apikeyurl = models.URLField("API key URL", null=True)
+    apikeyurl = models.URLField("API Key URL", null=True)
     pipedtosandbox = models.BooleanField("Piped to Sandbox")
     lastingestedtosandbox = models.DateTimeField(
         "Last Ingested To Sandbox (UTC)", null=True
     )
     pipedtosocrata = models.BooleanField("Piped to Socrata")
     socratadatasetid = models.TextField("Socrata Dataset ID", blank=True)
-    geocoded_column = models.JSONField(
-        "State Coordinate"
-    )  # Change to field time once GeoDjango is set up
+    geocoded_column = models.PointField("State Coordinate", null=True)
 
     # The following fields are needed for data processing
     last_checked = models.DateTimeField("Last Updated", auto_now=True)

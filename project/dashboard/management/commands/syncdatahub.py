@@ -5,6 +5,7 @@ from typing import Union
 
 import requests
 from dashboard.models import APIKey, Feed
+from django.contrib.gis.geos import Point
 from django.core.management.base import BaseCommand, CommandError
 
 
@@ -105,7 +106,14 @@ class Command(BaseCommand):
             )
             feed.pipedtosocrata = feed_requested.get("pipedtosocrata")
             feed.socratadatasetid = feed_requested.get("socratadatasetid", "")
-            feed.geocoded_column = feed_requested.get("geocoded_column")
+            feed.geocoded_column = (
+                Point(
+                    feed_requested.get("geocoded_column").get("coordinates"), srid=4326
+                )
+                if feed_requested.get("geocoded_column")
+                and feed_requested.get("geocoded_column").get("coordinates")
+                else None
+            )
 
             if feed_requested.get("apikeyurl"):
                 feed_data_url = get_feed_full_url(

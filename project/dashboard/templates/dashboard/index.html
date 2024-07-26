@@ -18,7 +18,7 @@
             {% for feed in feeds %}
                 <tr>
                     {% for col_name, col_val in feed.items  %}
-                        {% if col_name not in "feed_data+url+apikeyurl+geocoded_column" and col_val is not None %}
+                        {% if col_name not in "feed_data+url+apikeyurl" and col_val is not None %}
                             <td>{{ col_val|naturaltime }}</td>
                         {% else %}
                             <td></td>
