@@ -1,6 +1,6 @@
 import os
 import re
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from typing import Literal, Optional, TypedDict, Union
 
 import requests
@@ -59,14 +59,16 @@ def get_feed_full_url(api_key: Union[str, None], feed_url: Union[str, None]):
     return new_url
 
 
-regex = re.compile(r"((?P<hours>\d+?)h)?((?P<minutes>\d+?)m)?((?P<seconds>\d+?)s)?")
+time_regex = re.compile(
+    r"((?P<hours>\d+?)h)?((?P<minutes>\d+?)m)?((?P<seconds>\d+?)s)?"
+)
 
 
 def parse_time(time_str: Union[str, None]):
     if time_str is None:
         return None
 
-    parts = regex.match(time_str)
+    parts = time_regex.match(time_str)
     if not parts:
         return
     parts = parts.groupdict()
@@ -120,9 +122,9 @@ class Command(BaseCommand):
                 feed_requested.get("datafeed_frequency_update")
             )
             feed.version = feed_requested.get("version")
-            feed.sdate = datetime.fromisoformat(feed_requested.get("sdate"))
+            feed.sdate = datetime.fromisoformat(feed_requested.get("sdate")).date()
             feed.edate = (
-                datetime.fromisoformat(feed_requested.get("edate") or "")
+                datetime.fromisoformat(feed_requested.get("edate") or "").date()
                 if feed_requested.get("edate")
                 else None
             )
