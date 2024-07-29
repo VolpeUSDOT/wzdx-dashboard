@@ -1,2 +1,4 @@
 Django==4.2.14
 requests==2.25.1
+python-decouple==3.8
+psycopg[binary]==3.2.1
