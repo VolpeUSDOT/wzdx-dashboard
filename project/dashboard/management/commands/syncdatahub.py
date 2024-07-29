@@ -1,7 +1,7 @@
 import os
 import re
 from datetime import datetime, timedelta, timezone
-from typing import Union
+from typing import Literal, Optional, TypedDict, Union
 
 import requests
 from dashboard.models import APIKey, Feed
@@ -9,15 +9,47 @@ from django.contrib.gis.geos import Point
 from django.core.management.base import BaseCommand, CommandError
 
 
-# load_dotenv()
-def get_feed_full_url(feed_name: str, feed_url: Union[str, None]):
+class PointJSON(TypedDict):
+    type: Literal["Point"]
+    coordinates: tuple[float, float]
 
+
+class DataHubResponse(TypedDict):
+    state: str
+    issuingorganization: str
+    feedname: str
+    url: dict[Literal["url"], str]
+    format: str
+    active: bool
+    datafeed_frequency_update: str
+    version: str
+    sdate: str
+    edate: Optional[str]
+    needapikey: bool
+    apikeyurl: Optional[dict[Union[Literal["url"], Literal["description"]], str]]
+    pipedtosandbox: bool
+    lastingestedtosandbox: Optional[str]
+    pipedtosocrata: bool
+    socratadatasetid: Optional[str]
+    geocoded_column: PointJSON
+
+
+def get_api_key(feed_name: str):
     try:
         api_key = APIKey.objects.get(feed__pk=feed_name).key
+        in_db = True
     except APIKey.DoesNotExist:
         api_key = os.environ.get(feed_name)
-        if api_key is None:
-            return None
+        in_db = False
+
+    return (in_db, api_key)
+
+
+# load_dotenv()
+def get_feed_full_url(api_key: Union[str, None], feed_url: Union[str, None]):
+
+    if api_key is None:
+        return None
 
     if feed_url is None:
         return None
@@ -63,7 +95,7 @@ class Command(BaseCommand):
             )
 
         feeds_prior = [feed.feedname for feed in Feed.objects.all()]
-        datahub_json = datahub_request.json()
+        datahub_json: list[DataHubResponse] = datahub_request.json()
         for feed_requested in datahub_json:
             try:
                 feed = Feed.objects.get(pk=feed_requested.get("feedname"))
@@ -81,31 +113,35 @@ class Command(BaseCommand):
             feed.state = feed_requested.get("state")
             feed.issuingorganization = feed_requested.get("issuingorganization")
             feed.feedname = feed_requested.get("feedname")
-            feed.url = feed_requested.get("url").get("url")
+            feed.url = feed_requested.get("url").get("url", "")
             feed.format = feed_requested.get("format")
             feed.active = feed_requested.get("active")
             feed.datafeed_frequency_update = parse_time(
                 feed_requested.get("datafeed_frequency_update")
             )
             feed.version = feed_requested.get("version")
-            feed.sdate = feed_requested.get("sdate")
-            feed.edate = feed_requested.get("edate")
+            feed.sdate = datetime.fromisoformat(feed_requested.get("sdate"))
+            feed.edate = (
+                datetime.fromisoformat(feed_requested.get("edate") or "")
+                if feed_requested.get("edate")
+                else None
+            )
             feed.needapikey = feed_requested.get("needapikey")
             feed.apikeyurl = (
-                feed_requested.get("apikeyurl").get("url")
+                (feed_requested.get("apikeyurl") or {}).get("url", "") or ""
                 if feed_requested.get("apikeyurl")
                 else None
             )
             feed.pipedtosandbox = feed_requested.get("pipedtosandbox")
             feed.lastingestedtosandbox = (
                 datetime.fromisoformat(
-                    feed_requested.get("lastingestedtosandbox")
+                    feed_requested.get("lastingestedtosandbox") or ""
                 ).replace(tzinfo=timezone.utc)
                 if feed_requested.get("lastingestedtosandbox")
                 else None
             )
             feed.pipedtosocrata = feed_requested.get("pipedtosocrata")
-            feed.socratadatasetid = feed_requested.get("socratadatasetid", "")
+            feed.socratadatasetid = feed_requested.get("socratadatasetid") or ""
             feed.geocoded_column = (
                 Point(
                     feed_requested.get("geocoded_column").get("coordinates"), srid=4326
@@ -114,10 +150,10 @@ class Command(BaseCommand):
                 and feed_requested.get("geocoded_column").get("coordinates")
                 else None
             )
-
+            api_key = get_api_key(feed_requested.get("feedname"))
             if feed_requested.get("apikeyurl"):
                 feed_data_url = get_feed_full_url(
-                    feed_requested.get("feedname"),
+                    api_key[1],
                     (feed_requested.get("url").get("url")),
                 )
             else:
@@ -152,6 +188,16 @@ class Command(BaseCommand):
             feed.feed_data = feed_data_request.json()
 
             feed.save()
+
+            if feed_requested.get("needapikey") and not api_key[0]:
+                self.stdout.write(
+                    self.style.WARNING(
+                        f"No API key for {feed_requested.get('feedname')} found in database."
+                    )
+                )
+                APIKey.objects.create(
+                    feed=feed, key=(api_key[1] if api_key[1] is not None else "")
+                )
 
             try:
                 feeds_prior.remove(feed_requested.get("feedname"))
