@@ -1,12 +1,15 @@
 import os
 import re
-from datetime import date, datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Literal, Optional, TypedDict, Union
+from zoneinfo import ZoneInfo
 
 import requests
 from dashboard.models import APIKey, Feed
 from django.contrib.gis.geos import Point
 from django.core.management.base import BaseCommand, CommandError
+
+eastern_tz = ZoneInfo("America/New_York")
 
 
 class PointJSON(TypedDict):
@@ -122,9 +125,13 @@ class Command(BaseCommand):
                 feed_requested.get("datafeed_frequency_update")
             )
             feed.version = feed_requested.get("version")
-            feed.sdate = datetime.fromisoformat(feed_requested.get("sdate")).date()
+            feed.sdate = datetime.fromisoformat(feed_requested.get("sdate")).replace(
+                tzinfo=eastern_tz
+            )
             feed.edate = (
-                datetime.fromisoformat(feed_requested.get("edate") or "").date()
+                datetime.fromisoformat(feed_requested.get("edate") or "").replace(
+                    tzinfo=eastern_tz
+                )
                 if feed_requested.get("edate")
                 else None
             )
