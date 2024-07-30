@@ -33,7 +33,7 @@ class Feed(models.Model):
 
     # The following fields are needed for data processing
     last_checked = models.DateTimeField("Last Updated", auto_now=True)
-    feed_data = models.JSONField("Feed Data")
+    feed_data = models.JSONField("Feed Data", default=dict)
 
     def __str__(self):
         return self.issuingorganization
@@ -50,7 +50,7 @@ class FeedError(models.Model):
 
 class APIKey(models.Model):
     feed = models.OneToOneField(Feed, on_delete=models.CASCADE, primary_key=True)
-    key = models.TextField()
+    key = models.TextField(default="")
 
     def __str__(self):
         return f"{self.feed.feedname.upper()}={self.key}"

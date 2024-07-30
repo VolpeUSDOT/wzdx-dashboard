@@ -41,9 +41,12 @@ def get_api_key(feed_name: str):
     try:
         api_key = APIKey.objects.get(feed__pk=feed_name).key
         in_db = True
+        if not api_key:
+            in_db = False
+            api_key = os.environ.get(feed_name)
     except APIKey.DoesNotExist:
         api_key = os.environ.get(feed_name)
-        in_db = False
+        in_db = None
 
     return (in_db, api_key)
 
@@ -89,7 +92,12 @@ class Command(BaseCommand):
 
         try:
             datahub_request = requests.get(
-                "https://data.transportation.gov/resource/69qe-yiui.json", timeout=20
+                "https://data.transportation.gov/resource/69qe-yiui.json",
+                timeout=20,
+                headers={
+                    "X-App-Token": os.environ.get("DATAHUB_APP_TOKEN"),
+                    "Accept": "application/json",
+                },
             )
         except requests.exceptions.RequestException as e:
             raise CommandError(f"DataHub request failed: {e}")
@@ -97,6 +105,12 @@ class Command(BaseCommand):
         if datahub_request.status_code != requests.codes.ok:
             raise CommandError(
                 f"DataHub returned invalid request status code {datahub_request.status_code}"
+            )
+        else:
+            self.stdout.write(
+                self.style.HTTP_SUCCESS(
+                    f"DataHub returned a valid list of feeds! Scanning now..."
+                )
             )
 
         feeds_prior = [feed.feedname for feed in Feed.objects.all()]
@@ -109,7 +123,7 @@ class Command(BaseCommand):
                     raise CommandError("Could not find feedname.")
                 else:
                     self.stdout.write(
-                        self.style.NOTICE(
+                        self.style.SUCCESS(
                             f"New feed {feed_requested.get('feedname')} found!"
                         )
                     )
@@ -168,45 +182,43 @@ class Command(BaseCommand):
             else:
                 feed_data_url = feed_requested.get("url").get("url")
 
-            if feed_data_url is None:
-                self.stdout.write(
-                    self.style.WARNING(
-                        f"Could not find feed {feed_requested.get('feedname')} API key, skipping"
+            if feed_data_url is not None:
+                try:
+                    feed_data_request = requests.get(feed_data_url, timeout=20)
+                except requests.exceptions.RequestException as e:
+                    self.stdout.write(
+                        self.style.HTTP_BAD_REQUEST(
+                            f"Feed {feed_requested.get('feedname')} request failed: {e}"
+                        )
                     )
-                )
-                continue
-
-            try:
-                feed_data_request = requests.get(feed_data_url, timeout=20)
-            except requests.exceptions.RequestException as e:
-                self.stdout.write(
-                    self.style.ERROR(
-                        f"Feed {feed_requested.get('feedname')} request failed: {e}"
-                    )
-                )
-                continue
-
-            if feed_data_request.status_code != requests.codes.ok:
-                self.stdout.write(
-                    self.style.ERROR(
-                        f"Feed {feed_requested.get('feedname')} returned invalid request status code: {feed_data_request.url}"
-                    )
-                )
-                continue
-
-            feed.feed_data = feed_data_request.json()
+                else:
+                    if feed_data_request.status_code != requests.codes.ok:
+                        self.stdout.write(
+                            self.style.HTTP_BAD_REQUEST(
+                                f"Feed {feed_requested.get('feedname')} returned invalid request status code: {feed_data_request.url}"
+                            )
+                        )
+                    else:
+                        feed.feed_data = feed_data_request.json()
 
             feed.save()
 
-            if feed_requested.get("needapikey") and not api_key[0]:
+            if feed_requested.get("needapikey") and api_key[0] is None:
                 self.stdout.write(
                     self.style.WARNING(
                         f"No API key for {feed_requested.get('feedname')} found in database."
                     )
                 )
-                APIKey.objects.create(
-                    feed=feed, key=(api_key[1] if api_key[1] is not None else "")
+                APIKey.objects.create(feed=feed, key=(api_key[1] or ""))
+            elif feed_requested.get("needapikey") and not api_key[0] and api_key[1]:
+                self.stdout.write(
+                    self.style.WARNING(
+                        f"No API key for {feed_requested.get('feedname')} found in database, adding from environment."
+                    )
                 )
+                api_key_object = APIKey.objects.get(feed=feed)
+                api_key_object.key = api_key[1]
+                api_key_object.save()
 
             try:
                 feeds_prior.remove(feed_requested.get("feedname"))
