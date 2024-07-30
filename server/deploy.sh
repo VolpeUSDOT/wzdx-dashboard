@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BASE_DIR="/var/www/wzdx-dashboard"
+BASE_DIR="/var/www/html/wzdx-dashboard"
 cd $BASE_DIR || exit
 
 git pull
