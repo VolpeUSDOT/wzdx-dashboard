@@ -10,4 +10,6 @@ cd $BASE_DIR/project || exit | exit
 
 python3 manage.py makemigrations
 python3 manage.py migrate
-python3 manage.py collectstatic
+python3 manage.py collectstatic --noinput --clear
+
+systemctl restart gunicorn

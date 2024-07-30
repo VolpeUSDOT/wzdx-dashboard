@@ -1,0 +1,22 @@
+{
+  "name": "wzdx-dashboard",
+  "version": "1.0.0",
+  "description": "Internal dashboard for monitoring WZDx Feeds",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VolpeUSDOT/wzdx-dashboard.git"
+  },
+  "author": "Diego Temkin",
+  "license": "SEE LICENSE IN LICENSE",
+  "bugs": {
+    "url": "https://github.com/VolpeUSDOT/wzdx-dashboard/issues"
+  },
+  "homepage": "https://github.com/VolpeUSDOT/wzdx-dashboard#readme"
+}

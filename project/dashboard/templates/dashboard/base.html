@@ -10,13 +10,13 @@
       WZDx Dashboard - {% block title %}{% endblock %}
     </title>
 
-    <script src="{% static 'uswds/dist/js/uswds-init.min.js' %}"></script>
+    <script src="{% static 'uswds/js/uswds-init.min.js' %}"></script>
     <script src="{% static 'js/main.js' %}"></script>
     <link rel="stylesheet" href="{% static 'css/main.css' %}" type="text/css" />
-    <link rel="stylesheet" href="{% static 'uswds/dist/css/uswds.min.css' %}" type="text/css" />
+    <link rel="stylesheet" href="{% static 'uswds/css/uswds.min.css' %}" type="text/css" />
   </head>
   <body>
-    <script src="{% static 'uswds/dist/js/uswds.min.js' %}"></script>
+    <script src="{% static 'uswds/js/uswds.min.js' %}"></script>
     <a class="usa-skipnav" href="#main-content">Skip to main content</a>
     {%if ".gov" in request.get_host %}{% include "components/banner.html" %}{% endif %}
     {% include "components/header.html" %}
