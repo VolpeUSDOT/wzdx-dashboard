@@ -41,8 +41,11 @@ INSTALLED_APPS = [
     "django.contrib.humanize",
     "django.contrib.gis",
     "django.forms",
+    "rest_framework",
+    "rest_framework_gis",
     "docs.apps.DocsConfig",
     "dashboard.apps.DashboardConfig",
+    "api.apps.ApiConfig",
 ]
 
 MIDDLEWARE = [

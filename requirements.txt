@@ -3,3 +3,6 @@ requests==2.25.1
 psycopg[binary]==3.2.1
 tzdata==2024.1
 markdown==3.6
+djangorestframework==3.15.2
+djangorestframework-gis==1.0
+django-filter==24.2

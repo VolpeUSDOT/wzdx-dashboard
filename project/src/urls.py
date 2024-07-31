@@ -23,5 +23,6 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("feeds/", include("dashboard.urls")),
     path("docs/", include("docs.urls")),
+    path("api/", include("api.api")),
     path("", RedirectView.as_view(url="feeds/")),
 ]
