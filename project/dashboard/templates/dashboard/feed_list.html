@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% load humanize %}
+
+{% load static %}
+
+{% block title %}Home{% endblock %}
+
+{% block head%}
+<link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet/dist/leaflet.css"
+      crossorigin=""/>
+<script
+    src="https://unpkg.com/leaflet/dist/leaflet.js"
+    crossorigin=""></script>
+{% endblock%}
+
+{% block pagecontent %}
+
+<script defer src="{% static '/dashboard/feedsmap.js' %}"></script>
+<div class="grid-container">
+    <div class="grid-row grid-gap">
+        <main
+            class="desktop:grid-col flex-6" id="main-content"
+        >
+        <div style="overflow-x: auto">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th scope="col">Issuing Organization</th>
+                        <th scope="col">Feed Name</th>
+                        <th scope="col">Version</th>
+                        <th scope="col">Start Date</th>
+                        <th scope="col">Last Updated</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for feed in page_obj %}
+                        <tr>
+                            <td>{{ feed.issuingorganization }}</td>
+                            <td>{{ feed.feedname }}</td>
+                            <td>{{ feed.version }}</td>
+                            <td>{{ feed.sdate|naturaltime }}</td>
+                            <td>{{ feed.last_checked|naturaltime }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if is_paginated%}
+        <div class="table-paging">
+                {% if page_obj.has_previous %}
+                    <button onclick="location.href='?page={{ page_obj.previous_page_number }}'" class="table-paging-btn table-paging-prev" id="table-paging-prev-btn">&lt;</button>
+                {% else %}
+                    <button disabled class="table-paging-btn table-paging-prev" id="table-paging-prev-btn">&lt;</button>
+                {% endif %}
+
+                {% for page_num in page_range %}
+                    <button
+                        id="table-paging-btn"
+                        class="table-paging-btn table-paging-btn {% if page_num == page_obj.number %}table-paging-btn-active{% endif %}"
+                        onclick="location.href='?page={{ page_num }}'"
+                    > {{ page_num }}
+                </button>
+                {% endfor %}
+        
+                {% if page_obj.has_next %}
+                    <button onclick="location.href='?page={{ page_obj.next_page_number }}'" class="table-paging-btn table-paging-next" id="table-paging-next-btn">&gt;</button>
+                {% else %}
+                    <button disabled class="table-paging-btn table-paging-next" id="table-paging-next-btn">&gt;</button>
+                {% endif %}
+        </div>
+        {% endif %}
+        </main>
+        <div class="display-none desktop:display-block desktop:grid-col flex-6">
+            <div id="map" style="height: 100%; width: 100%"></div>
+        </div>
+        {% comment %} <div class="display-block desktop:display-none">
+            <div id="map" style="height: 200px; width: 100%"></div>
+        </div> {% endcomment %}
+    </div>
+</div>
+{% endblock %}
