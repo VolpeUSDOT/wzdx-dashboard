@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BASE_DIR="/var/www/wzdx-dashboard"
+BASE_DIR="/var/www/html/wzdx-dashboard"
 cd $BASE_DIR || exit
 
 git pull
@@ -10,4 +10,6 @@ cd $BASE_DIR/project || exit | exit
 
 python3 manage.py makemigrations
 python3 manage.py migrate
-python3 manage.py collectstatic
+python3 manage.py collectstatic --noinput --clear
+
+systemctl restart gunicorn
