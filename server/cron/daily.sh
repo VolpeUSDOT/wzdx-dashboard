@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BASE_DIR="/var/www/wzdx-dashboard"
-cd $BASE_DIR || exit
+PROJECT_PATH="/var/www/wzdx-dashboard/project"
+cd $PROJECT_PATH || exit
 
 python3 manage.py syncdatahub
