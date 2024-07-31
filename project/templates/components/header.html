@@ -76,33 +76,24 @@
           </ul>
         </li> {% endcomment %}
         <li class="usa-nav__primary-item">
-          <a href="/" class="usa-nav-link{% if request.path == '/'%} usa-current{%endif%}" 
+          <a href="/feeds/" class="usa-nav-link{% if '/feeds/' in request.path %} usa-current{%endif%}" 
             ><span>Home</span></a
           >
         </li>
+        <li class="usa-nav__primary-item">
+          <a href="/docs/" class="usa-nav-link{% if '/docs/' in request.path %} usa-current{%endif%}" 
+            ><span>Docs</span></a
+          >
+        </li>
       </ul>
+      {% if form %}
       <div class="usa-nav__secondary">
         <ul class="usa-nav__secondary-links"></ul>
         <section aria-label="Search component">
-          <form class="usa-search usa-search--small" role="search">
-            <label class="usa-sr-only" for="search-field">Search</label>
-            <input
-              class="usa-input"
-              id="search-field"
-              type="search"
-              name="search"
-              placeholder="Find a feed!"
-            />
-            <button class="usa-button" type="submit">
-              <img
-                src="{% static '/uswds/img/usa-icons-bg/navigate_next--white.svg' %}"
-                class="usa-search__submit-icon"
-                alt="Search"
-              />
-            </button>
-          </form>
+          {{ form }}
         </section>
       </div>
+      {% endif %}
     </div>
   </nav>
 </header>

@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.humanize",
     "django.contrib.gis",
+    "django.forms",
+    "docs.apps.DocsConfig",
     "dashboard.apps.DashboardConfig",
 ]
 
@@ -58,7 +60,7 @@ ROOT_URLCONF = "src.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [os.path.join(BASE_DIR, "templates")],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -139,3 +141,5 @@ except ImportError:
 
 if SECRET_KEY is None:
     raise KeyError("SECRET_KEY")
+
+FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
