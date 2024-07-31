@@ -89,6 +89,10 @@ class Command(BaseCommand):
     help = "Syncs every entry in Feed with the current feeds on https://data.transportation.gov/d/69qe-yiui/"
 
     def handle(self, *args, **options):
+        if os.environ.get("DATAHUB_APP_TOKEN") is None:
+            self.stdout.write(
+                self.style.HTTP_SUCCESS(f"No app token found for DataHub.")
+            )
 
         try:
             datahub_request = requests.get(
