@@ -8,12 +8,15 @@ class MarkdownContent(models.Model):
     intro = models.TextField(blank=True)
     content = models.TextField()
     slug = models.SlugField(blank=True, unique=True)
+    id = models.BigAutoField(
+        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+    )
 
     class Meta:
         verbose_name_plural = "Markdown content"
 
     def __str__(self):
-        return self.title
+        return f"{self.id}-{self.title}"
 
     def check_slug_equal(self, string: str):
         return self.slug == string

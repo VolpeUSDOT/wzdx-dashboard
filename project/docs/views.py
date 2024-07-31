@@ -12,12 +12,16 @@ class Lower(Func):
 
 def docs(request, docspage=""):
     markdown_content = get_object_or_404(MarkdownContent, slug=docspage)
-    all_docs = MarkdownContent.objects.annotate(
-        current_page=ExpressionWrapper(
-            Q(slug__exact=docspage),
-            BooleanField(),
+    all_docs = (
+        MarkdownContent.objects.annotate(
+            current_page=ExpressionWrapper(
+                Q(slug__exact=docspage),
+                BooleanField(),
+            )
         )
-    ).values("title", "slug", "current_page")
+        .values("title", "slug", "current_page")
+        .order_by("id")
+    )
 
     context = {
         "markdown_content": markdown_content,
