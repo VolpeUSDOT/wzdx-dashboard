@@ -20,10 +20,10 @@
     <a class="usa-skipnav" href="#main-content">Skip to main content</a>
     {%if ".gov" in request.get_host %}{% include "components/banner.html" %}{% endif %}
     {% include "components/header.html" %}
-    <main id="main-content">
-        {% block pagecontent %}
-        {% endblock %}
-    </main>
+
+    {% block pagecontent %}
+    {% endblock %}
+
     {% include "components/footer.html" %}
   </body>
 </html>
