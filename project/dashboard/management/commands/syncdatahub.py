@@ -90,9 +90,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if os.environ.get("DATAHUB_APP_TOKEN") is None:
-            self.stdout.write(
-                self.style.HTTP_SUCCESS(f"No app token found for DataHub.")
-            )
+            self.stdout.write(self.style.WARNING(f"No app token found for DataHub."))
 
         try:
             datahub_request = requests.get(
