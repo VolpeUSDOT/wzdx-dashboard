@@ -1,0 +1,2 @@
+# Set scripts executable 
+*.sh text eol=lf executable
