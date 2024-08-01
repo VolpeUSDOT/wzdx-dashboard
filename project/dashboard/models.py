@@ -35,6 +35,9 @@ class Feed(models.Model):
     last_checked = models.DateTimeField("Last Updated", auto_now=True)
     feed_data = models.JSONField("Feed Data", default=dict)
 
+    class Meta:
+        ordering = ["sdate"]
+
     def __str__(self):
         return self.issuingorganization
 
