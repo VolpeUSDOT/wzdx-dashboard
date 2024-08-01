@@ -174,8 +174,8 @@ class FeedError(models.Model):
 
 
 class SchemaError(FeedError):
-    schema_error_type = models.CharField(_("Schema Error Type"), max_length=50)
-    schema_error_field = models.CharField(_("Schema Error Field"), max_length=50)
+    schema_error_type = models.CharField(_("Schema Error Type"), max_length=150)
+    schema_error_field = models.CharField(_("Schema Error Field"), max_length=150)
 
     class Meta:
         verbose_name_plural = _("schema errors")
