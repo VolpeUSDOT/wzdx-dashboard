@@ -1,4 +1,4 @@
-from django.contrib.gis.db.models import Field
+from django.contrib.gis.db.models import Max, OuterRef, Subquery
 from django.core.paginator import Page, Paginator
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render
@@ -7,30 +7,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView
 
 from .forms import SearchForm
-from .models import Feed
-
-# Create your views here.
-# @csrf_exempt
-# def index(request):
-#     headers = [
-#         field.verbose_name  # type: ignore
-#         for field in Feed._meta.get_fields()
-#         if issubclass(type(field), Field)
-#     ]
-#     feed_list = Paginator(Feed.objects.order_by("sdate").values(), 10)
-
-#     if request.method == "POST":
-#         form = SearchForm(request.POST)
-#         feed_redirect = form.data["feed_to_find"]
-
-#         return HttpResponseRedirect(f"/feeds/{feed_redirect}")
-#     else:
-#         form = SearchForm()
-#         rendered_form = form.render()  # type: ignore
-
-#     context = {"feeds": feed_list, "headers": headers, "form": rendered_form}
-
-#     return render(request, "dashboard/index.html", context)
+from .models import Feed, FeedStatus
 
 
 def get_page_button_array(paginator: Paginator, page: Page):

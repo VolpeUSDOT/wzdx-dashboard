@@ -4,6 +4,8 @@
 
 {% load humanize_extra %}
 
+{% load feedstatus %}
+
 {% load static %}
 
 {% load leaflet_tags %}
@@ -29,7 +31,7 @@
         const layerGroup = L.layerGroup().addTo(map);
       
         async function load_points() {
-          const points_url = `/api/feedpoints/?in_bbox=${map
+          const points_url = `/api/points/?in_bbox=${map
             .getBounds()
             .toBBoxString()}`;
           const response = await fetch(points_url);
@@ -72,9 +74,9 @@
                         <tr>
                             <td>{{ feed.state|title }}</td>
                             <td>{{ feed.issuingorganization }}</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
+                            <td class="{% if feed.status == "OK" %}text-green{% else %}text-red{% endif %}">{{ feed.status|get_status_label|upper }}</td>
+                            <td>{{ feed.status_details }}</td>
+                            <td>{{ feed.status_last_checked|naturaltime }}</td>
                             <td>{{ feed.datafeed_frequency_update|precisedelta }}</td>
                             <td>{{ feed.version }}</td>
                             <td>{{ feed.last_checked|naturaltime }}</td>
