@@ -1,6 +1,12 @@
 {% extends 'base.html' %}
 
+{% load static %}
+
 {% load markdown_cleaner %}
+
+{% block head%}
+<link rel="stylesheet" type="text/css" href="{% static 'docs/styles.css' %}">
+{% endblock %}
 
 {% block title %}{{ markdown_content.title }}{% endblock %}
 

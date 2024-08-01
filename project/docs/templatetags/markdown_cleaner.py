@@ -6,7 +6,7 @@ from docs.markdown_extensions import SlugFieldExtension
 
 register = template.Library()
 
-MD_EXTENSIONS = ["fenced_code", "toc", SlugFieldExtension()]
+MD_EXTENSIONS = ["fenced_code", "toc", "codehilite", SlugFieldExtension()]
 
 
 @register.filter

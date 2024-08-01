@@ -55,11 +55,6 @@ class FeedListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["headers"] = [
-            field.verbose_name  # type: ignore
-            for field in Feed._meta.get_fields()
-            if issubclass(type(field), Field)
-        ]
         context["page_range"] = get_page_button_array(
             context["paginator"], context["page_obj"]
         )

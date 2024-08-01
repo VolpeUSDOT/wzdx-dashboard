@@ -6,3 +6,4 @@ markdown==3.6
 djangorestframework==3.15.2
 djangorestframework-gis==1.0
 django-filter==24.2
+Pygments==2.18.0
