@@ -2,6 +2,8 @@
 
 {% load humanize %}
 
+{% load humanize_extra %}
+
 {% load static %}
 
 {% load leaflet_tags %}
@@ -68,12 +70,12 @@
                 <tbody>
                     {% for feed in page_obj %}
                         <tr>
-                            <td>{{ feed.state }}</td>
+                            <td>{{ feed.state|title }}</td>
                             <td>{{ feed.issuingorganization }}</td>
                             <td></td>
                             <td></td>
                             <td></td>
-                            <td>{{ feed.datafeed_frequency_update }}</td>
+                            <td>{{ feed.datafeed_frequency_update|precisedelta }}</td>
                             <td>{{ feed.version }}</td>
                             <td>{{ feed.last_checked|naturaltime }}</td>
                         </tr>
