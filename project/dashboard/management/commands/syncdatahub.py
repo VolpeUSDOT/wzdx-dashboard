@@ -5,6 +5,7 @@ from typing import Literal, Optional, TypedDict, Union
 from zoneinfo import ZoneInfo
 
 import requests
+import semver
 from dashboard.models import APIKey, Feed
 from django.contrib.gis.geos import Point
 from django.core.management.base import BaseCommand, CommandError
@@ -140,7 +141,12 @@ class Command(BaseCommand):
             feed.datafeed_frequency_update = parse_time(
                 feed_requested.get("datafeed_frequency_update")
             )
-            feed.version = feed_requested.get("version")
+            feed.version = str(
+                semver.Version.parse(
+                    feed_requested.get("version"), optional_minor_and_patch=True
+                )
+            )[0:3]
+
             feed.sdate = (
                 datetime.fromisoformat(feed_requested.get("sdate"))
                 .replace(tzinfo=eastern_tz)

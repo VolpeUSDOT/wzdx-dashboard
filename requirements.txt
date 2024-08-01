@@ -9,3 +9,6 @@ django-filter==24.2
 Pygments==2.18.0
 django-leaflet==0.30.1
 humanize==4.10.0
+jsonschema==4.23.0
+semver==3.0.2
+iso8601==2.1.0
