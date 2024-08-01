@@ -19,8 +19,8 @@ class Feed(models.Model):
         "Datafeed Update Frequency", null=True
     )
     version = models.TextField("Version")
-    sdate = models.DateTimeField("Start Date")
-    edate = models.DateTimeField("End Date", null=True)
+    sdate = models.DateField("Start Date")
+    edate = models.DateField("End Date", null=True)
     needapikey = models.BooleanField("Need API Key")
     apikeyurl = models.URLField("API Key URL", null=True)
     pipedtosandbox = models.BooleanField("Piped to Sandbox")
