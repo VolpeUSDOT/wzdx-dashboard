@@ -76,21 +76,30 @@ class Feed(models.Model):
 
     @property
     def status(self):
-        try:
-            return FeedStatus.objects.filter(feed=self)[0].status_type
-        except FeedStatus.DoesNotExist:
+        status = FeedStatus.objects.filter(feed=self).first()
+
+        if status is None:
             return ""
+
+        return status.status_type
 
     @property
     def status_last_checked(self):
-        return FeedStatus.objects.filter(feed=self)[0].datetime_checked
+        status = FeedStatus.objects.filter(feed=self).first()
+
+        if status is None:
+            return ""
+
+        return status.datetime_checked
 
     @property
     def status_details(self):
-        try:
-            return FeedStatus.objects.filter(feed=self)[0].details
-        except FeedStatus.DoesNotExist:
+        status = FeedStatus.objects.filter(feed=self).first()
+
+        if status is None:
             return ""
+
+        return status.details
 
 
 class FeedStatus(models.Model):
@@ -140,20 +149,27 @@ class FeedStatus(models.Model):
                 .annotate(
                     count=Count("schema_error_type", output_field=models.IntegerField())
                 )
-                .order_by("-count")[0]
-                .schema_error_type
+                .order_by("-count")
+                .first()
             )
+            if most_common_error is None:
+                return "No errors were found."
             schema_error_count = SchemaError.objects.filter(
-                schema_error_type=most_common_error
+                schema_error_type=most_common_error.schema_error_type
             ).count()
-            return f"Schema error detected! The most common error is: {most_common_error}. This error appeared {schema_error_count} time{'s' if schema_error_count > 1 else ''}."  # type: ignore
+            return f"Schema error detected! The most common error is: {most_common_error.schema_error_type}. This error appeared {schema_error_count} time{'s' if schema_error_count > 1 else ''}."  # type: ignore
         elif self.status_type == self.StatusType.OUTDATED:
-            return f"Event data last updated: {humanize.naturaldate(OutdatedError.objects.filter(error_status=self)[0].update_date)}"
+            outdated_error = OutdatedError.objects.filter(error_status=self).first()
+            if outdated_error is None:
+                return "Feed is not outdated."
+            return f"Event data last updated: {humanize.naturaldate(outdated_error.update_date)}"
         elif self.status_type == self.StatusType.STALE:
-            stale_error = StaleError.objects.filter(error_status=self)[0]
+            stale_error = StaleError.objects.filter(error_status=self).first()
+            if stale_error is None:
+                return "Feed is not stale."
             return f" {stale_error.amount_events_before_end_date} events have ended over 14 days ago."
         elif self.status_type == self.StatusType.OFFLINE:
-            return "Feed unreachable at URL"
+            return "Feed unreachable at URL."
         return ""
 
     class Meta:
@@ -174,8 +190,8 @@ class FeedError(models.Model):
 
 
 class SchemaError(FeedError):
-    schema_error_type = models.CharField(_("Schema Error Type"), max_length=150)
-    schema_error_field = models.CharField(_("Schema Error Field"), max_length=150)
+    schema_error_type = models.TextField(_("Schema Error Type"), blank=True)
+    schema_error_field = models.TextField(_("Schema Error Field"), blank=True)
 
     class Meta:
         verbose_name_plural = _("schema errors")
