@@ -4,21 +4,48 @@
 
 {% load static %}
 
+{% load leaflet_tags %}
+
 {% block title %}Home{% endblock %}
 
 {% block head%}
-<link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet/dist/leaflet.css"
-      crossorigin=""/>
-<script
-    src="https://unpkg.com/leaflet/dist/leaflet.js"
-    crossorigin=""></script>
+    {% leaflet_js %}
+    {% leaflet_css %}
 {% endblock%}
 
 {% block pagecontent %}
 
-<script defer src="{% static '/dashboard/feedsmap.js' %}"></script>
+<script>
+    function map_init(map, options) {
+        
+        const mapBounds = L.latLngBounds([
+            [37.09024, -125.001650],
+            [49.384358, -66.934570]
+        ]);
+        map.fitBounds(mapBounds);
+      
+        const layerGroup = L.layerGroup().addTo(map);
+      
+        async function load_points() {
+          const points_url = `/api/feedpoints/?in_bbox=${map
+            .getBounds()
+            .toBBoxString()}`;
+          const response = await fetch(points_url);
+          const geojson = await response.json();
+          return geojson;
+        }
+      
+        async function render_points() {
+          const points = await load_points();
+          layerGroup.clearLayers();
+          L.geoJSON(points)
+            .bindPopup((layer) => layer.feature.properties.issuingorganization)
+            .addTo(layerGroup);
+        }
+      
+        map.on("moveend", render_points);
+      }      
+</script>
 <div class="grid-container">
     <div class="grid-row grid-gap">
         <main
@@ -28,20 +55,26 @@
             <table class="data-table">
                 <thead>
                     <tr>
+                        <th scope="col">State</th>
                         <th scope="col">Issuing Organization</th>
-                        <th scope="col">Feed Name</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Detailed Status</th>
+                        <th scope="col">Status Since</th>
+                        <th scope="col">Update Frequency</th>
                         <th scope="col">Version</th>
-                        <th scope="col">Start Date</th>
-                        <th scope="col">Last Updated</th>
+                        <th scope="col">Last Pulled</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for feed in page_obj %}
                         <tr>
+                            <td>{{ feed.state }}</td>
                             <td>{{ feed.issuingorganization }}</td>
-                            <td>{{ feed.feedname }}</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>{{ feed.datafeed_frequency_update }}</td>
                             <td>{{ feed.version }}</td>
-                            <td>{{ feed.sdate|naturaltime }}</td>
                             <td>{{ feed.last_checked|naturaltime }}</td>
                         </tr>
                     {% endfor %}
@@ -51,30 +84,31 @@
         {% if is_paginated%}
         <div class="table-paging">
                 {% if page_obj.has_previous %}
-                    <button onclick="location.href='?page={{ page_obj.previous_page_number }}'" class="table-paging-btn table-paging-prev" id="table-paging-prev-btn">&lt;</button>
+                    <a href="?page={{ page_obj.previous_page_number }}" class="table-paging-btn table-paging-prev btn" id="table-paging-prev-btn">&lt;</a>
                 {% else %}
-                    <button disabled class="table-paging-btn table-paging-prev" id="table-paging-prev-btn">&lt;</button>
+                    <a href="#" class="table-paging-btn table-paging-prev btn btn-disabled" id="table-paging-prev-btn">&lt;</a>
                 {% endif %}
 
                 {% for page_num in page_range %}
-                    <button
+                    <a
                         id="table-paging-btn"
-                        class="table-paging-btn table-paging-btn {% if page_num == page_obj.number %}table-paging-btn-active{% endif %}"
-                        onclick="location.href='?page={{ page_num }}'"
+                        class="btn table-paging-btn table-paging-btn {% if page_num == page_obj.number %}table-paging-btn-active{% endif %}"
+                        href="?page={{ page_num }}"
                     > {{ page_num }}
-                </button>
+                    </a>
                 {% endfor %}
         
                 {% if page_obj.has_next %}
-                    <button onclick="location.href='?page={{ page_obj.next_page_number }}'" class="table-paging-btn table-paging-next" id="table-paging-next-btn">&gt;</button>
+                    <a href="?page={{ page_obj.next_page_number }}" class="btn table-paging-btn table-paging-next" id="table-paging-next-btn">&gt;</a>
                 {% else %}
-                    <button disabled class="table-paging-btn table-paging-next" id="table-paging-next-btn">&gt;</button>
+                    <a href="#" class="btn btn-disabled table-paging-btn table-paging-next" id="table-paging-next-btn">&gt;</a>
                 {% endif %}
         </div>
         {% endif %}
         </main>
         <div class="display-none desktop:display-block desktop:grid-col flex-6">
-            <div id="map" style="height: 100%; width: 100%"></div>
+            {% comment %} <div id="map" style="height: 100%; width: 100%"></div> {% endcomment %}
+            {% leaflet_map "feed_map" callback="window.map_init" %}
         </div>
         {% comment %} <div class="display-block desktop:display-none">
             <div id="map" style="height: 200px; width: 100%"></div>

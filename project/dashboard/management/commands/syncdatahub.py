@@ -141,13 +141,15 @@ class Command(BaseCommand):
                 feed_requested.get("datafeed_frequency_update")
             )
             feed.version = feed_requested.get("version")
-            feed.sdate = datetime.fromisoformat(feed_requested.get("sdate")).replace(
-                tzinfo=eastern_tz
+            feed.sdate = (
+                datetime.fromisoformat(feed_requested.get("sdate"))
+                .replace(tzinfo=eastern_tz)
+                .date()
             )
             feed.edate = (
-                datetime.fromisoformat(feed_requested.get("edate") or "").replace(
-                    tzinfo=eastern_tz
-                )
+                datetime.fromisoformat(feed_requested.get("edate") or "")
+                .replace(tzinfo=eastern_tz)
+                .date()
                 if feed_requested.get("edate")
                 else None
             )

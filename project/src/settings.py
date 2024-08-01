@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "django.forms",
     "rest_framework",
     "rest_framework_gis",
+    "leaflet",
     "docs.apps.DocsConfig",
     "dashboard.apps.DashboardConfig",
     "api.apps.ApiConfig",
