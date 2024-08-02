@@ -1,7 +1,11 @@
-import humanize
+from datetime import datetime
+from time import timezone
+
 from django.contrib.gis.db import models
 from django.contrib.gis.db.models import Count
+from django.db import models as normal_models
 from django.utils.translation import gettext_lazy as _
+from model_utils.managers import InheritanceManager
 
 # Create your models here.
 
@@ -98,55 +102,69 @@ class Feed(models.Model):
         return events
 
     @property
-    def status(self):
+    def feed_status(self):
         status = FeedStatus.objects.filter(feed=self).first()
 
         if status is None:
-            return ""
+            return None
 
-        return status.status_type
+        if hasattr(status, "okstatus") and type(status.okstatus) is OKStatus:  # type: ignore
+            return status.okstatus  # type: ignore
 
-    @property
-    def status_last_checked(self):
-        status = FeedStatus.objects.filter(feed=self).first()
+        if (
+            hasattr(status, "schemaerrorstatus")
+            and type(status.schemaerrorstatus) is SchemaErrorStatus  # type: ignore
+        ):
+            return status.schemaerrorstatus  # type: ignore
 
-        if status is None:
-            return ""
+        if (
+            hasattr(status, "outdatederrorstatus")
+            and type(status.outdatederrorstatus) is OutdatedErrorStatus  # type: ignore
+        ):
+            return status.outdatederrorstatus  # type: ignore
 
-        return status.datetime_checked
+        if (
+            hasattr(status, "staleerrorstatus")
+            and type(status.staleerrorstatus) is StaleErrorStatus  # type: ignore
+        ):
+            return status.staleerrorstatus  # type: ignore
 
-    @property
-    def status_details(self):
-        status = FeedStatus.objects.filter(feed=self).first()
+        if (
+            hasattr(status, "offlineerrorstatus")
+            and type(status.offlineerrorstatus) is OfflineErrorStatus  # type: ignore
+        ):
+            return status.offlineerrorstatus  # type: ignore
 
-        if status is None:
-            return ""
-
-        return status.details
+        return None
 
 
 class FeedStatus(models.Model):
-    feed = models.ForeignKey(
-        Feed,
-        on_delete=models.CASCADE,
-    )
+    """Base class for Feed Errors. To be inherited by schema, outdated, stale, etc errors."""
 
     class StatusType(models.TextChoices):
+        NULL = "NA", ("null")
         OK = "OK", _("ok")
         ERROR = "ER", _("error")
         OUTDATED = "OU", _("outdated")
         STALE = "ST", _("stale")
         OFFLINE = "OF", _("offline")
 
+    feed = models.ForeignKey(
+        Feed,
+        on_delete=models.CASCADE,
+    )
+
     status_type = models.CharField(
         max_length=2,
         choices=StatusType.choices,
-        default=StatusType.OK,
+        default=StatusType.NULL,
     )
 
     datetime_checked = models.DateTimeField(
         auto_now_add=True,
     )
+
+    status_since = models.DateTimeField(auto_now_add=True)
 
     notif_sent = models.BooleanField(default=False)
 
@@ -164,75 +182,92 @@ class FeedStatus(models.Model):
 
     @property
     def details(self):
-        """Detailed status..."""
-        if self.status_type == self.StatusType.OK:
-            events = self.feed.work_zone_events
-            return f"All good! {len(events)} work zone events."
-        elif self.status_type == self.StatusType.ERROR:
-            most_common_error = (
-                SchemaError.objects.filter(error_status=self)
-                .annotate(
-                    count=Count("schema_error_type", output_field=models.IntegerField())
-                )
-                .order_by("-count")
-                .first()
-            )
-            if most_common_error is None:
-                return "No errors were found."
-            most_common_error_count = SchemaError.objects.filter(
-                error_status=self, schema_error_type=most_common_error.schema_error_type
-            ).count()
-            total_schema_errors = SchemaError.objects.filter(error_status=self).count()
-            other_errors = total_schema_errors - most_common_error_count
-            return f"{most_common_error_count} event{'s' if most_common_error_count != 1 else ''} {'have' if most_common_error_count != 1 else 'has'} the following error: {most_common_error.schema_error_type}. There {'are' if other_errors != 1 else 'is'} {other_errors} other error{'s' if other_errors != 1 else ''}."
-        elif self.status_type == self.StatusType.OUTDATED:
-            outdated_error = OutdatedError.objects.filter(error_status=self).first()
-            if outdated_error is None:
-                return "Feed is not outdated."
-            return f"Event data last updated: {outdated_error.update_date.date().strftime('%x')}"
-        elif self.status_type == self.StatusType.STALE:
-            stale_error = StaleError.objects.filter(error_status=self).first()
-            if stale_error is None:
-                return "Feed is not stale."
-            return f"{stale_error.amount_events_before_end_date} events have ended over 14 days ago."
-        elif self.status_type == self.StatusType.OFFLINE:
-            return "Feed unreachable at URL."
-        return ""
+        return "No details available."
 
     class Meta:
         ordering = ["-datetime_checked"]
         verbose_name_plural = _("feed statuses")
 
 
-class FeedError(models.Model):
-    """Base class for Feed Errors. To be inherited by schema, outdated, stale, etc errors."""
+class OKStatus(FeedStatus):
+    def __init__(self, *args, **kwargs):
+        super(OKStatus, self).__init__(*args, **kwargs)
+        self.status_type = FeedStatus.StatusType.OK
 
+    def details(self):
+        events = self.feed.work_zone_events
+        return f"All good! {len(events)} work zone events."
+
+
+class SchemaErrorStatus(FeedStatus):
+    def __init__(self, *args, **kwargs):
+        super(SchemaErrorStatus, self).__init__(*args, **kwargs)
+        self.status_type = FeedStatus.StatusType.ERROR
+
+    @property
+    def most_common_validation_error(self):
+        return (
+            SchemaValidationError.objects.filter(error_status=self)
+            .annotate(count=Count("error_type"))
+            .order_by("-count")
+            .first()
+        )
+
+    @property
+    def details(self):
+        most_common_error = self.most_common_validation_error
+
+        if most_common_error is None:
+            return "No errors were found."
+
+        most_common_error_count = SchemaValidationError.objects.filter(
+            error_status=self, error_type=most_common_error.error_type
+        ).count()
+
+        total_schema_errors = SchemaValidationError.objects.filter(
+            error_status=self
+        ).count()
+        other_errors = total_schema_errors - most_common_error_count
+
+        return f"{most_common_error_count} event{'s' if most_common_error_count != 1 else ''} {'have' if most_common_error_count != 1 else 'has'} the following error: {most_common_error.error_type}. There {'are' if other_errors != 1 else 'is'} {other_errors if other_errors != 0 else 'no'} other error{'s' if other_errors != 1 else ''}."
+
+
+class SchemaValidationError(models.Model):
     error_status = models.ForeignKey(
-        FeedStatus,
+        SchemaErrorStatus,
         on_delete=models.CASCADE,
     )
+    error_type = models.TextField(_("Schema Error Type"), blank=True)
+    error_field = models.TextField(_("Schema Error Field"), blank=True)
+
+    def __str__(self):
+        return f"{self.error_type} at {self.error_field}"
 
     class Meta:
-        abstract = True
+        verbose_name_plural = _("schema status")
 
 
-class SchemaError(FeedError):
-    schema_error_type = models.TextField(_("Schema Error Type"), blank=True)
-    schema_error_field = models.TextField(_("Schema Error Field"), blank=True)
+class OutdatedErrorStatus(FeedStatus):
+    def __init__(self, *args, **kwargs):
+        super(OutdatedErrorStatus, self).__init__(*args, **kwargs)
+        self.status_type = FeedStatus.StatusType.OUTDATED
 
-    class Meta:
-        verbose_name_plural = _("schema errors")
-
-
-class OutdatedError(FeedError):
     update_date = models.DateTimeField(_("Outdated Update Date"))
+
+    @property
+    def details(self):
+        return f"Event data last updated: {self.update_date.date().strftime('%x')}"
 
     class Meta:
         ordering = ["-update_date"]
         verbose_name_plural = _("outdated errors")
 
 
-class StaleError(FeedError):
+class StaleErrorStatus(FeedStatus):
+    def __init__(self, *args, **kwargs):
+        super(StaleErrorStatus, self).__init__(*args, **kwargs)
+        self.status_type = FeedStatus.StatusType.STALE
+
     latest_end_date = models.DateTimeField(_("Stale End Date"))
     amount_events_before_end_date = models.PositiveIntegerField(
         _("Stale Events"), default=0
@@ -241,6 +276,22 @@ class StaleError(FeedError):
     class Meta:
         ordering = ["-latest_end_date"]
         verbose_name_plural = _("stale errors")
+
+    @property
+    def details(self):
+        return (
+            f"{self.amount_events_before_end_date} events have ended over 14 days ago."
+        )
+
+
+class OfflineErrorStatus(FeedStatus):
+    def __init__(self, *args, **kwargs):
+        super(OfflineErrorStatus, self).__init__(*args, **kwargs)
+        self.status_type = FeedStatus.StatusType.OFFLINE
+
+    @property
+    def details(self):
+        return "Feed unreachable at URL."
 
 
 class APIKey(models.Model):

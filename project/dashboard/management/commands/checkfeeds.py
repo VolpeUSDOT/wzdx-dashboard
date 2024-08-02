@@ -1,12 +1,21 @@
 import json
 import os
-from datetime import datetime, timedelta, timezone, tzinfo
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Optional, Sequence
 
 import iso8601
 import requests
-from dashboard.models import Feed, FeedStatus, OutdatedError, SchemaError, StaleError
+from dashboard.models import (
+    Feed,
+    FeedStatus,
+    OfflineErrorStatus,
+    OKStatus,
+    OutdatedErrorStatus,
+    SchemaErrorStatus,
+    SchemaValidationError,
+    StaleErrorStatus,
+)
 from django.core.management.base import BaseCommand
 from jsonschema import Draft7Validator, ValidationError
 from jsonschema.exceptions import best_match
@@ -60,6 +69,30 @@ def find_all_instances_key(
                 values_found += item
 
     return values_found
+
+
+def get_formatted_errors(errors: list[ValidationError], feedname: str):
+    error_list: list[tuple[str, str]] = []
+
+    for error in errors:
+        if error.context is None or len(error.context) == 0:
+            # No sub errors
+            error_list.append((error.message, format_as_index(feedname, error.path)))
+        else:
+            # Get most relevant suberror, save that
+            best_error: ValidationError = best_match(error.context)
+            if type(best_error) is ValidationError:
+                error_list.append(
+                    (
+                        best_error.message,
+                        format_as_index(
+                            format_as_index(feedname, error.path),
+                            best_error.path,
+                        ),
+                    )
+                )
+
+    return error_list
 
 
 # GET ALL SCHEMAS AND SAVE IN REGISTRY (minimizes time to analyze schema)
@@ -150,78 +183,68 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         for feed in Feed.objects.all():
             self.stdout.write(self.style.NOTICE(f"Checking {feed.feedname}..."))
-            feed_status = FeedStatus(feed=feed)
+            previous_status = feed.feed_status
 
             # OFFLINE
             if is_offline(feed):
                 self.stdout.write(
                     self.style.WARNING(f"Feed {feed.feedname} is offline.")
                 )
-                feed_status.status_type = FeedStatus.StatusType.OFFLINE
-                feed_status.save()
+                feed_status = OfflineErrorStatus.objects.create(feed=feed)
 
-                continue
-
-            # ERROR
-            errors = get_schema_errors(feed)
-            if len(errors) > 0:
-                self.stdout.write(
-                    self.style.WARNING(
-                        f"Feed {feed.feedname} has {len(errors)} error{'s' if len(errors) > 1 else ''}."
+            else:
+                # ERROR
+                errors = get_schema_errors(feed)
+                if len(errors) > 0:
+                    self.stdout.write(
+                        self.style.WARNING(
+                            f"Feed {feed.feedname} has {len(errors)} error{'s' if len(errors) > 1 else ''}."
+                        )
                     )
-                )
-                feed_status.status_type = FeedStatus.StatusType.ERROR
-                feed_status.save()
-                for error in errors:
-                    schema_error = SchemaError(error_status=feed_status)
-                    if error.context is None or len(error.context) == 0:
-                        # No sub errors
-                        schema_error.schema_error_type = error.message
-                        schema_error.schema_error_field = format_as_index(
-                            feed.feedname, error.path
+                    feed_status = SchemaErrorStatus.objects.create(feed=feed)
+                    for error_type, error_field in get_formatted_errors(
+                        errors, feed.feedname
+                    ):
+                        SchemaValidationError.objects.create(
+                            error_status=feed_status,
+                            error_type=error_type,
+                            error_field=error_field,
+                        )
+
+                else:
+                    # OUTDATED
+                    is_outdated, latest_update = outdated(feed)
+                    if is_outdated:
+                        self.stdout.write(
+                            self.style.WARNING(f"Feed {feed.feedname} is outdated.")
+                        )
+                        feed_status = OutdatedErrorStatus.objects.create(
+                            feed=feed, update_date=latest_update
                         )
                     else:
-                        # Get most relevant suberror, save that
-                        best_error: ValidationError = best_match(error.context)
-                        schema_error.schema_error_type = best_error.message
-                        schema_error.schema_error_field = format_as_index(
-                            format_as_index(feed.feedname, error.path),
-                            best_error.path,
-                        )
-                    schema_error.save()
-                continue
+                        # STALE
+                        stale_events = stale(feed)
+                        if len(stale_events) > 0:
+                            self.stdout.write(
+                                self.style.WARNING(f"Feed {feed.feedname} is stale.")
+                            )
+                            feed_status = StaleErrorStatus.objects.create(
+                                feed=feed,
+                                end_date=max(stale_events),
+                                amount_events_before_end_date=len(stale_events),
+                            )
+                        else:
+                            # OK!
+                            self.stdout.write(
+                                self.style.SUCCESS(f"Feed {feed.feedname} is ok.")
+                            )
+                            feed_status = OKStatus.objects.create(feed=feed)
 
-            # OUTDATED
-            is_outdated, latest_update = outdated(feed)
-            if is_outdated:
-                self.stdout.write(
-                    self.style.WARNING(f"Feed {feed.feedname} is outdated.")
-                )
-                feed_status.status_type = FeedStatus.StatusType.OUTDATED
+            if (
+                previous_status is not None
+                and previous_status.status_type == feed_status.status_type
+            ):
+                feed_status.status_since = previous_status.status_since
                 feed_status.save()
-                OutdatedError.objects.create(
-                    error_status=feed_status, update_date=latest_update
-                )
-                continue
-
-            # STALE
-            stale_events = stale(feed)
-            if len(stale_events) > 0:
-                self.stdout.write(self.style.WARNING(f"Feed {feed.feedname} is stale."))
-                feed_status.status_type = FeedStatus.StatusType.STALE
-                feed_status.save()
-                StaleError.objects.create(
-                    error_status=feed_status,
-                    end_date=max(stale_events),
-                    amount_events_before_end_date=len(stale_events),
-                )
-                continue
-
-            # OK!
-            self.stdout.write(self.style.SUCCESS(f"Feed {feed.feedname} is ok."))
-            FeedStatus.objects.create(
-                feed=feed,
-                status_type=FeedStatus.StatusType.OK,
-            )
 
         self.style.SUCCESS(f"Finished analyzing feeds!")

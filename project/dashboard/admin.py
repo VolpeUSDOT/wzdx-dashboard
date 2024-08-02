@@ -4,7 +4,16 @@ from django.contrib import admin
 from django.contrib.gis.db import models
 
 # Register your models here.
-from .models import APIKey, Feed, FeedStatus, OutdatedError, SchemaError, StaleError
+from .models import (
+    APIKey,
+    Feed,
+    OfflineErrorStatus,
+    OKStatus,
+    OutdatedErrorStatus,
+    SchemaErrorStatus,
+    SchemaValidationError,
+    StaleErrorStatus,
+)
 
 
 class ReadOnlyAdmin(admin.ModelAdmin):
@@ -62,23 +71,6 @@ class ReadOnlyStackedAdmin(admin.StackedInline):
         return False
 
 
-class SchemaErrorInline(ReadOnlyTabularAdmin):
-    model = SchemaError
-
-
-class OutdatedErrorInline(ReadOnlyTabularAdmin):
-    model = OutdatedError
-
-
-class StaleErrorInline(ReadOnlyTabularAdmin):
-    model = StaleError
-
-
-class FeedStatusInline(ReadOnlyStackedAdmin):
-    model = FeedStatus
-    show_change_link = True
-
-
 class APIKeyInline(admin.StackedInline):
     model = APIKey
     readonly_fields = ["feed"]
@@ -91,14 +83,41 @@ class APIKeyInline(admin.StackedInline):
         return False
 
 
+class SchemaValidationErrorInline(ReadOnlyTabularAdmin):
+    model = SchemaValidationError
+
+
+class OKStatusInline(ReadOnlyTabularAdmin):
+    model = OKStatus
+
+
+class SchemaErrorStatusInline(ReadOnlyTabularAdmin):
+    model = SchemaErrorStatus
+    inline = [SchemaValidationErrorInline]
+
+
+class OutdatedErrorStatusInline(ReadOnlyTabularAdmin):
+    model = OutdatedErrorStatus
+
+
+class StaleErrorStatusInline(ReadOnlyTabularAdmin):
+    model = StaleErrorStatus
+
+
+class OfflineErrorStatusInline(ReadOnlyTabularAdmin):
+    model = OfflineErrorStatus
+
+
 @admin.register(Feed)
 class FeedAdmin(ReadOnlyAdmin):
-    inlines = [APIKeyInline, FeedStatusInline]
-
-
-@admin.register(FeedStatus)
-class FeedStatusAdmin(ReadOnlyAdmin):
-    inlines = [SchemaErrorInline, OutdatedErrorInline, StaleErrorInline]
+    inlines = [
+        APIKeyInline,
+        OKStatusInline,
+        OfflineErrorStatusInline,
+        SchemaErrorStatusInline,
+        OutdatedErrorStatusInline,
+        StaleErrorStatusInline,
+    ]
 
 
 @admin.register(APIKey)
