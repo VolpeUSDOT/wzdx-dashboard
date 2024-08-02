@@ -53,15 +53,25 @@
             </ul> 
           </nav>
         </div>
-        <main class="desktop:grid-col-9 usa-prose" id="main-content">
-            <h1>{{ markdown_content.title }}</h1>
-            {% if markdown_content.intro%}
-                <p class="usa-intro">
-                    {{ markdown_content.intro }}
-                </p>
-            {% endif %}
-            {{ markdown_content.content|render_markdown }}
-        </main>
+        <div class="usa-in-page-nav-container desktop:grid-col-9">
+            <aside
+                class="usa-in-page-nav"
+                data-title-text="On this page"
+                data-title-heading-level="h4"
+                data-scroll-offset="0"
+                data-root-margin="0px 0px 0px 0px"
+                data-threshold="1"
+            ></aside>
+            <main class="usa-prose" id="main-content">
+                <h1>{{ markdown_content.title }}</h1>
+                {% if markdown_content.intro%}
+                    <p class="usa-intro">
+                        {{ markdown_content.intro }}
+                    </p>
+                {% endif %}
+                {{ markdown_content.content|render_markdown }}
+                </main>
+        </div>
       </div>
       <div class="usa-layout-docs__sidenav desktop:display-none">
         <nav aria-label="Secondary navigation">

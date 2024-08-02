@@ -15,108 +15,88 @@
 {% block head%}
     {% leaflet_js %}
     {% leaflet_css %}
+
+    <script>
+        function map_init(map, options) {
+            
+            const mapBounds = L.latLngBounds([
+                [37.09024, -125.001650],
+                [49.384358, -66.934570]
+            ]);
+            map.fitBounds(mapBounds);
+          
+            const layerGroup = L.layerGroup().addTo(map);
+          
+            async function load_points() {
+              const points_url = `/api/points/?in_bbox=${map
+                .getBounds()
+                .toBBoxString()}`;
+              const response = await fetch(points_url);
+              const geojson = await response.json();
+              return geojson;
+            }
+          
+            async function render_points() {
+              const points = await load_points();
+              layerGroup.clearLayers();
+              L.geoJSON(points)
+                .bindPopup((layer) => layer.feature.properties.issuingorganization)
+                .addTo(layerGroup);
+            }
+          
+            map.on("moveend", render_points);
+          }      
+    </script>
 {% endblock%}
 
 {% block pagecontent %}
-
-<script>
-    function map_init(map, options) {
-        
-        const mapBounds = L.latLngBounds([
-            [37.09024, -125.001650],
-            [49.384358, -66.934570]
-        ]);
-        map.fitBounds(mapBounds);
-      
-        const layerGroup = L.layerGroup().addTo(map);
-      
-        async function load_points() {
-          const points_url = `/api/points/?in_bbox=${map
-            .getBounds()
-            .toBBoxString()}`;
-          const response = await fetch(points_url);
-          const geojson = await response.json();
-          return geojson;
-        }
-      
-        async function render_points() {
-          const points = await load_points();
-          layerGroup.clearLayers();
-          L.geoJSON(points)
-            .bindPopup((layer) => layer.feature.properties.issuingorganization)
-            .addTo(layerGroup);
-        }
-      
-        map.on("moveend", render_points);
-      }      
-</script>
-<div class="grid-container">
-    <div class="grid-row grid-gap">
-        <main
-            class="desktop:grid-col flex-6" id="main-content"
-        >
-        <div style="overflow-x: auto">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th scope="col">State</th>
-                        <th scope="col">Issuing Organization</th>
-                        <th scope="col">Status</th>
-                        <th scope="col">Detailed Status</th>
-                        <th scope="col">Status Since</th>
-                        <th scope="col">Update Frequency</th>
-                        <th scope="col">Version</th>
-                        <th scope="col">Last Pulled</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for feed in page_obj %}
-                        <tr>
-                            <td>{{ feed.state|title }}</td>
-                            <td>{{ feed.issuingorganization }}</td>
-                            <td class="{% if feed.status == "OK" %}text-green{% else %}text-red{% endif %}">{{ feed.status|get_status_label|upper }}</td>
-                            <td>{{ feed.status_details }}</td>
-                            <td>{{ feed.status_last_checked|naturaltime }}</td>
-                            <td>{{ feed.datafeed_frequency_update|precisedelta }}</td>
-                            <td>{{ feed.version }}</td>
-                            <td>{{ feed.last_checked|naturaltime }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        {% if is_paginated%}
-        <div class="table-paging">
-                {% if page_obj.has_previous %}
-                    <a href="?page={{ page_obj.previous_page_number }}" class="table-paging-btn table-paging-prev btn" id="table-paging-prev-btn">&lt;</a>
-                {% else %}
-                    <a href="#" class="table-paging-btn table-paging-prev btn btn-disabled" id="table-paging-prev-btn">&lt;</a>
+<div class="usa-section">
+    <div class="grid-container">
+        <div class="grid-row grid-gap">
+            <main
+                class="desktop:grid-col flex-8" id="main-content"
+            >
+                <div class="overflow-x-auto">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">State</th>
+                                <th scope="col">Issuing Organization</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Detailed Status</th>
+                                <th scope="col">Status Since</th>
+                                <th scope="col">Update Frequency</th>
+                                <th scope="col">Version</th>
+                                <th scope="col">Last Pulled</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for feed in page_obj %}
+                                <tr>
+                                    <td>{{ feed.state|title }}</td>
+                                    <td>{{ feed.issuingorganization }}</td>
+                                    <td class="{% if feed.status == "OK" %}text-green{% else %}text-red{% endif %}">{{ feed.status|get_status_label|upper }}</td>
+                                    <td>{{ feed.status_details }}</td>
+                                    <td>{{ feed.status_last_checked|naturaltime }}</td>
+                                    <td>{{ feed.datafeed_frequency_update|precisedelta }}</td>
+                                    <td>{{ feed.version }}</td>
+                                    <td>{{ feed.last_checked|naturaltime }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% if is_paginated%}
+                    {% include 'components/pagination.html' %}
                 {% endif %}
-
-                {% for page_num in page_range %}
-                    <a
-                        id="table-paging-btn"
-                        class="btn table-paging-btn table-paging-btn {% if page_num == page_obj.number %}table-paging-btn-active{% endif %}"
-                        href="?page={{ page_num }}"
-                    > {{ page_num }}
-                    </a>
-                {% endfor %}
-        
-                {% if page_obj.has_next %}
-                    <a href="?page={{ page_obj.next_page_number }}" class="btn table-paging-btn table-paging-next" id="table-paging-next-btn">&gt;</a>
-                {% else %}
-                    <a href="#" class="btn btn-disabled table-paging-btn table-paging-next" id="table-paging-next-btn">&gt;</a>
-                {% endif %}
+            </main>
+            <div class="display-none desktop:display-block desktop:grid-col flex-4">
+                {% leaflet_map "feed_map_desktop" callback="window.map_init" %}
+            </div>
         </div>
-        {% endif %}
-        </main>
-        <div class="display-none desktop:display-block desktop:grid-col flex-6">
-            {% comment %} <div id="map" style="height: 100%; width: 100%"></div> {% endcomment %}
-            {% leaflet_map "feed_map" callback="window.map_init" %}
+        <div class="desktop:display-none height-mobile">
+            {% leaflet_map "feed_map_mobile" callback="window.map_init" %}
         </div>
-        {% comment %} <div class="display-block desktop:display-none">
-            <div id="map" style="height: 200px; width: 100%"></div>
-        </div> {% endcomment %}
     </div>
 </div>
 {% endblock %}
