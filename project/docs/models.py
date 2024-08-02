@@ -13,7 +13,8 @@ class MarkdownContent(models.Model):
     )
 
     class Meta:
-        verbose_name_plural = "Markdown content"
+        verbose_name_plural = "Doc pages"
+        ordering = ["id"]
 
     def __str__(self):
         return f"{self.id}-{self.title}"
