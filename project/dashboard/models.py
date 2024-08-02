@@ -75,6 +75,29 @@ class Feed(models.Model):
         return self.issuingorganization
 
     @property
+    def work_zone_events(self):
+        features = self.feed_data["features"]
+        if self.version.startswith("3"):
+            events = [
+                feature
+                for feature in features
+                if feature.get("properties", {}).get("event_type", "") == "work-zone"
+            ]
+        elif self.version.startswith("4"):
+            events = [
+                feature
+                for feature in features
+                if feature.get("properties", {})
+                .get("core_details", {})
+                .get("event_type", "")
+                == "work-zone"
+            ]
+        else:
+            events = []
+
+        return events
+
+    @property
     def status(self):
         status = FeedStatus.objects.filter(feed=self).first()
 
@@ -127,6 +150,10 @@ class FeedStatus(models.Model):
 
     notif_sent = models.BooleanField(default=False)
 
+    def __str__(self):
+        return f"{self.feed.feedname}: {self.StatusType(self.status_type).label} {self.datetime_checked}"
+
+    @property
     def is_error(self):
         return self.status_type in {
             self.StatusType.ERROR,
@@ -135,14 +162,12 @@ class FeedStatus(models.Model):
             self.StatusType.OFFLINE,
         }
 
-    def __str__(self):
-        return f"{self.feed.feedname}: {self.StatusType(self.status_type).label} {self.datetime_checked}"
-
     @property
     def details(self):
         """Detailed status..."""
         if self.status_type == self.StatusType.OK:
-            return "All good!"
+            events = self.feed.work_zone_events
+            return f"All good! {len(events)} work zone events."
         elif self.status_type == self.StatusType.ERROR:
             most_common_error = (
                 SchemaError.objects.filter(error_status=self)
@@ -154,20 +179,22 @@ class FeedStatus(models.Model):
             )
             if most_common_error is None:
                 return "No errors were found."
-            schema_error_count = SchemaError.objects.filter(
-                schema_error_type=most_common_error.schema_error_type
+            most_common_error_count = SchemaError.objects.filter(
+                error_status=self, schema_error_type=most_common_error.schema_error_type
             ).count()
-            return f"Schema error detected! The most common error is: {most_common_error.schema_error_type}. This error appeared {schema_error_count} time{'s' if schema_error_count > 1 else ''}."  # type: ignore
+            total_schema_errors = SchemaError.objects.filter(error_status=self).count()
+            other_errors = total_schema_errors - most_common_error_count
+            return f"{most_common_error_count} event{'s' if most_common_error_count != 1 else ''} {'have' if most_common_error_count != 1 else 'has'} the following error: {most_common_error.schema_error_type}. There {'are' if other_errors != 1 else 'is'} {other_errors} other error{'s' if other_errors != 1 else ''}."
         elif self.status_type == self.StatusType.OUTDATED:
             outdated_error = OutdatedError.objects.filter(error_status=self).first()
             if outdated_error is None:
                 return "Feed is not outdated."
-            return f"Event data last updated: {humanize.naturaldate(outdated_error.update_date)}"
+            return f"Event data last updated: {outdated_error.update_date.date().strftime('%x')}"
         elif self.status_type == self.StatusType.STALE:
             stale_error = StaleError.objects.filter(error_status=self).first()
             if stale_error is None:
                 return "Feed is not stale."
-            return f" {stale_error.amount_events_before_end_date} events have ended over 14 days ago."
+            return f"{stale_error.amount_events_before_end_date} events have ended over 14 days ago."
         elif self.status_type == self.StatusType.OFFLINE:
             return "Feed unreachable at URL."
         return ""
