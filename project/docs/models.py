@@ -4,16 +4,16 @@ from django.db import models
 
 
 class MarkdownContent(models.Model):
-    title = models.CharField(max_length=100)
+    title = models.CharField(max_length=100, unique=True)
     intro = models.TextField(blank=True)
-    content = models.TextField()
+    content = models.TextField(blank=True)
     slug = models.SlugField(blank=True, unique=True)
     id = models.BigAutoField(
         auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
     )
 
     class Meta:
-        verbose_name_plural = "Doc pages"
+        verbose_name_plural = "markdown content"
         ordering = ["id"]
 
     def __str__(self):
