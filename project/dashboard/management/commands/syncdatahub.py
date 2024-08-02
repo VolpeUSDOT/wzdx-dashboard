@@ -192,6 +192,7 @@ class Command(BaseCommand):
             else:
                 feed_data_url = feed_requested.get("url").get("url")
 
+            feed_data = {}
             if feed_data_url is not None:
                 try:
                     feed_data_request = requests.get(feed_data_url, timeout=20)
@@ -209,8 +210,9 @@ class Command(BaseCommand):
                             )
                         )
                     else:
-                        feed.feed_data = feed_data_request.json()
+                        feed_data = feed_data_request.json()
 
+            feed.feed_data = feed_data
             feed.save()
 
             if feed_requested.get("needapikey") and api_key[0] is None:
