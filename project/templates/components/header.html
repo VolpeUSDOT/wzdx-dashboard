@@ -1,99 +1,42 @@
 {% load static %}
 
 <div class="usa-overlay"></div>
-<header class="usa-header usa-header--extended">
-  <div class="usa-navbar">
-    <div class="usa-logo">
-      <em class="usa-logo__text"
-        ><a href="/" title="WZDx Dashboard">WZDx Dashboard</a></em
-      >
+<header class="usa-header usa-header--basic">
+  <div class="usa-nav-container">
+    <div class="usa-navbar">
+      <div class="usa-logo">
+        <em class="usa-logo__text"
+          ><a href="/" title="<Project title>">WZDx Dashboard</a></em
+        >
+      </div>
+      <button type="button" class="usa-menu-btn">Menu</button>
     </div>
-    <button type="button" class="usa-menu-btn">Menu</button>
-  </div>
-  <nav aria-label="Primary navigation" class="usa-nav">
-    <div class="usa-nav__inner">
+    <nav aria-label="Primary navigation" class="usa-nav">
       <button type="button" class="usa-nav__close">
-        <img src="{% static '/uswds/img/usa-icons-bg/navigate_next--white.svg' %}" role="img" alt="Close" />
+        <img src="{% static '/uswds/img/usa-icons/close.svg' %}" role="img" alt="Close" />
       </button>
       <ul class="usa-nav__primary usa-accordion">
-        {% comment %} <li class="usa-nav__primary-item">
-          <button
-            type="button"
-            class="usa-accordion__button usa-nav__link usa-current"
-            aria-expanded="false"
-            aria-controls="extended-nav-section-one"
-          >
-            <span>&lt;Current section&gt;</span>
-          </button>
-          <ul id="extended-nav-section-one" class="usa-nav__submenu">
-            <li class="usa-nav__submenu-item">
-              <a href="javascript:void(0);"
-                ><span>&lt;Navigation link&gt;</span></a
-              >
-            </li>
-            <li class="usa-nav__submenu-item">
-              <a href="javascript:void(0);"
-                ><span>&lt;Navigation link&gt;</span></a
-              >
-            </li>
-            <li class="usa-nav__submenu-item">
-              <a href="javascript:void(0);"
-                ><span>&lt;Navigation link&gt;</span></a
-              >
-            </li>
-            <li class="usa-nav__submenu-item">
-              <a href="javascript:void(0);"
-                ><span>&lt;Navigation link&gt;</span></a
-              >
-            </li>
-          </ul>
-        </li>
         <li class="usa-nav__primary-item">
-          <button
-            type="button"
-            class="usa-accordion__button usa-nav__link"
-            aria-expanded="false"
-            aria-controls="extended-nav-section-two"
-          >
-            <span>&lt;Section&gt;</span>
-          </button>
-          <ul id="extended-nav-section-two" class="usa-nav__submenu">
-            <li class="usa-nav__submenu-item">
-              <a href="javascript:void(0);"
-                ><span>&lt;Navigation link&gt;</span></a
-              >
-            </li>
-            <li class="usa-nav__submenu-item">
-              <a href="javascript:void(0);"
-                ><span>&lt;Navigation link&gt;</span></a
-              >
-            </li>
-            <li class="usa-nav__submenu-item">
-              <a href="javascript:void(0);"
-                ><span>&lt;Navigation link&gt;</span></a
-              >
-            </li>
-          </ul>
-        </li> {% endcomment %}
-        <li class="usa-nav__primary-item">
-          <a href="/feeds/" class="usa-nav-link{% if '/feeds/' in request.path %} usa-current{%endif%}" 
+          <a href="/feeds/" class="usa-nav-link{% if '/feeds/' in request.path %} usa-current{%endif%}"
             ><span>Home</span></a
           >
         </li>
         <li class="usa-nav__primary-item">
-          <a href="/docs/" class="usa-nav-link{% if '/docs/' in request.path %} usa-current{%endif%}" 
+          <a href="/docs/" class="usa-nav-link{% if '/docs/' in request.path %} usa-current{%endif%}"
             ><span>Docs</span></a
+          >
+        </li>
+        <li class="usa-nav__primary-item">
+          <a href="/admin/" class="usa-nav-link {% if '/admin/' in request.path %} usa-current{%endif%}"
+            ><span>Admin</span></a
           >
         </li>
       </ul>
       {% if form %}
-      <div class="usa-nav__secondary">
-        <ul class="usa-nav__secondary-links"></ul>
         <section aria-label="Search component">
           {{ form }}
         </section>
-      </div>
       {% endif %}
-    </div>
-  </nav>
+    </nav>
+  </div>
 </header>
