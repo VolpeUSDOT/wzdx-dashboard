@@ -206,7 +206,7 @@ class Command(BaseCommand):
                     if feed_data_request.status_code != requests.codes.ok:
                         self.stdout.write(
                             self.style.HTTP_BAD_REQUEST(
-                                f"Feed {feed_requested.get('feedname')} returned invalid request status code: {feed_data_request.url}"
+                                f"Feed {feed_requested.get('feedname')} returned invalid request status code ({feed_data_request.status_code}): {feed_data_request.url}"
                             )
                         )
                     else:
