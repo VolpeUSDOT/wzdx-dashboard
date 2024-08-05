@@ -73,9 +73,9 @@
                         <tbody>
                             {% for feed in page_obj %}
                                 <tr>
-                                    <td>{{ feed.state|title }}</td>
+                                    <td>{%if feed.state %}{{ feed.state }}{%else%}N/A{%endif%}</td>
                                     <td>{{ feed.issuingorganization }}</td>
-                                    <td class="{% if feed.feed_status.status_type == "OK" %}text-green{% else %}text-red{% endif %}">{{ feed.feed_status.status_type|get_status_label|upper }}</td>
+                                    <td class="{% if feed.feed_status.status_type == "OK" %}text-green{% else %}text-red{% endif %}">{{ feed.feed_status.status_type.label|upper }}</td>
                                     <td>{{ feed.feed_status.details }}</td>
                                     <td>{{ feed.feed_status.status_since|naturaltime }}</td>
                                     <td>{{ feed.datafeed_frequency_update|precisedelta }}</td>

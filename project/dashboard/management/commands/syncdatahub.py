@@ -9,6 +9,7 @@ import semver
 from dashboard.models import APIKey, Feed
 from django.contrib.gis.geos import Point
 from django.core.management.base import BaseCommand, CommandError
+from localflavor.us import us_states
 
 eastern_tz = ZoneInfo("America/New_York")
 
@@ -132,7 +133,12 @@ class Command(BaseCommand):
                     )
                     feed = Feed()
 
-            feed.state = feed_requested.get("state")
+            state = feed_requested.get("state")
+            if state is not None and state in us_states.STATES_NORMALIZED.keys():
+                feed.state = us_states.STATES_NORMALIZED[state]
+            else:
+                feed.state = ""
+
             feed.issuingorganization = feed_requested.get("issuingorganization")
             feed.feedname = feed_requested.get("feedname")
             feed.url = feed_requested.get("url").get("url", "")

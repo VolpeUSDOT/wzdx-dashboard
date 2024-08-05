@@ -1,5 +1,6 @@
 import json
 import os
+from collections import Counter
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Optional, Sequence
@@ -13,7 +14,6 @@ from dashboard.models import (
     OKStatus,
     OutdatedErrorStatus,
     SchemaErrorStatus,
-    SchemaValidationError,
     StaleErrorStatus,
 )
 from django.core.management.base import BaseCommand
@@ -183,7 +183,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         for feed in Feed.objects.all():
             self.stdout.write(self.style.NOTICE(f"Checking {feed.feedname}..."))
-            previous_status = feed.feed_status
+            previous_status = feed.feed_status()
 
             # OFFLINE
             if is_offline(feed):
@@ -201,15 +201,23 @@ class Command(BaseCommand):
                             f"Feed {feed.feedname} has {len(errors)} error{'s' if len(errors) > 1 else ''}."
                         )
                     )
-                    feed_status = SchemaErrorStatus.objects.create(feed=feed)
-                    for error_type, error_field in get_formatted_errors(
-                        errors, feed.feedname
-                    ):
-                        SchemaValidationError.objects.create(
-                            error_status=feed_status,
-                            error_type=error_type,
-                            error_field=error_field,
-                        )
+                    formatted_errors = get_formatted_errors(errors, feed.feedname)
+                    feed_error_messages: tuple[list[str], list[str]] = list(zip(*formatted_errors))  # type: ignore
+
+                    most_common_type, most_common_count = Counter(
+                        feed_error_messages[0]
+                    ).most_common(1)[0]
+                    most_common_field = feed_error_messages[1][
+                        feed_error_messages[0].index(most_common_type)
+                    ]
+
+                    feed_status = SchemaErrorStatus.objects.create(
+                        feed=feed,
+                        most_common_type=most_common_type,
+                        most_common_field=most_common_field,
+                        most_common_count=most_common_count,
+                        total_errors=len(errors),
+                    )
 
                 else:
                     # OUTDATED

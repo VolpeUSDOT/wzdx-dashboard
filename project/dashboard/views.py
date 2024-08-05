@@ -1,15 +1,13 @@
 from typing import Union
 
-from django.contrib.gis.db.models import Max, OuterRef, Subquery
 from django.core.paginator import Page, Paginator
-from django.http import Http404, HttpResponseRedirect
-from django.shortcuts import render
+from django.http import HttpResponseRedirect
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import ListView
+from django.views.generic import DetailView, ListView
 
 from .forms import SearchForm
-from .models import Feed, FeedStatus
+from .models import Feed
 
 
 def get_page_button_array(paginator: Paginator, page: Page) -> list[Union[int, str]]:
@@ -70,11 +68,26 @@ class FeedListView(ListView):
         return HttpResponseRedirect(f"/feeds/{feed_redirect}")
 
 
-def feed(request, feedname):
-    try:
-        feed = Feed.objects.get(pk=feedname)
-    except Feed.DoesNotExist:
-        raise Http404("Feed does not exist")
+@method_decorator(csrf_exempt, name="dispatch")
+class FeedDetailView(DetailView):
+    model = Feed
+    context_object_name = "feed"
+    queryset = Feed.objects.all()
 
-    context = {"feed": feed}
-    return render(request, "dashboard/feed_object.html", context)
+    def get_object(self):
+        obj = super().get_object()
+        # Get more data here!
+        return obj
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context["form"] = SearchForm()
+
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = SearchForm(request.POST)
+        feed_redirect = form.data["feed_to_find"]
+
+        return HttpResponseRedirect(f"/feeds/{feed_redirect}")

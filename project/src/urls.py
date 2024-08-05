@@ -20,6 +20,7 @@ from django.urls import include, path
 from django.views.generic.base import RedirectView
 
 urlpatterns = [
+    path("admin/doc/", include("django.contrib.admindocs.urls")),
     path("admin/", admin.site.urls),
     path("feeds/", include("dashboard.urls")),
     path("docs/", include("docs.urls")),
