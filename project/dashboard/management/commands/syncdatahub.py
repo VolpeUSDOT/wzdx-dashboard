@@ -198,7 +198,6 @@ class Command(BaseCommand):
             else:
                 feed_data_url = feed_requested.get("url").get("url")
 
-            feed_data = {}
             if feed_data_url is not None:
                 try:
                     feed_data_request = requests.get(feed_data_url, timeout=20)
@@ -209,6 +208,7 @@ class Command(BaseCommand):
                         )
                     )
                 else:
+                    feed.response_code = feed_data_request.status_code
                     if feed_data_request.status_code != requests.codes.ok:
                         self.stdout.write(
                             self.style.HTTP_BAD_REQUEST(
@@ -216,10 +216,16 @@ class Command(BaseCommand):
                             )
                         )
                     else:
-                        feed_data = feed_data_request.json()
-                        feed.is_online = True
+                        try:
+                            feed_data = feed_data_request.json()
+                            feed.feed_data = feed_data
+                        except:
+                            self.stdout.write(
+                                self.style.ERROR(
+                                    f"Feed {feed_requested.get('feedname')} was unable to be converted to JSON."
+                                )
+                            )
 
-            feed.feed_data = feed_data
             feed.save()
 
             if feed_requested.get("needapikey") and api_key[0] is None:

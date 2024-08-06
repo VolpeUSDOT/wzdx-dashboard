@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import UserPassesTestMixin
 from django.db.models import BooleanField, ExpressionWrapper, Q
 from django.http import Http404
 from django.shortcuts import redirect
@@ -9,6 +10,11 @@ from .forms import DocsContentForm
 from .models import DocsContent
 
 # Create your views here.
+
+
+class StaffMemberRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        return self.request.user.is_staff  # type: ignore
 
 
 def docs_redirect(request):
@@ -41,16 +47,16 @@ class DocsContentView(DetailView):
         return context
 
 
-class DocsContentCreateView(CreateView):
+class DocsContentCreateView(StaffMemberRequiredMixin, CreateView):
     model = DocsContent
     form_class = DocsContentForm
 
 
-class DocsContentUpdateView(UpdateView):
+class DocsContentUpdateView(StaffMemberRequiredMixin, UpdateView):
     model = DocsContent
     form_class = DocsContentForm
 
 
-class DocsContentDeleteView(DeleteView):
+class DocsContentDeleteView(StaffMemberRequiredMixin, DeleteView):
     model = DocsContent
     success_url = reverse_lazy("docs-redirect")
