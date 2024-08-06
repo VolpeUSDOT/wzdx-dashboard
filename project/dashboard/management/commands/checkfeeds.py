@@ -9,7 +9,6 @@ import iso8601
 import requests
 from dashboard.models import (
     Feed,
-    FeedStatus,
     OfflineErrorStatus,
     OKStatus,
     OutdatedErrorStatus,
@@ -120,8 +119,12 @@ REGISTRY = Registry(retrieve=retrieve_via_web).with_resources(
 
 # FEED CHECKER CLASSES
 def is_offline(feed: Feed):
-    """If feed cannot be reached at the correct URL"""
-    return not feed.is_online
+    """Checks if feed response code was 200 and that JSON data was written."""
+    return (
+        (feed.response_code == 0)
+        or (feed.response_code != requests.codes.ok)
+        or (not bool(feed.feed_data))
+    )
 
 
 def get_schema_errors(feed: Feed):

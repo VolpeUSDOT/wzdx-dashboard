@@ -1,3 +1,4 @@
+import requests
 from django.contrib.gis.db import models
 from django.utils.translation import gettext_lazy as _
 from localflavor.us import models as usmodels
@@ -61,7 +62,7 @@ class Feed(models.Model):
     )
 
     # The following fields are needed for data processing
-    is_online = models.BooleanField(_("Feed Online"), default=False)
+    response_code = models.IntegerField(_("HTML Response Code"), default=0)
     last_checked = models.DateTimeField(
         _("Last Updated"),
         auto_now=True,
@@ -306,7 +307,18 @@ class OfflineErrorStatus(FeedStatus):
         self.status_type = FeedStatus.StatusType.OFFLINE
 
     def details(self):
-        """Returns a string with detailed status. In this case, just says unreachable. (Note to self: return HTML error status?)"""
+        """Returns a string with detailed status. Rather than storing information twice, uses stored feed data to generate message."""
+        response_code, json_data = self.feed.response_code, self.feed.feed_data
+
+        if response_code == 0:
+            return f"Feed is unreachable at URL due to request error."
+
+        if response_code != requests.codes.ok:
+            return f"Feed is unreachable at URL due to HTTP status code {response_code}"
+
+        if not bool(json_data):
+            return f"Feed is unreachable at URL due to JSON decode error."
+
         return "Feed unreachable at URL."
 
 
