@@ -21,8 +21,8 @@
             <ul class="usa-sidenav">
             {% for docs_link in all_docs %}
                 <li class="usa-sidenav__item">
-                    <a href="/docs/{{ docs_link.slug }}" class="{% if docs_link.current_page %}usa-current{% endif %}">{{ docs_link.title }}</a>
-                    {% if docs_link.current_page %}
+                    <a href="/docs/{{ docs_link.slug }}" class="{% if docs_link.slug == docs_content.slug %}usa-current{% endif %}">{{ docs_link.title }}</a>
+                    {% if docs_link.slug == docs_content.slug %}
                         {% with docs_content.content|get_toc as toc_dict %}
                             {% if toc_dict %}
                                 <ul class="usa-sidenav__sublist">
@@ -92,8 +92,8 @@
           <ul class="usa-sidenav">
           {% for docs_link in all_docs %}
               <li class="usa-sidenav__item">
-                  <a href="/docs/{{ docs_link.slug }}" class="{% if docs_link.current_page %}usa-current{% endif %}">{{ docs_link.title }}</a>
-                  {% if docs_link.current_page %}
+                  <a href="/docs/{{ docs_link.slug }}" class="{% if docs_link.slug == docs_content.slug %}usa-current{% endif %}">{{ docs_link.title }}</a>
+                  {% if docs_link.slug == docs_content.slug %}
                       {% with docs_content.content|get_toc as toc_dict %}
                           {% if toc_dict %}
                               <ul class="usa-sidenav__sublist">

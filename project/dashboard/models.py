@@ -1,3 +1,5 @@
+from typing import Union
+
 import requests
 from django.contrib.gis.db import models
 from django.utils.translation import gettext_lazy as _
@@ -88,10 +90,10 @@ class Feed(models.Model):
         if feed_status is None or feed_status.status_type != FeedStatus.StatusType.OK:
             return []
 
-        try:
-            features = self.feed_data["features"]
-        except KeyError:
-            return []
+        features = self.feed_data.get("features", [])
+
+        if not features:
+            return features
 
         if self.version.startswith("3"):
             events = [
@@ -117,36 +119,24 @@ class Feed(models.Model):
         """
         Returns most up-to-date feed status from :model:`dashboard.FeedStatus`.
         """
-        status = FeedStatus.objects.filter(feed=self).first()
+        status = FeedStatus.objects.filter(feed=self.pk).first()
 
         if status is None:
             return None
 
-        if hasattr(status, "okstatus") and type(status.okstatus) is OKStatus:  # type: ignore
+        if status.status_type == status.StatusType.OK:
             return status.okstatus  # type: ignore
 
-        if (
-            hasattr(status, "schemaerrorstatus")
-            and type(status.schemaerrorstatus) is SchemaErrorStatus  # type: ignore
-        ):
+        if status.status_type == status.StatusType.ERROR:
             return status.schemaerrorstatus  # type: ignore
 
-        if (
-            hasattr(status, "outdatederrorstatus")
-            and type(status.outdatederrorstatus) is OutdatedErrorStatus  # type: ignore
-        ):
+        if status.status_type == status.StatusType.OUTDATED:
             return status.outdatederrorstatus  # type: ignore
 
-        if (
-            hasattr(status, "staleerrorstatus")
-            and type(status.staleerrorstatus) is StaleErrorStatus  # type: ignore
-        ):
+        if status.status_type == status.StatusType.STALE:
             return status.staleerrorstatus  # type: ignore
 
-        if (
-            hasattr(status, "offlineerrorstatus")
-            and type(status.offlineerrorstatus) is OfflineErrorStatus  # type: ignore
-        ):
+        if status.status_type == status.StatusType.OFFLINE:
             return status.offlineerrorstatus  # type: ignore
 
         return None
