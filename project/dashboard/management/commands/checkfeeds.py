@@ -121,7 +121,7 @@ REGISTRY = Registry(retrieve=retrieve_via_web).with_resources(
 # FEED CHECKER CLASSES
 def is_offline(feed: Feed):
     """If feed cannot be reached at the correct URL"""
-    return not bool(feed.feed_data)
+    return not feed.is_online
 
 
 def get_schema_errors(feed: Feed):

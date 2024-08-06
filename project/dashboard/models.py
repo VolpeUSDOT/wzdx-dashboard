@@ -61,6 +61,7 @@ class Feed(models.Model):
     )
 
     # The following fields are needed for data processing
+    is_online = models.BooleanField(_("Feed Online"), default=False)
     last_checked = models.DateTimeField(
         _("Last Updated"),
         auto_now=True,
@@ -71,11 +72,11 @@ class Feed(models.Model):
     )
 
     class Meta:
-        ordering = ["sdate"]
+        ordering = ["state"]
         verbose_name_plural = _("feeds")
 
     def __str__(self):
-        return self.issuingorganization
+        return f"{f'{self.state} - ' if self.state else ''}{self.issuingorganization}"
 
     def work_zone_events(self):
         """
@@ -148,6 +149,12 @@ class Feed(models.Model):
             return status.offlineerrorstatus  # type: ignore
 
         return None
+
+    def status_type(self):
+        feed_status = self.feed_status()
+
+        if feed_status:
+            return feed_status.status_type
 
 
 class FeedStatus(models.Model):

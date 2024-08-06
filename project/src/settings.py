@@ -148,6 +148,10 @@ REST_FRAMEWORK = {
     ]
 }
 
+FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
+LOGIN_REDIRECT_URL = "/feeds"
+LOGOUT_REDIRECT_URL = "/accounts/login"
+
 try:
     from .local_settings import *
 except ImportError:
@@ -155,5 +159,3 @@ except ImportError:
 
 if SECRET_KEY is None:
     raise KeyError("SECRET_KEY")
-
-FORM_RENDERER = "django.forms.renderers.TemplatesSetting"

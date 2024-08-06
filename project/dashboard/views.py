@@ -1,17 +1,26 @@
-from typing import Union
+from mimetypes import init
+from typing import Optional, Union
 
 from django.core.paginator import Page, Paginator
 from django.http import HttpResponseRedirect
+from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import DetailView, ListView
+from django.views.generic import DetailView, FormView, ListView
+from django.views.generic.detail import SingleObjectMixin
 
 from .forms import SearchForm
 from .models import Feed
 
 
-def get_page_button_array(paginator: Paginator, page: Page) -> list[Union[int, str]]:
+def get_page_button_array(
+    paginator: Optional[Paginator], page: Page
+) -> list[Union[int, str]]:
     """Create what pages to use, based on guidelines from USWDS page https://designsystem.digital.gov/components/pagination/"""
+
+    if paginator is None:
+        return []
+
     total_pages = paginator.num_pages
     current_page = page.number
 
@@ -47,47 +56,34 @@ def get_page_button_array(paginator: Paginator, page: Page) -> list[Union[int, s
             ]
 
 
-@method_decorator(csrf_exempt, name="dispatch")
+# @method_decorator(csrf_exempt, name="dispatch")
 class FeedListView(ListView):
     model = Feed
-    paginate_by = 5
+    paginate_by = 8
+    context_object_name = "feeds"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["page_range"] = get_page_button_array(
             context["paginator"], context["page_obj"]
         )
-        context["form"] = SearchForm()
+        context["search_form"] = SearchForm()
 
         return context
 
-    def post(self, request, *args, **kwargs):
-        form = SearchForm(request.POST)
-        feed_redirect = form.data["feed_to_find"]
 
-        return HttpResponseRedirect(f"/feeds/{feed_redirect}")
-
-
-@method_decorator(csrf_exempt, name="dispatch")
 class FeedDetailView(DetailView):
     model = Feed
     context_object_name = "feed"
-    queryset = Feed.objects.all()
 
-    def get_object(self):
-        obj = super().get_object()
-        # Get more data here!
-        return obj
+    # def get_object(self):
+    #     obj = super().get_object()
+    #     # Get more data here!
+    #     return obj
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context["form"] = SearchForm()
+        context["search_form"] = SearchForm(initial={"search_feed": context["feed"].pk})
 
         return context
-
-    def post(self, request, *args, **kwargs):
-        form = SearchForm(request.POST)
-        feed_redirect = form.data["feed_to_find"]
-
-        return HttpResponseRedirect(f"/feeds/{feed_redirect}")

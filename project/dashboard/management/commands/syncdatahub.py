@@ -217,6 +217,7 @@ class Command(BaseCommand):
                         )
                     else:
                         feed_data = feed_data_request.json()
+                        feed.is_online = True
 
             feed.feed_data = feed_data
             feed.save()

@@ -26,15 +26,30 @@
             ><span>Docs</span></a
           >
         </li>
+        {% if user.is_authenticated %}
+          {% if user.is_staff %}
+            <li class="usa-nav__primary-item">
+              <a href="/admin/" class="usa-nav-link {% if '/admin/' in request.path %} usa-current{%endif%}"
+                ><span>Admin</span></a
+              >
+            </li>
+          {% endif %}
+          <li class="usa-nav__primary-item">
+            <a href="/accounts/logout/" class="usa-nav-link {% if '/accounts/logout/' in request.path %} usa-current{%endif%}"
+              ><span>Logout</span></a
+            >
+          </li>
+        {% else %}
         <li class="usa-nav__primary-item">
-          <a href="/admin/" class="usa-nav-link {% if '/admin/' in request.path %} usa-current{%endif%}"
-            ><span>Admin</span></a
+          <a href="/accounts/login/" class="usa-nav-link {% if '/accounts/login/' in request.path %} usa-current{%endif%}"
+            ><span>Login</span></a
           >
         </li>
+        {% endif %}
       </ul>
-      {% if form %}
+      {% if search_form %}
         <section aria-label="Search component">
-          {{ form }}
+          {{ search_form }}
         </section>
       {% endif %}
     </nav>
