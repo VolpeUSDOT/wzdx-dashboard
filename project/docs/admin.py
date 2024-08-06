@@ -1,12 +1,12 @@
 from django.contrib import admin
 
-from .models import MarkdownContent
+from .models import DocsContent
 
 # Register your models here.
 
 
-class MarkdownContentAdmin(admin.ModelAdmin):
+class DocsContentAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ["title"]}
 
 
-admin.site.register(MarkdownContent, MarkdownContentAdmin)
+admin.site.register(DocsContent, DocsContentAdmin)

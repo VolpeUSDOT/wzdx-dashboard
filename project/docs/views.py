@@ -1,31 +1,56 @@
-from django.db.models import BooleanField, ExpressionWrapper, F, Func, Q
+from django.db.models import BooleanField, ExpressionWrapper, Q
 from django.http import Http404
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import redirect
+from django.urls import reverse_lazy
+from django.views.generic.detail import DetailView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
-from .models import MarkdownContent
-
+from .forms import DocsContentForm
+from .models import DocsContent
 
 # Create your views here.
-class Lower(Func):
-    function = "LOWER"
 
 
-def docs(request, docspage=""):
-    markdown_content = get_object_or_404(MarkdownContent, slug=docspage)
-    all_docs = (
-        MarkdownContent.objects.annotate(
-            current_page=ExpressionWrapper(
-                Q(slug__exact=docspage),
-                BooleanField(),
+def docs_redirect(request):
+    docs_first = DocsContent.objects.first()
+
+    if docs_first is None:
+        raise Http404("No docs exit.")
+
+    return redirect(docs_first)
+
+
+class DocsContentView(DetailView):
+    model = DocsContent
+    context_object_name = "docs_content"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context["all_docs"] = (
+            DocsContent.objects.annotate(
+                current_page=ExpressionWrapper(
+                    Q(slug__exact=self.kwargs["slug"]),
+                    BooleanField(),
+                )
             )
+            .values("title", "slug", "current_page")
+            .order_by("id")
         )
-        .values("title", "slug", "current_page")
-        .order_by("id")
-    )
 
-    context = {
-        "markdown_content": markdown_content,
-        "all_docs": all_docs,
-    }
+        return context
 
-    return render(request, "docs/markdown.html", context=context)
+
+class DocsContentCreateView(CreateView):
+    model = DocsContent
+    form_class = DocsContentForm
+
+
+class DocsContentUpdateView(UpdateView):
+    model = DocsContent
+    form_class = DocsContentForm
+
+
+class DocsContentDeleteView(DeleteView):
+    model = DocsContent
+    success_url = reverse_lazy("docs-redirect")

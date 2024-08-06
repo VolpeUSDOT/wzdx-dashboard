@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content%}
+<div class="usa-section">
+    <div class="grid-container">
+        <main>
+            <form method="post" class="usa-form usa-form--large">{% csrf_token %}
+                <fieldset class='usa-fieldset'>
+                    <legend class="usa-legend usa-legend--large">Delete Docs Page</legend>
+                    <p>Are you sure you want to delete "{{ object }}"?</p>
+                    {{ form }}
+                    <input type="submit" class="usa-button" value="Confirm">
+                </fieldset>
+            </form>
+        </main>
+    </div>
+</div>
+{% endblock %}
