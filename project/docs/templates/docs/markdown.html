@@ -54,7 +54,16 @@
         </nav>
     </div>
     <main class="desktop:grid-col-9 usa-prose" id="main-content">
-        <h1>{{ markdown_content.title }}</h1>
+        <h1>{{ markdown_content.title }}
+            {% if user.is_staff %}
+            <a href="/admin/docs/markdowncontent/1/change/">
+                <svg class='usa-icon usa-icon--size-4' aria-labelledby="edit-page-title" role="img">
+                    <title id="edit-page-title">Edit this page!</title>
+                    <use xlink:href="{% static 'uswds/img/sprite.svg' %}#edit"></use>
+                </svg>
+            </a>
+            {%endif%}
+        </h1>
         {% if markdown_content.intro%}
             <p class="usa-intro">
                 {{ markdown_content.intro }}
@@ -95,10 +104,11 @@
                       {% endwith %}
                   {% endif %}
               </li>
-          {% endfor%}
+            {% endfor%}
           </ul> 
         </nav>
       </div>
     </div>
   </div>
+</div>
 {% endblock %}
