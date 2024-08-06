@@ -199,6 +199,7 @@ class FeedStatus(models.Model):
         }
 
     def details(self):
+        """Base function for feed status details. Should be overridden by subclasses."""
         return "No details available."
 
     class Meta:
@@ -207,16 +208,25 @@ class FeedStatus(models.Model):
 
 
 class OKStatus(FeedStatus):
+    """
+    Represents a :model:`dashboard.FeedStatus` for a feed without errors.
+    """
+
     def __init__(self, *args, **kwargs):
         super(OKStatus, self).__init__(*args, **kwargs)
         self.status_type = FeedStatus.StatusType.OK
 
     def details(self):
+        """Returns a string with detailed status. In this case, details how many work zone events are present"""
         events = self.feed.work_zone_events()
         return f"All good! {len(events)} work zone events."
 
 
 class SchemaErrorStatus(FeedStatus):
+    """
+    Represents a :model:`dashboard.FeedStatus` for a feed with schema errors.
+    """
+
     def __init__(self, *args, **kwargs):
         super(SchemaErrorStatus, self).__init__(*args, **kwargs)
         self.status_type = FeedStatus.StatusType.ERROR
@@ -230,6 +240,7 @@ class SchemaErrorStatus(FeedStatus):
     total_errors = models.IntegerField(_("Total Schema Errors"))
 
     def details(self):
+        """Returns a string with detailed status. In this case, details most common error and how many are present."""
 
         most_common_error = (
             self.most_common_type or "Most common error cannot be determined"
@@ -241,6 +252,10 @@ class SchemaErrorStatus(FeedStatus):
 
 
 class OutdatedErrorStatus(FeedStatus):
+    """
+    Represents a :model:`dashboard.FeedStatus` for a feed that has not been updated in over 14 days.
+    """
+
     def __init__(self, *args, **kwargs):
         super(OutdatedErrorStatus, self).__init__(*args, **kwargs)
         self.status_type = FeedStatus.StatusType.OUTDATED
@@ -248,6 +263,7 @@ class OutdatedErrorStatus(FeedStatus):
     update_date = models.DateTimeField(_("Outdated Update Date"))
 
     def details(self):
+        """Returns a string with detailed status. In this case, details last time event data was updated."""
         return f"Event data last updated: {self.update_date.date().strftime('%x')}"
 
     class Meta:
@@ -256,6 +272,10 @@ class OutdatedErrorStatus(FeedStatus):
 
 
 class StaleErrorStatus(FeedStatus):
+    """
+    Represents a :model:`dashboard.FeedStatus` for a feed that has events which ended over 14 days ago.
+    """
+
     def __init__(self, *args, **kwargs):
         super(StaleErrorStatus, self).__init__(*args, **kwargs)
         self.status_type = FeedStatus.StatusType.STALE
@@ -270,17 +290,23 @@ class StaleErrorStatus(FeedStatus):
         verbose_name_plural = _("stale errors")
 
     def details(self):
+        """Returns a string with detailed status. In this case, details how many events have ended over 14 days ago."""
         return (
             f"{self.amount_events_before_end_date} events have ended over 14 days ago."
         )
 
 
 class OfflineErrorStatus(FeedStatus):
+    """
+    Represents a :model:`dashboard.FeedStatus` for a feed that was unable to be reached at its URL.
+    """
+
     def __init__(self, *args, **kwargs):
         super(OfflineErrorStatus, self).__init__(*args, **kwargs)
         self.status_type = FeedStatus.StatusType.OFFLINE
 
     def details(self):
+        """Returns a string with detailed status. In this case, just says unreachable. (Note to self: return HTML error status?)"""
         return "Feed unreachable at URL."
 
 

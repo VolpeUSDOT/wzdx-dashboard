@@ -1,13 +1,7 @@
-from mimetypes import init
 from typing import Optional, Union
 
 from django.core.paginator import Page, Paginator
-from django.http import HttpResponseRedirect
-from django.shortcuts import render
-from django.utils.decorators import method_decorator
-from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import DetailView, FormView, ListView
-from django.views.generic.detail import SingleObjectMixin
+from django.views.generic import DetailView, ListView
 
 from .forms import SearchForm
 from .models import Feed
@@ -56,7 +50,6 @@ def get_page_button_array(
             ]
 
 
-# @method_decorator(csrf_exempt, name="dispatch")
 class FeedListView(ListView):
     model = Feed
     paginate_by = 8

@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content%}
+<div class='usa-section'>
+    <div class='grid-container'>
+        <main>
+            <form method="post" class="usa-form usa-form--large">
+                {% csrf_token %}
+                <fieldset class="usa-fieldset">
+                    <legend class="usa-legend usa-legend--large">Add/Update Docs Page</legend>
+                    <p>
+                        Required fields are marked with an asterisk (<abbr
+                          title="required"
+                          class="usa-hint usa-hint--required"
+                          >*</abbr
+                        >).
+                    </p>
+                    {{ form.non_field_errors }}
+                    <div class="fieldWrapper">
+                        {{ form.title.errors }}
+                        <label for="{{ form.title.id_for_label }}" class="usa-label">{{ form.title.label}} <abbr title="required" class="usa-hint usa-hint--required">*</abbr></label>
+                        {{ form.title }}
+                    </div>
+                    <div class="fieldWrapper">
+                        {{ form.intro.errors }}
+                        <label for="{{ form.intro.id_for_label }}" class="usa-label">{{ form.intro.label}}</label>
+                        {{ form.intro }}
+                    </div>
+                    <div class="fieldWrapper">
+                        {{ form.content.errors }}
+                        <label for="{{ form.content.id_for_label }}" class="usa-label">{{ form.content.label}}</label>
+                        {{ form.content }}
+                    </div>
+                    <div class="fieldWrapper">
+                        {{ form.ordering.errors }}
+                        <label for="{{ form.ordering.id_for_label }}" class="usa-label">{{ form.ordering.label}} <abbr title="required" class="usa-hint usa-hint--required">*</abbr></label>
+                        {{ form.ordering }}
+                    </div>
+                    <input class="usa-button" type="submit" value="Submit" />
+                </fieldset>
+            </form>
+        </main>
+    </div>
+</div>
+{% endblock %}
