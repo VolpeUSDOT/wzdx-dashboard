@@ -1,6 +1,7 @@
 from typing import Optional, Union
 
 from django.core.paginator import Page, Paginator
+from django.db.models import F
 from django.views.generic import DetailView, ListView
 
 from .forms import SearchForm
@@ -54,6 +55,19 @@ class FeedListView(ListView):
     model = Feed
     paginate_by = 8
     context_object_name = "feeds"
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        queryset = queryset.only(
+            "state",
+            "issuingorganization",
+            "datafeed_frequency_update",
+            "version",
+            "last_checked",
+        )
+
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

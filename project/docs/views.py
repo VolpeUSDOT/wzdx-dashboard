@@ -33,17 +33,7 @@ class DocsContentView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context["all_docs"] = (
-            DocsContent.objects.annotate(
-                current_page=ExpressionWrapper(
-                    Q(slug__exact=self.kwargs["slug"]),
-                    BooleanField(),
-                )
-            )
-            .values("title", "slug", "current_page")
-            .order_by("id")
-        )
-
+        context["all_docs"] = DocsContent.objects.values("title", "slug")
         return context
 
 

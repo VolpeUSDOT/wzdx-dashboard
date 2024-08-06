@@ -11,5 +11,7 @@ class FeedPointsViewSet(
 ):
     bbox_filter_field = "geocoded_column"
     filter_backends = [filters.InBBoxFilter]
-    queryset = Feed.objects.all()
+    queryset = Feed.objects.only(
+        "feedname", "issuingorganization", "geocoded_column"
+    ).all()
     serializer_class = FeedPointsSerializer
