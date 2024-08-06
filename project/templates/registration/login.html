@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class='usa-section'>
+<div class="grid-container">
+
+{% if form.errors %}
+<p>Your username and password didn't match. Please try again.</p>
+{% endif %}
+
+{% if next %}
+    {% if user.is_authenticated %}
+    <p>Your account doesn't have access to this page. To proceed,
+    please login with an account that has access.</p>
+    {% else %}
+    <p>Please login to see this page.</p>
+    {% endif %}
+{% endif %}
+
+<form class="usa-form" action="{% url 'login' %}" method="post">
+    {% csrf_token %}
+    <fieldset class="usa-fieldset">
+      <legend class="usa-legend usa-legend--large">Access your account</legend>
+      <label class="usa-label" for="username">{{ form.username.label_tag }}</label>
+      <input
+        class="usa-input"
+        id="username"
+        name="username"
+        type="text"
+        autocapitalize="off"
+        autocorrect="off"
+        required
+      />
+      <label class="usa-label" for="password-sign-in">{{ form.password.label_tag }}</label>
+      <input
+        class="usa-input"
+        id="password-sign-in"
+        name="password"
+        type="password"
+        required
+      />
+      {% comment %} TODO: Figure this out :( {% endcomment %}
+      {% comment %} <button
+        title=""
+        type="button"
+        class="usa-show-password"
+        aria-controls=""
+        data-show-text="Show password"
+        data-hide-text="Hide password"
+      >
+        Show password
+      </button> {% endcomment %}
+      <input class="usa-button" type="submit" value="Sign in" />
+      <input type="hidden" name="next" value="{{ next }}">
+      <p>
+        <a href="{% url 'password_reset' %}" title="Forgot password">Forgot password?</a>
+      </p>
+    </fieldset>
+  </form>
+
+</div>
+</div>
+{% endblock %}

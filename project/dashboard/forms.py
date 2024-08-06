@@ -2,23 +2,18 @@ from django import forms
 
 from .models import Feed
 
-FEED_CHOICES = [("", "Find a feed!")] + [
-    (feed.feedname, feed.issuingorganization) for feed in Feed.objects.all()
-]
-
 
 class SearchForm(forms.Form):
-    template_name = "components/search.html"
+    template_name = "dashboard/search_feeds.html"
 
-    feed_to_find = forms.ChoiceField(
-        choices=FEED_CHOICES,
+    search_feed = forms.ModelChoiceField(
+        empty_label="Find a feed!",
+        queryset=Feed.objects,
         widget=forms.Select(
             attrs={
                 "class": "usa-input",
                 "type": "search",
                 "name": "search",
-                "placeholder": "Find a feed!",
             }
         ),
-        label="Search",
     )

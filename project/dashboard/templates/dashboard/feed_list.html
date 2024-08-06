@@ -4,8 +4,6 @@
 
 {% load humanize_extra %}
 
-{% load feedstatus %}
-
 {% load static %}
 
 {% load leaflet_tags %}
@@ -17,6 +15,15 @@
     {% leaflet_css %}
 
     <script>
+        function style (feature, latlng) {
+            return L.circleMarker(latlng, {
+            radius: 8,
+            className: 'usa-icon ' + (feature.properties.status_type === "OK" ? 'text-green' : 'text-red'),
+            stroke: false,
+            fillOpacity: 0.8
+            });
+        };
+
         function map_init(map, options) {
             
             const mapBounds = L.latLngBounds([
@@ -39,7 +46,9 @@
             async function render_points() {
               const points = await load_points();
               layerGroup.clearLayers();
-              L.geoJSON(points)
+              L.geoJSON(points, {
+                    pointToLayer: style
+                })
                 .bindPopup((layer) => layer.feature.properties.issuingorganization)
                 .addTo(layerGroup);
             }
@@ -49,15 +58,15 @@
     </script>
 {% endblock%}
 
-{% block pagecontent %}
+{% block content %}
 <div class="usa-section">
     <div class="grid-container">
         <div class="grid-row grid-gap">
             <main
                 class="desktop:grid-col flex-8" id="main-content"
             >
-                <div class="overflow-x-auto">
-                    <table class="data-table">
+                <div class="usa-table-container--scrollable" tabindex="0">
+                    <table class="usa-table usa-table--borderless usa-table--compact">
                         <thead>
                             <tr>
                                 <th scope="col">State</th>
@@ -71,11 +80,11 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for feed in page_obj %}
+                            {% for feed in feeds %}
                                 <tr>
-                                    <td>{{ feed.state|title }}</td>
+                                    <td>{%if feed.state %}{{ feed.state }}{%else%}N/A{%endif%}</td>
                                     <td>{{ feed.issuingorganization }}</td>
-                                    <td class="{% if feed.feed_status.status_type == "OK" %}text-green{% else %}text-red{% endif %}">{{ feed.feed_status.status_type|get_status_label|upper }}</td>
+                                    <td class="{% if feed.feed_status.is_error %}text-red{% else %}text-green{% endif %}">{{ feed.feed_status.status_type.label|upper }}</td>
                                     <td>{{ feed.feed_status.details }}</td>
                                     <td>{{ feed.feed_status.status_since|naturaltime }}</td>
                                     <td>{{ feed.datafeed_frequency_update|precisedelta }}</td>
@@ -86,14 +95,14 @@
                         </tbody>
                     </table>
                 </div>
-                {% if is_paginated%}
-                    {% include 'components/pagination.html' %}
-                {% endif %}
             </main>
             <div class="display-none desktop:display-block desktop:grid-col flex-4">
                 {% leaflet_map "feed_map_desktop" callback="window.map_init" %}
             </div>
         </div>
+        {% if is_paginated%}
+            {% include 'components/pagination.html' %}
+        {% endif %}
         <div class="desktop:display-none height-mobile">
             {% leaflet_map "feed_map_mobile" callback="window.map_init" %}
         </div>

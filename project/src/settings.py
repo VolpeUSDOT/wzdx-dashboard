@@ -40,10 +40,12 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.humanize",
     "django.contrib.gis",
+    "django.contrib.admindocs",
     "django.forms",
     "rest_framework",
     "rest_framework_gis",
     "leaflet",
+    "localflavor",
     "docs.apps.DocsConfig",
     "dashboard.apps.DashboardConfig",
     "api.apps.ApiConfig",
@@ -146,6 +148,10 @@ REST_FRAMEWORK = {
     ]
 }
 
+FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
+LOGIN_REDIRECT_URL = "/feeds"
+LOGOUT_REDIRECT_URL = "/accounts/login"
+
 try:
     from .local_settings import *
 except ImportError:
@@ -153,5 +159,3 @@ except ImportError:
 
 if SECRET_KEY is None:
     raise KeyError("SECRET_KEY")
-
-FORM_RENDERER = "django.forms.renderers.TemplatesSetting"

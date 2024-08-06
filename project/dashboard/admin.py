@@ -7,11 +7,11 @@ from django.contrib.gis.db import models
 from .models import (
     APIKey,
     Feed,
+    FeedStatus,
     OfflineErrorStatus,
     OKStatus,
     OutdatedErrorStatus,
     SchemaErrorStatus,
-    SchemaValidationError,
     StaleErrorStatus,
 )
 
@@ -83,41 +83,8 @@ class APIKeyInline(admin.StackedInline):
         return False
 
 
-class SchemaValidationErrorInline(ReadOnlyTabularAdmin):
-    model = SchemaValidationError
-
-
-class OKStatusInline(ReadOnlyTabularAdmin):
-    model = OKStatus
-
-
-class SchemaErrorStatusInline(ReadOnlyTabularAdmin):
-    model = SchemaErrorStatus
-    inline = [SchemaValidationErrorInline]
-
-
-class OutdatedErrorStatusInline(ReadOnlyTabularAdmin):
-    model = OutdatedErrorStatus
-
-
-class StaleErrorStatusInline(ReadOnlyTabularAdmin):
-    model = StaleErrorStatus
-
-
-class OfflineErrorStatusInline(ReadOnlyTabularAdmin):
-    model = OfflineErrorStatus
-
-
-@admin.register(Feed)
-class FeedAdmin(ReadOnlyAdmin):
-    inlines = [
-        APIKeyInline,
-        OKStatusInline,
-        OfflineErrorStatusInline,
-        SchemaErrorStatusInline,
-        OutdatedErrorStatusInline,
-        StaleErrorStatusInline,
-    ]
+class FeedStatusAdminInline(ReadOnlyTabularAdmin):
+    model = FeedStatus
 
 
 @admin.register(APIKey)
@@ -129,3 +96,11 @@ class APIKeyAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+
+@admin.register(Feed)
+class FeedAdmin(ReadOnlyAdmin):
+    inlines = [
+        APIKeyInline,
+        FeedStatusAdminInline,
+    ]
