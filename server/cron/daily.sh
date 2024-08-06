@@ -1,7 +1,7 @@
 #!/bin/bash
 
-PROJECT_PATH="/var/www/wzdx-dashboard/project"
+PROJECT_PATH="/var/www/wzdx-dashboard"
 cd $PROJECT_PATH || exit
 
-python3 manage.py syncdatahub
-python3 manage.py checkfeeds
+git pull
+python3 ./server/deploy.sh
