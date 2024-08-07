@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dashboard', '0009_alter_apikey_key'),
+        ("dashboard", "0009_alter_apikey_key"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='feed',
-            options={'ordering': ['sdate']},
+            name="feed",
+            options={"ordering": ["sdate"]},
         ),
     ]

@@ -8,48 +8,96 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Feed',
+            name="Feed",
             fields=[
-                ('state', models.TextField(verbose_name='State')),
-                ('issuingorganization', models.TextField(verbose_name='Issuing Organization')),
-                ('feedname', models.TextField(primary_key=True, serialize=False, verbose_name='Feed Name')),
-                ('url', models.URLField(verbose_name='URL')),
-                ('format', models.TextField(verbose_name='Format')),
-                ('active', models.BooleanField(verbose_name='Active')),
-                ('datafeed_frequency_update', models.TextField(verbose_name='Datafeed Update Frequency')),
-                ('version', models.TextField(verbose_name='Version')),
-                ('sdate', models.DateTimeField(verbose_name='Start Date')),
-                ('edate', models.DateTimeField(null=True, verbose_name='End Date')),
-                ('needapikey', models.BooleanField(verbose_name='Need API Key')),
-                ('apikeyurl', models.URLField(null=True, verbose_name='API key URL')),
-                ('pipedtosandbox', models.BooleanField(verbose_name='Piped to Sandbox')),
-                ('lastingestedtosandbox', models.DateTimeField(null=True, verbose_name='Last Ingested To Sandbox (UTC)')),
-                ('pipedtosocrata', models.BooleanField(verbose_name='Piped to Socrata')),
-                ('socratadatasetid', models.TextField(null=True, verbose_name='Socrata Dataset ID')),
-                ('geocoded_column', models.JSONField(verbose_name='State Coordinate')),
-                ('last_checked', models.DateTimeField(auto_now=True, verbose_name='Last Updated')),
-                ('feed_data', models.JSONField(verbose_name='Feed Data')),
+                ("state", models.TextField(verbose_name="State")),
+                (
+                    "issuingorganization",
+                    models.TextField(verbose_name="Issuing Organization"),
+                ),
+                (
+                    "feedname",
+                    models.TextField(
+                        primary_key=True, serialize=False, verbose_name="Feed Name"
+                    ),
+                ),
+                ("url", models.URLField(verbose_name="URL")),
+                ("format", models.TextField(verbose_name="Format")),
+                ("active", models.BooleanField(verbose_name="Active")),
+                (
+                    "datafeed_frequency_update",
+                    models.TextField(verbose_name="Datafeed Update Frequency"),
+                ),
+                ("version", models.TextField(verbose_name="Version")),
+                ("sdate", models.DateTimeField(verbose_name="Start Date")),
+                ("edate", models.DateTimeField(null=True, verbose_name="End Date")),
+                ("needapikey", models.BooleanField(verbose_name="Need API Key")),
+                ("apikeyurl", models.URLField(null=True, verbose_name="API key URL")),
+                (
+                    "pipedtosandbox",
+                    models.BooleanField(verbose_name="Piped to Sandbox"),
+                ),
+                (
+                    "lastingestedtosandbox",
+                    models.DateTimeField(
+                        null=True, verbose_name="Last Ingested To Sandbox (UTC)"
+                    ),
+                ),
+                (
+                    "pipedtosocrata",
+                    models.BooleanField(verbose_name="Piped to Socrata"),
+                ),
+                (
+                    "socratadatasetid",
+                    models.TextField(null=True, verbose_name="Socrata Dataset ID"),
+                ),
+                ("geocoded_column", models.JSONField(verbose_name="State Coordinate")),
+                (
+                    "last_checked",
+                    models.DateTimeField(auto_now=True, verbose_name="Last Updated"),
+                ),
+                ("feed_data", models.JSONField(verbose_name="Feed Data")),
             ],
         ),
         migrations.CreateModel(
-            name='APIKey',
+            name="APIKey",
             fields=[
-                ('feed', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, primary_key=True, serialize=False, to='dashboard.feed')),
-                ('key', models.TextField()),
+                (
+                    "feed",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        primary_key=True,
+                        serialize=False,
+                        to="dashboard.feed",
+                    ),
+                ),
+                ("key", models.TextField()),
             ],
         ),
         migrations.CreateModel(
-            name='FeedError',
+            name="FeedError",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('error_message', models.TextField()),
-                ('datetime_found', models.DateTimeField(auto_now_add=True)),
-                ('feed', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dashboard.feed')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("error_message", models.TextField()),
+                ("datetime_found", models.DateTimeField(auto_now_add=True)),
+                (
+                    "feed",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="dashboard.feed"
+                    ),
+                ),
             ],
         ),
     ]

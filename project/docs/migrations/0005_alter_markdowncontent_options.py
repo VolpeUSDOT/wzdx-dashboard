@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('docs', '0004_markdowncontent_intro'),
+        ("docs", "0004_markdowncontent_intro"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='markdowncontent',
-            options={'ordering': ['id'], 'verbose_name_plural': 'Doc pages'},
+            name="markdowncontent",
+            options={"ordering": ["id"], "verbose_name_plural": "Doc pages"},
         ),
     ]

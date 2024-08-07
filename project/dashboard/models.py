@@ -239,7 +239,7 @@ class SchemaErrorStatus(FeedStatus):
 
         other_errors = self.total_errors - self.most_common_count
 
-        return f"{self.most_common_count} event{'s' if self.most_common_count != 1 else ''} {'have' if self.most_common_count != 1 else 'has'} the following error: {most_common_error}. There {'are' if other_errors != 1 else 'is'} {other_errors if other_errors != 0 else 'no'} other error{'s' if other_errors != 1 else ''}."
+        return f"{self.most_common_count} schema error{'s' if self.most_common_count != 1 else ''} detected: {most_common_error}.{(' There ' + ('are ' if other_errors != 1 else 'is ') + str(other_errors) + ' other error' + ('s' if other_errors != 1 else '') + '.') if other_errors > 0 else ''}"
 
 
 class OutdatedErrorStatus(FeedStatus):

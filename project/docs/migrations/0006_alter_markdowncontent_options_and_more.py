@@ -6,22 +6,22 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('docs', '0005_alter_markdowncontent_options'),
+        ("docs", "0005_alter_markdowncontent_options"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='markdowncontent',
-            options={'ordering': ['id'], 'verbose_name_plural': 'markdown content'},
+            name="markdowncontent",
+            options={"ordering": ["id"], "verbose_name_plural": "markdown content"},
         ),
         migrations.AlterField(
-            model_name='markdowncontent',
-            name='content',
+            model_name="markdowncontent",
+            name="content",
             field=models.TextField(blank=True),
         ),
         migrations.AlterField(
-            model_name='markdowncontent',
-            name='title',
+            model_name="markdowncontent",
+            name="title",
             field=models.CharField(max_length=100, unique=True),
         ),
     ]

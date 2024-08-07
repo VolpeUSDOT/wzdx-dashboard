@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dashboard', '0004_alter_feed_geocoded_column'),
+        ("dashboard", "0004_alter_feed_geocoded_column"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='feed',
-            name='apikeyurl',
-            field=models.URLField(null=True, verbose_name='API Key URL'),
+            model_name="feed",
+            name="apikeyurl",
+            field=models.URLField(null=True, verbose_name="API Key URL"),
         ),
     ]

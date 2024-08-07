@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dashboard', '0007_alter_feed_edate_alter_feed_sdate'),
+        ("dashboard", "0007_alter_feed_edate_alter_feed_sdate"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='feed',
-            name='feed_data',
-            field=models.JSONField(default=dict, verbose_name='Feed Data'),
+            model_name="feed",
+            name="feed_data",
+            field=models.JSONField(default=dict, verbose_name="Feed Data"),
         ),
     ]

@@ -6,16 +6,16 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('docs', '0006_alter_markdowncontent_options_and_more'),
+        ("docs", "0006_alter_markdowncontent_options_and_more"),
     ]
 
     operations = [
         migrations.RenameModel(
-            old_name='MarkdownContent',
-            new_name='DocsContent',
+            old_name="MarkdownContent",
+            new_name="DocsContent",
         ),
         migrations.AlterModelOptions(
-            name='docscontent',
-            options={'ordering': ['id'], 'verbose_name_plural': 'docs content'},
+            name="docscontent",
+            options={"ordering": ["id"], "verbose_name_plural": "docs content"},
         ),
     ]
