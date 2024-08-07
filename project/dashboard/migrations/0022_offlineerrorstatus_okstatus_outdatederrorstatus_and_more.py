@@ -8,94 +8,186 @@ import django.utils.timezone
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dashboard', '0021_alter_schemaerror_schema_error_field_and_more'),
+        ("dashboard", "0021_alter_schemaerror_schema_error_field_and_more"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='OfflineErrorStatus',
+            name="OfflineErrorStatus",
             fields=[
-                ('feedstatus_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='dashboard.feedstatus')),
+                (
+                    "feedstatus_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="dashboard.feedstatus",
+                    ),
+                ),
             ],
-            bases=('dashboard.feedstatus',),
+            bases=("dashboard.feedstatus",),
         ),
         migrations.CreateModel(
-            name='OKStatus',
+            name="OKStatus",
             fields=[
-                ('feedstatus_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='dashboard.feedstatus')),
+                (
+                    "feedstatus_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="dashboard.feedstatus",
+                    ),
+                ),
             ],
-            bases=('dashboard.feedstatus',),
+            bases=("dashboard.feedstatus",),
         ),
         migrations.CreateModel(
-            name='OutdatedErrorStatus',
+            name="OutdatedErrorStatus",
             fields=[
-                ('feedstatus_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='dashboard.feedstatus')),
-                ('update_date', models.DateTimeField(verbose_name='Outdated Update Date')),
+                (
+                    "feedstatus_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="dashboard.feedstatus",
+                    ),
+                ),
+                (
+                    "update_date",
+                    models.DateTimeField(verbose_name="Outdated Update Date"),
+                ),
             ],
             options={
-                'verbose_name_plural': 'outdated errors',
-                'ordering': ['-update_date'],
+                "verbose_name_plural": "outdated errors",
+                "ordering": ["-update_date"],
             },
-            bases=('dashboard.feedstatus',),
+            bases=("dashboard.feedstatus",),
         ),
         migrations.CreateModel(
-            name='SchemaErrorStatus',
+            name="SchemaErrorStatus",
             fields=[
-                ('feedstatus_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='dashboard.feedstatus')),
+                (
+                    "feedstatus_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="dashboard.feedstatus",
+                    ),
+                ),
             ],
-            bases=('dashboard.feedstatus',),
+            bases=("dashboard.feedstatus",),
         ),
         migrations.CreateModel(
-            name='SchemaValidationError',
+            name="SchemaValidationError",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('error_type', models.TextField(blank=True, verbose_name='Schema Error Type')),
-                ('error_field', models.TextField(blank=True, verbose_name='Schema Error Field')),
-                ('error_status', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dashboard.schemaerrorstatus')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "error_type",
+                    models.TextField(blank=True, verbose_name="Schema Error Type"),
+                ),
+                (
+                    "error_field",
+                    models.TextField(blank=True, verbose_name="Schema Error Field"),
+                ),
+                (
+                    "error_status",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="dashboard.schemaerrorstatus",
+                    ),
+                ),
             ],
             options={
-                'verbose_name_plural': 'schema status',
+                "verbose_name_plural": "schema status",
             },
         ),
         migrations.CreateModel(
-            name='StaleErrorStatus',
+            name="StaleErrorStatus",
             fields=[
-                ('feedstatus_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='dashboard.feedstatus')),
-                ('latest_end_date', models.DateTimeField(verbose_name='Stale End Date')),
-                ('amount_events_before_end_date', models.PositiveIntegerField(default=0, verbose_name='Stale Events')),
+                (
+                    "feedstatus_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="dashboard.feedstatus",
+                    ),
+                ),
+                (
+                    "latest_end_date",
+                    models.DateTimeField(verbose_name="Stale End Date"),
+                ),
+                (
+                    "amount_events_before_end_date",
+                    models.PositiveIntegerField(default=0, verbose_name="Stale Events"),
+                ),
             ],
             options={
-                'verbose_name_plural': 'stale errors',
-                'ordering': ['-latest_end_date'],
+                "verbose_name_plural": "stale errors",
+                "ordering": ["-latest_end_date"],
             },
-            bases=('dashboard.feedstatus',),
+            bases=("dashboard.feedstatus",),
         ),
         migrations.RemoveField(
-            model_name='schemaerror',
-            name='error_status',
+            model_name="schemaerror",
+            name="error_status",
         ),
         migrations.RemoveField(
-            model_name='staleerror',
-            name='error_status',
+            model_name="staleerror",
+            name="error_status",
         ),
         migrations.AddField(
-            model_name='feedstatus',
-            name='status_since',
-            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now),
+            model_name="feedstatus",
+            name="status_since",
+            field=models.DateTimeField(
+                auto_now_add=True, default=django.utils.timezone.now
+            ),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='feedstatus',
-            name='status_type',
-            field=models.CharField(choices=[('NA', 'null'), ('OK', 'ok'), ('ER', 'error'), ('OU', 'outdated'), ('ST', 'stale'), ('OF', 'offline')], default='NA', max_length=2),
+            model_name="feedstatus",
+            name="status_type",
+            field=models.CharField(
+                choices=[
+                    ("NA", "null"),
+                    ("OK", "ok"),
+                    ("ER", "error"),
+                    ("OU", "outdated"),
+                    ("ST", "stale"),
+                    ("OF", "offline"),
+                ],
+                default="NA",
+                max_length=2,
+            ),
         ),
         migrations.DeleteModel(
-            name='OutdatedError',
+            name="OutdatedError",
         ),
         migrations.DeleteModel(
-            name='SchemaError',
+            name="SchemaError",
         ),
         migrations.DeleteModel(
-            name='StaleError',
+            name="StaleError",
         ),
     ]

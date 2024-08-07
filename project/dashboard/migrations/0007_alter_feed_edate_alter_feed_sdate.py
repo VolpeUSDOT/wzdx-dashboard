@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dashboard', '0006_alter_feed_edate_alter_feed_sdate'),
+        ("dashboard", "0006_alter_feed_edate_alter_feed_sdate"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='feed',
-            name='edate',
-            field=models.DateTimeField(null=True, verbose_name='End Date'),
+            model_name="feed",
+            name="edate",
+            field=models.DateTimeField(null=True, verbose_name="End Date"),
         ),
         migrations.AlterField(
-            model_name='feed',
-            name='sdate',
-            field=models.DateTimeField(verbose_name='Start Date'),
+            model_name="feed",
+            name="sdate",
+            field=models.DateTimeField(verbose_name="Start Date"),
         ),
     ]

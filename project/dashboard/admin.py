@@ -4,16 +4,7 @@ from django.contrib import admin
 from django.contrib.gis.db import models
 
 # Register your models here.
-from .models import (
-    APIKey,
-    Feed,
-    FeedStatus,
-    OfflineErrorStatus,
-    OKStatus,
-    OutdatedErrorStatus,
-    SchemaErrorStatus,
-    StaleErrorStatus,
-)
+from .models import APIKey, Feed, FeedData, FeedStatus
 
 
 class ReadOnlyAdmin(admin.ModelAdmin):
@@ -83,6 +74,10 @@ class APIKeyInline(admin.StackedInline):
         return False
 
 
+class FeedDataAdminInline(ReadOnlyStackedAdmin):
+    model = FeedData
+
+
 class FeedStatusAdminInline(ReadOnlyTabularAdmin):
     model = FeedStatus
 
@@ -100,7 +95,4 @@ class APIKeyAdmin(admin.ModelAdmin):
 
 @admin.register(Feed)
 class FeedAdmin(ReadOnlyAdmin):
-    inlines = [
-        APIKeyInline,
-        FeedStatusAdminInline,
-    ]
+    inlines = [APIKeyInline, FeedStatusAdminInline, FeedDataAdminInline]

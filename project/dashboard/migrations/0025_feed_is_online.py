@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dashboard', '0024_alter_feed_state'),
+        ("dashboard", "0024_alter_feed_state"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='feed',
-            name='is_online',
-            field=models.BooleanField(default=False, verbose_name='Feed Online'),
+            model_name="feed",
+            name="is_online",
+            field=models.BooleanField(default=False, verbose_name="Feed Online"),
         ),
     ]

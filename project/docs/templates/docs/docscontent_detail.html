@@ -13,127 +13,129 @@
 {% block content %}
 <div class="usa-section">
     <div class="grid-container">
-      <div class="grid-row grid-gap">
-        <div
-          class="usa-layout-docs__sidenav display-none desktop:display-block desktop:grid-col-3"
-        >
-          <nav aria-label="Secondary navigation">
-            <ul class="usa-sidenav">
-            {% for docs_link in all_docs %}
-                <li class="usa-sidenav__item">
-                    <a href="/docs/{{ docs_link.slug }}" class="{% if docs_link.slug == docs_content.slug %}usa-current{% endif %}">{{ docs_link.title }}</a>
-                    {% if docs_link.slug == docs_content.slug %}
-                        {% with docs_content.content|get_toc as toc_dict %}
-                            {% if toc_dict %}
-                                <ul class="usa-sidenav__sublist">
-                                {% for toc_first_level in toc_dict %}
-                                    <li class="usa-sidenav__item">
-                                        <a href="#{{ toc_first_level.id }}"
-                                        >{{ toc_first_level.name }}</a
-                                        >
-                                        {% if toc_first_level.children %}
-                                            <ul class="usa-sidenav__sublist">
-                                                {% for toc_second_level in toc_first_level.children %}
-                                                    <li class="usa-sidenav__item">
-                                                        <a href="#{{ toc_second_level.id }}"
-                                                        >{{ toc_second_level.name }}</a
-                                                        >
-                                                    </li>
-                                                {% endfor %}
-                                            </ul>
-                                        {% endif %}
-                                    </li>
-                                {% endfor %}
-                                </ul>
-                            {% endif %}
-                        {% endwith %}
-                    {% endif %}
-                </li>
-            {% endfor%}
+        <div class="grid-row grid-gap">
+            <div
+            class="usa-layout-docs__sidenav display-none desktop:display-block desktop:grid-col-3"
+            >
+            <nav aria-label="Secondary navigation">
+                <ul class="usa-sidenav">
+                {% for docs_link in all_docs %}
+                    <li class="usa-sidenav__item">
+                        <a href="/docs/{{ docs_link.slug }}" class="{% if docs_link.slug == docs_content.slug %}usa-current{% endif %}">{{ docs_link.title }}</a>
+                        {% if docs_link.slug == docs_content.slug %}
+                            {% with docs_content.content|get_toc as toc_dict %}
+                                {% if toc_dict %}
+                                    <ul class="usa-sidenav__sublist">
+                                    {% for toc_first_level in toc_dict %}
+                                        <li class="usa-sidenav__item">
+                                            <a href="#{{ toc_first_level.id }}"
+                                            >{{ toc_first_level.name }}</a
+                                            >
+                                            {% if toc_first_level.children %}
+                                                <ul class="usa-sidenav__sublist">
+                                                    {% for toc_second_level in toc_first_level.children %}
+                                                        <li class="usa-sidenav__item">
+                                                            <a href="#{{ toc_second_level.id }}"
+                                                            >{{ toc_second_level.name }}</a
+                                                            >
+                                                        </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            {% endif %}
+                                        </li>
+                                    {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            {% endwith %}
+                        {% endif %}
+                    </li>
+                {% endfor%}
+                {% if user.is_staff %}
+                    <li class="usa-sidenav__item">
+                        <a href="/docs/add">
+                            <svg class="usa-icon bottom-neg-2px" aria-hidden="true" role="img">
+                                <use xlink:href="{% static 'uswds/img/sprite.svg' %}#add"></use>
+                            </svg>
+                            Add new page
+                        </a>
+                    </li>
+                {% endif %}
+                </ul> 
+            </nav>
+        </div>
+        <main class="desktop:grid-col-9 usa-prose" id="main-content">
+            <h1>{{ docs_content.title }}</h1>
             {% if user.is_staff %}
-                <li class="usa-sidenav__item">
-                    <a href="/docs/add">
-                        <svg class="usa-icon bottom-neg-2px" aria-hidden="true" role="img">
-                            <use xlink:href="{% static 'uswds/img/sprite.svg' %}#add"></use>
-                        </svg>
-                        Add new page
-                    </a>
-                </li>
-            {% endif %}
-            </ul> 
-        </nav>
-    </div>
-    <main class="desktop:grid-col-9 usa-prose" id="main-content">
-        <h1>{{ docs_content.title }}</h1>
-        {% if user.is_staff %}
-            <a href="/docs/{{docs_content.slug}}/update" class="usa-button margin-top-1 font-body-xs">
-                <svg class="usa-icon" aria-hidden="true" role="img">
-                    <use xlink:href="{% static 'uswds/img/sprite.svg' %}#edit"></use>
-                </svg>
-                Edit this page
-            </a>
-            <a href="/docs/{{docs_content.slug}}/delete" class="usa-button usa-button--secondary margin-top-1 font-body-xs">
-                <svg class="usa-icon bottom-neg-2px" aria-hidden="true" role="img">
-                    <use xlink:href="{% static 'uswds/img/sprite.svg' %}#delete"></use>
-                </svg>
-                Delete this page
-            </a>
+                <div class="usa-button-group" role="toolbar">
+                    <div class="usa-button-group__item">
+                        <a href="/docs/{{docs_content.slug}}/update" class="usa-button">
+                            <svg class="usa-icon" aria-hidden="true" role="img">
+                                <use xlink:href="{% static 'uswds/img/sprite.svg' %}#edit"></use>
+                            </svg>
+                            Edit this page
+                        </a>
+                    </div>
+                    <div class="usa-button-group__item">
+                        <a href="/docs/{{docs_content.slug}}/delete" class="usa-button usa-button--secondary">
+                            <svg class="usa-icon" aria-hidden="true" role="img">
+                                <use xlink:href="{% static 'uswds/img/sprite.svg' %}#delete"></use>
+                            </svg>
+                            Delete this page
+                        </a>
+                    </div>
+                </div>
             {%endif%}
-        {% if docs_content.intro%}
-            <p class="usa-intro">
-                {{ docs_content.intro }}
-            </p>
-        {% endif %}
-        {{ docs_content.content|render_markdown }}
-    </main>
-</div>
-      <div class="usa-layout-docs__sidenav desktop:display-none">
-        <nav aria-label="Secondary navigation">
-          <ul class="usa-sidenav">
-          {% for docs_link in all_docs %}
-              <li class="usa-sidenav__item">
-                  <a href="/docs/{{ docs_link.slug }}" class="{% if docs_link.slug == docs_content.slug %}usa-current{% endif %}">{{ docs_link.title }}</a>
-                  {% if docs_link.slug == docs_content.slug %}
-                      {% with docs_content.content|get_toc as toc_dict %}
-                          {% if toc_dict %}
-                              <ul class="usa-sidenav__sublist">
-                              {% for toc_first_level in toc_dict %}
-                                  <li class="usa-sidenav__item">
-                                      <a href="#{{ toc_first_level.id }}"
-                                      >{{ toc_first_level.name }}</a
-                                      >
-                                      {% if toc_first_level.children %}
-                                          <ul class="usa-sidenav__sublist">
-                                              {% for toc_second_level in toc_first_level.children %}
-                                                  <li class="usa-sidenav__item">
-                                                      <a href="#{{ toc_second_level.id }}"
-                                                      >{{ toc_second_level.name }}</a
-                                                      >
-                                                  </li>
-                                              {% endfor %}
-                                          </ul>
-                                      {% endif %}
-                                  </li>
-                              {% endfor %}
-                              </ul>
-                          {% endif %}
-                      {% endwith %}
-                  {% endif %}
-              </li>
-            {% endfor%}
-            {% if user.is_staff %}
-                <li class="usa-sidenav__item">
-                    <a href="/docs/add">
-                        <svg class="usa-icon bottom-neg-2px" aria-hidden="true" role="img">
-                            <use xlink:href="{% static 'uswds/img/sprite.svg' %}#add"></use>
-                        </svg>
-                        Add new page
-                    </a>
-                </li>
+            {% if docs_content.intro%}
+                <p class="usa-intro">
+                    {{ docs_content.intro }}
+                </p>
             {% endif %}
-          </ul> 
-        </nav>
-      </div>
+            {{ docs_content.content|render_markdown }}
+        </main>
     </div>
-  </div>
+    <div class="usa-layout-docs__sidenav desktop:display-none">
+        <nav aria-label="Secondary navigation">
+            <ul class="usa-sidenav">
+                {% for docs_link in all_docs %}
+                    <li class="usa-sidenav__item">
+                        <a href="/docs/{{ docs_link.slug }}" class="{% if docs_link.slug == docs_content.slug %}usa-current{% endif %}">{{ docs_link.title }}</a>
+                            {% if docs_link.slug == docs_content.slug %}
+                                {% with docs_content.content|get_toc as toc_dict %}
+                                    {% if toc_dict %}
+                                        <ul class="usa-sidenav__sublist">
+                                            {% for toc_first_level in toc_dict %}
+                                                <li class="usa-sidenav__item">
+                                                    <a href="#{{ toc_first_level.id }}">{{ toc_first_level.name }}</a>
+                                                    {% if toc_first_level.children %}
+                                                        <ul class="usa-sidenav__sublist">
+                                                            {% for toc_second_level in toc_first_level.children %}
+                                                                <li class="usa-sidenav__item">
+                                                                    <a href="#{{ toc_second_level.id }}">{{ toc_second_level.name }}</a>
+                                                                </li>
+                                                            {% endfor %}
+                                                        </ul>
+                                                    {% endif %}
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                {% endwith %}
+                            {% endif %}
+                        </li>
+                    {% endfor%}
+                    {% if user.is_staff %}
+                        <li class="usa-sidenav__item">
+                            <a href="/docs/add">
+                                <svg class="usa-icon bottom-neg-2px" aria-hidden="true" role="img">
+                                    <use xlink:href="{% static 'uswds/img/sprite.svg' %}#add"></use>
+                                </svg>
+                                Add new page
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul> 
+            </nav>
+        </div>
+    </div>
+</div>
 {% endblock %}

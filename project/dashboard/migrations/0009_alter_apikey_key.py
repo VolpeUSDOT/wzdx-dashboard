@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dashboard', '0008_alter_feed_feed_data'),
+        ("dashboard", "0008_alter_feed_feed_data"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='apikey',
-            name='key',
-            field=models.TextField(default=''),
+            model_name="apikey",
+            name="key",
+            field=models.TextField(default=""),
         ),
     ]

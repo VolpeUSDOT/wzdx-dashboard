@@ -13,14 +13,15 @@
 {% block head%}
     {% leaflet_js %}
     {% leaflet_css %}
-
+    
     <script>
         function style (feature, latlng) {
             return L.circleMarker(latlng, {
             radius: 8,
             className: 'usa-icon ' + (feature.properties.status_type === "OK" ? 'text-green' : 'text-red'),
             stroke: false,
-            fillOpacity: 0.8
+            fillOpacity: 0.8,
+            alt: feature.properties.issuingorganization
             });
         };
 
@@ -97,14 +98,14 @@
                 </div>
             </main>
             <div class="display-none desktop:display-block desktop:grid-col flex-4">
-                {% leaflet_map "feed_map_desktop" callback="window.map_init" %}
+                {% leaflet_map "points_map_desktop" callback="window.map_init" %}
             </div>
         </div>
         {% if is_paginated%}
             {% include 'components/pagination.html' %}
         {% endif %}
         <div class="desktop:display-none height-mobile">
-            {% leaflet_map "feed_map_mobile" callback="window.map_init" %}
+            {% leaflet_map "points_map_mobile" callback="window.map_init" %}
         </div>
     </div>
 </div>

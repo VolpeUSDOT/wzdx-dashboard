@@ -1,7 +1,6 @@
 {% load static %}
 
 <form class="usa-search usa-search--small" id="search_feeds" role="search">
-  {% comment %} {% csrf_token %} {% endcomment %}
     {% for field in form %}
         <label class="usa-sr-only" for="{{ field.auto_id }}">{{ field.label }}</label>
         {{ field }}

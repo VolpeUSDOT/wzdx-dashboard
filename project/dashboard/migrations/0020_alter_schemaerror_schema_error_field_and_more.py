@@ -6,18 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dashboard', '0019_alter_outdatederror_update_date'),
+        ("dashboard", "0019_alter_outdatederror_update_date"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='schemaerror',
-            name='schema_error_field',
-            field=models.CharField(max_length=150, verbose_name='Schema Error Field'),
+            model_name="schemaerror",
+            name="schema_error_field",
+            field=models.CharField(max_length=150, verbose_name="Schema Error Field"),
         ),
         migrations.AlterField(
-            model_name='schemaerror',
-            name='schema_error_type',
-            field=models.CharField(max_length=150, verbose_name='Schema Error Type'),
+            model_name="schemaerror",
+            name="schema_error_type",
+            field=models.CharField(max_length=150, verbose_name="Schema Error Type"),
         ),
     ]

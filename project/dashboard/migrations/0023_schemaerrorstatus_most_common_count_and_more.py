@@ -6,33 +6,39 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dashboard', '0022_offlineerrorstatus_okstatus_outdatederrorstatus_and_more'),
+        ("dashboard", "0022_offlineerrorstatus_okstatus_outdatederrorstatus_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='schemaerrorstatus',
-            name='most_common_count',
-            field=models.IntegerField(default=0, verbose_name='Occurences of Most Common Error'),
+            model_name="schemaerrorstatus",
+            name="most_common_count",
+            field=models.IntegerField(
+                default=0, verbose_name="Occurences of Most Common Error"
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='schemaerrorstatus',
-            name='most_common_field',
-            field=models.TextField(blank=True, verbose_name='Most Common Schema Error Field'),
+            model_name="schemaerrorstatus",
+            name="most_common_field",
+            field=models.TextField(
+                blank=True, verbose_name="Most Common Schema Error Field"
+            ),
         ),
         migrations.AddField(
-            model_name='schemaerrorstatus',
-            name='most_common_type',
-            field=models.TextField(blank=True, verbose_name='Most Common Schema Error Type'),
+            model_name="schemaerrorstatus",
+            name="most_common_type",
+            field=models.TextField(
+                blank=True, verbose_name="Most Common Schema Error Type"
+            ),
         ),
         migrations.AddField(
-            model_name='schemaerrorstatus',
-            name='total_errors',
-            field=models.IntegerField(default=0, verbose_name='Total Schema Errors'),
+            model_name="schemaerrorstatus",
+            name="total_errors",
+            field=models.IntegerField(default=0, verbose_name="Total Schema Errors"),
             preserve_default=False,
         ),
         migrations.DeleteModel(
-            name='SchemaValidationError',
+            name="SchemaValidationError",
         ),
     ]

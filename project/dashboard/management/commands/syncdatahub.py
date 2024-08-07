@@ -6,7 +6,7 @@ from zoneinfo import ZoneInfo
 
 import requests
 import semver
-from dashboard.models import APIKey, Feed
+from dashboard.models import APIKey, Feed, FeedData
 from django.contrib.gis.geos import Point
 from django.core.management.base import BaseCommand, CommandError
 from localflavor.us import us_states
@@ -198,8 +198,12 @@ class Command(BaseCommand):
             else:
                 feed_data_url = feed_requested.get("url").get("url")
 
+            feed.save()
+
+            feed_data_model = feed.feed_data() or FeedData(feed=feed)
             request_status = 0
             feed_data = dict()
+
             if feed_data_url is not None:
                 try:
                     feed_data_request = requests.get(feed_data_url, timeout=20)
@@ -227,10 +231,9 @@ class Command(BaseCommand):
                                 )
                             )
 
-            feed.response_code = request_status
-            feed.feed_data = feed_data
-
-            feed.save()
+            feed_data_model.response_code = request_status
+            feed_data_model.feed_data = feed_data
+            feed_data_model.save()
 
             if feed_requested.get("needapikey") and api_key[0] is None:
                 self.stdout.write(

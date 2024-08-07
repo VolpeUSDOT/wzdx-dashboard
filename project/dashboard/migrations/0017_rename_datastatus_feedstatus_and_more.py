@@ -6,16 +6,19 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dashboard', '0016_rename_status_datastatus_alter_datastatus_options'),
+        ("dashboard", "0016_rename_status_datastatus_alter_datastatus_options"),
     ]
 
     operations = [
         migrations.RenameModel(
-            old_name='DataStatus',
-            new_name='FeedStatus',
+            old_name="DataStatus",
+            new_name="FeedStatus",
         ),
         migrations.AlterModelOptions(
-            name='feedstatus',
-            options={'ordering': ['-datetime_checked'], 'verbose_name_plural': 'feed statuses'},
+            name="feedstatus",
+            options={
+                "ordering": ["-datetime_checked"],
+                "verbose_name_plural": "feed statuses",
+            },
         ),
     ]

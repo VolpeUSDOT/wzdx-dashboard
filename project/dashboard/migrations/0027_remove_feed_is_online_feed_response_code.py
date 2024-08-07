@@ -6,17 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dashboard', '0026_alter_feed_options'),
+        ("dashboard", "0026_alter_feed_options"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='feed',
-            name='is_online',
+            model_name="feed",
+            name="is_online",
         ),
         migrations.AddField(
-            model_name='feed',
-            name='response_code',
-            field=models.IntegerField(default=0, verbose_name='HTML Response Code'),
+            model_name="feed",
+            name="response_code",
+            field=models.IntegerField(default=0, verbose_name="HTML Response Code"),
         ),
     ]

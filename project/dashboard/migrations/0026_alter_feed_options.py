@@ -6,12 +6,12 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dashboard', '0025_feed_is_online'),
+        ("dashboard", "0025_feed_is_online"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='feed',
-            options={'ordering': ['state'], 'verbose_name_plural': 'feeds'},
+            name="feed",
+            options={"ordering": ["state"], "verbose_name_plural": "feeds"},
         ),
     ]

@@ -7,13 +7,15 @@ import localflavor.us.models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dashboard', '0023_schemaerrorstatus_most_common_count_and_more'),
+        ("dashboard", "0023_schemaerrorstatus_most_common_count_and_more"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='feed',
-            name='state',
-            field=localflavor.us.models.USStateField(blank=True, default='', max_length=2, verbose_name='State'),
+            model_name="feed",
+            name="state",
+            field=localflavor.us.models.USStateField(
+                blank=True, default="", max_length=2, verbose_name="State"
+            ),
         ),
     ]

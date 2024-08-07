@@ -6,23 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('docs', '0007_rename_markdowncontent_docscontent_and_more'),
+        ("docs", "0007_rename_markdowncontent_docscontent_and_more"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='docscontent',
-            options={'ordering': ['ordering'], 'verbose_name_plural': 'docs content'},
+            name="docscontent",
+            options={"ordering": ["ordering"], "verbose_name_plural": "docs content"},
         ),
         migrations.AddField(
-            model_name='docscontent',
-            name='ordering',
+            model_name="docscontent",
+            name="ordering",
             field=models.PositiveIntegerField(default=1, unique=True),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='docscontent',
-            name='slug',
+            model_name="docscontent",
+            name="slug",
             field=models.SlugField(unique=True),
         ),
     ]

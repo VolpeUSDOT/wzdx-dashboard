@@ -6,26 +6,32 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dashboard', '0017_rename_datastatus_feedstatus_and_more'),
+        ("dashboard", "0017_rename_datastatus_feedstatus_and_more"),
     ]
 
     operations = [
         migrations.AlterModelOptions(
-            name='outdatederror',
-            options={'ordering': ['-update_date'], 'verbose_name_plural': 'outdated errors'},
+            name="outdatederror",
+            options={
+                "ordering": ["-update_date"],
+                "verbose_name_plural": "outdated errors",
+            },
         ),
         migrations.AlterModelOptions(
-            name='staleerror',
-            options={'ordering': ['-latest_end_date'], 'verbose_name_plural': 'stale errors'},
+            name="staleerror",
+            options={
+                "ordering": ["-latest_end_date"],
+                "verbose_name_plural": "stale errors",
+            },
         ),
         migrations.RenameField(
-            model_name='staleerror',
-            old_name='end_date',
-            new_name='latest_end_date',
+            model_name="staleerror",
+            old_name="end_date",
+            new_name="latest_end_date",
         ),
         migrations.AddField(
-            model_name='staleerror',
-            name='amount_events_before_end_date',
-            field=models.PositiveIntegerField(default=0, verbose_name='Stale Events'),
+            model_name="staleerror",
+            name="amount_events_before_end_date",
+            field=models.PositiveIntegerField(default=0, verbose_name="Stale Events"),
         ),
     ]

@@ -2,10 +2,65 @@
 
 {% block title %}{{feed.issuingorganization}}{% endblock %}
 
+{% load static %}
+
+{% load leaflet_tags %}
+
+{% block head%}
+    {% leaflet_js %}
+    {% leaflet_css %}
+{% endblock %}
+
 {% block content %}
     <div class="usa-section">
         <div class="grid-container">
-            Work in progress!
+                <div class="usa-alert usa-alert--info margin-bottom-2">
+                    <div class="usa-alert__body">
+                    <h4 class="usa-alert__heading">Work in progress</h4>
+                    <p class="usa-alert__text">
+                        This page is still being expanded. If you have feedback, feel free to <a class="usa-link" href="mailto:diego.temkin@dot.gov">send the developers a comment</a>.
+                    </p>
+                    </div>
+                </div>
+            <div class="grid-row grid-gap">
+                <main
+                    class="desktop:grid-col flex-8" id="main-content"
+                >
+                <h1>{{feed.issuingorganization}}</h1>
+                <ul class="usa-icon-list">
+                    {% if feed.state %}
+                    <li class="usa-icon-list__item">
+                      <div class="usa-icon-list__icon text-blue">
+                        <svg class="usa-icon" aria-hidden="true" role="img">
+                          <use xlink:href="{% static '/uswds/img/sprite.svg' %}#account_balance"></use>
+                        </svg>
+                      </div>
+                      <div class="usa-icon-list__content">
+                        <span class="text-bold">State:</span> {{feed.state_name}}
+                      </div>
+                    </li>
+                    {% endif %}
+                    {% if feed.feed_status %}
+                    <li class="usa-icon-list__item">
+                      <div class="usa-icon-list__icon text-blue">
+                        <svg class="usa-icon" aria-hidden="true" role="img">
+                          <use xlink:href="{% static '/uswds/img/sprite.svg' %}#construction"></use>
+                        </svg>
+                      </div>
+                      <div class="usa-icon-list__content">
+                        <span class="text-bold">Status:</span> {{ feed.feed_status.status_type.label|title }}: {{ feed.feed_status.details }}
+                      </div>
+                    </li>
+                    {% endif %}
+                  </ul>
+            </main>
+            <div class="display-none desktop:display-block desktop:grid-col flex-4">
+                {% leaflet_map "feed_map_desktop" callback="window.map_init" %}
+            </div>
+        </div>
+        <div class="desktop:display-none height-mobile">
+            {% leaflet_map "feed_map_mobile" callback="window.map_init" %}
         </div>
     </div>
+</div>
 {% endblock %}

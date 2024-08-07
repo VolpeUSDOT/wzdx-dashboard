@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('docs', '0002_markdowncontent_slug'),
+        ("docs", "0002_markdowncontent_slug"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='markdowncontent',
-            name='slug',
+            model_name="markdowncontent",
+            name="slug",
             field=models.SlugField(blank=True, unique=True),
         ),
     ]

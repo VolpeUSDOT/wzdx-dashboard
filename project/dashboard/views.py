@@ -64,7 +64,6 @@ class FeedListView(ListView):
             "issuingorganization",
             "datafeed_frequency_update",
             "version",
-            "last_checked",
         )
 
         return queryset
