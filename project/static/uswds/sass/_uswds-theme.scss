@@ -26,6 +26,8 @@ in the form $setting: value,
 // $volpeParchment: "#f3efde";
 
 
-// @use "uswds-core" with (
-
-// )
+@use "uswds-core" with (
+    $theme-show-notifications: false,
+    $theme-banner-background-color: 'base-darkest',
+    $theme-identifier-background-color: 'blue-80v'
+)

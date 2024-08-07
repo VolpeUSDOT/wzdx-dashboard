@@ -17,7 +17,7 @@ class SearchForm(forms.Form):
         choices=FEED_CHOICES,
         widget=forms.Select(
             attrs={
-                "class": "usa-input",
+                "class": "usa-select",
                 "type": "search",
                 "name": "search",
             }

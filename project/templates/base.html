@@ -4,7 +4,6 @@
 <html lang='en'>
   <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
       WZDx Dashboard - {% block title %}{% endblock %}
@@ -22,7 +21,7 @@
   <body>
     <script src="{% static 'uswds/js/uswds.min.js' %}"></script>
     <a class="usa-skipnav" href="#main-content">Skip to main content</a>
-    {%if ".gov" in request.get_host %}{% include "components/banner.html" %}{% endif %}
+    {% include "components/banner.html" %}
     {% include "components/header.html" %}
 
     {% block content %}

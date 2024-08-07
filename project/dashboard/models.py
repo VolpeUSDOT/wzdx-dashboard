@@ -1,9 +1,9 @@
-from typing import Union
-
 import requests
 from django.contrib.gis.db import models
+from django.core.exceptions import ObjectDoesNotExist
 from django.utils.translation import gettext_lazy as _
-from localflavor.us import models as usmodels
+from localflavor.us import models as us_models
+from localflavor.us import us_states
 
 # Create your models here.
 
@@ -18,7 +18,7 @@ class Feed(models.Model):
     """
 
     # The following fields are all from the public data hub, https://data.transportation.gov/d/69qe-yiui
-    state = usmodels.USStateField(_("State"), blank=True, default="")
+    state = us_models.USStateField(_("State"), blank=True, default="")
     issuingorganization = models.CharField(_("Issuing Organization"), max_length=150)
     feedname = models.CharField(_("Feed Name"), primary_key=True, max_length=150)
     url = models.URLField(
@@ -63,17 +63,6 @@ class Feed(models.Model):
         null=True,
     )
 
-    # The following fields are needed for data processing
-    response_code = models.IntegerField(_("HTML Response Code"), default=0)
-    last_checked = models.DateTimeField(
-        _("Last Updated"),
-        auto_now=True,
-    )
-    feed_data = models.JSONField(
-        _("Feed Data"),
-        default=dict,
-    )
-
     class Meta:
         ordering = ["state"]
         verbose_name_plural = _("feeds")
@@ -90,7 +79,12 @@ class Feed(models.Model):
         if feed_status is None or feed_status.status_type != FeedStatus.StatusType.OK:
             return []
 
-        features = self.feed_data.get("features", [])
+        feed_data = self.feed_data() or {}
+
+        if not feed_data:
+            return []
+
+        features = feed_data.get("features", [])
 
         if not features:
             return features
@@ -146,6 +140,56 @@ class Feed(models.Model):
 
         if feed_status:
             return feed_status.status_type
+
+    def feed_data(self):
+        try:
+            feed_data = self.feeddata  # type: ignore
+            return feed_data.feed_data
+        except ObjectDoesNotExist:
+            return None
+
+    def response_code(self):
+        try:
+            feed_data = self.feeddata  # type: ignore
+            return feed_data.response_code
+        except ObjectDoesNotExist:
+            return None
+
+    def last_checked(self):
+        try:
+            feed_data = self.feeddata  # type: ignore
+            return feed_data.last_checked
+        except ObjectDoesNotExist:
+            return None
+
+    def state_name(self):
+        state_tuple = us_states.STATE_CHOICES
+
+        try:
+            state_index = list(zip(*state_tuple))[0].index(self.state)
+        except ValueError:
+            return None
+
+        return state_tuple[state_index][1]
+
+
+class FeedData(models.Model):
+    """Contains :model:`dashboard.Feed` JSON data, and other response information. In it's own model to not pull in all data whenever requesting feed information."""
+
+    feed = models.OneToOneField(
+        Feed,
+        on_delete=models.CASCADE,
+        primary_key=True,
+    )
+    response_code = models.IntegerField(_("HTML Response Code"), default=0)
+    last_checked = models.DateTimeField(
+        _("Last Updated"),
+        auto_now=True,
+    )
+    feed_data = models.JSONField(
+        _("Feed Data"),
+        default=dict,
+    )
 
 
 class FeedStatus(models.Model):
@@ -298,7 +342,7 @@ class OfflineErrorStatus(FeedStatus):
 
     def details(self):
         """Returns a string with detailed status. Rather than storing information twice, uses stored feed data to generate message."""
-        response_code, json_data = self.feed.response_code, self.feed.feed_data
+        response_code, json_data = self.feed.response_code(), self.feed.feed_data()
 
         if response_code == 0:
             return f"Feed is unreachable at URL due to request error."

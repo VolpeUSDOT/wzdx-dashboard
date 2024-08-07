@@ -120,16 +120,27 @@ REGISTRY = Registry(retrieve=retrieve_via_web).with_resources(
 # FEED CHECKER CLASSES
 def is_offline(feed: Feed):
     """Checks if feed response code was 200 and that JSON data was written."""
+
+    response_code = feed.response_code()
+
+    if response_code is None:
+        return True
+
+    feed_data = feed.feed_data()
+
+    if feed_data is None:
+        return True
+
     return (
-        (feed.response_code == 0)
-        or (feed.response_code != requests.codes.ok)
-        or (not bool(feed.feed_data))
+        (response_code == 0)
+        or (response_code != requests.codes.ok)
+        or (not bool(feed_data))
     )
 
 
 def get_schema_errors(feed: Feed):
     """If feed fails to validate against JSON schema"""
-    feed_data = feed.feed_data
+    feed_data = feed.feed_data()
     feed_version = feed.version
 
     errors: list[ValidationError] = []
@@ -148,7 +159,7 @@ def outdated(feed: Feed):
     # Recursively get all instances of "update_date"
     all_update_dates = [
         iso8601.parse_date(update_date_string, default_timezone=timezone.utc)
-        for update_date_string in find_all_instances_key(feed.feed_data, "update_date")
+        for update_date_string in find_all_instances_key(feed.feed_data(), "update_date")  # type: ignore
     ]
 
     is_outdated = (
@@ -170,7 +181,7 @@ def stale(feed: Feed):
     # Recursively get all instances of "update_date"
     all_end_dates = [
         iso8601.parse_date(end_date_string, default_timezone=timezone.utc)
-        for end_date_string in find_all_instances_key(feed.feed_data, "end_date")
+        for end_date_string in find_all_instances_key(feed.feed_data(), "end_date")  # type: ignore
     ]
 
     stale_events = [
