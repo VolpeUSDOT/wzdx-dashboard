@@ -1,4 +1,4 @@
-from dashboard.models import Feed, FeedData
+from dashboard.models import Feed
 from rest_framework import serializers
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
 
@@ -13,7 +13,10 @@ class FeedPointsSerializer(
 
     class Meta:
         model = Feed
-        fields = ("status_type", "issuingorganization")
+        fields = (
+            "status_type",
+            "issuingorganization",
+        )
         geo_field = "geocoded_column"
         auto_bbox = True
 

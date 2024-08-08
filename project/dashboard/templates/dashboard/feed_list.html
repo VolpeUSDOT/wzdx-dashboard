@@ -27,11 +27,13 @@
 
         function map_init(map, options) {
             
+            {% if bounding_box %}
             const mapBounds = L.latLngBounds([
-                [37.09024, -125.001650],
-                [49.384358, -66.934570]
+                {{bounding_box}}
+                
             ]);
             map.fitBounds(mapBounds);
+            {% endif %}
           
             const layerGroup = L.layerGroup().addTo(map);
           

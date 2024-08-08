@@ -1,4 +1,4 @@
-from dashboard.models import Feed, FeedData
+from dashboard.models import Feed
 from rest_framework import viewsets
 from rest_framework_gis import filters
 
@@ -11,7 +11,7 @@ class FeedPointsViewSet(
 ):
     bbox_filter_field = "geocoded_column"
     filter_backends = [filters.InBBoxFilter]
-    queryset = Feed.objects.all()
+    queryset = Feed.objects.only("issuingorganization").all()
     serializer_class = FeedPointsSerializer
 
 

@@ -1,5 +1,6 @@
 from typing import Optional, Union
 
+from django.contrib.gis.db.models import Extent
 from django.core.paginator import Page, Paginator
 from django.db.models import F
 from django.views.generic import DetailView, ListView
@@ -64,6 +65,7 @@ class FeedListView(ListView):
             "issuingorganization",
             "datafeed_frequency_update",
             "version",
+            "geocoded_column",
         )
 
         return queryset
@@ -74,6 +76,19 @@ class FeedListView(ListView):
             context["paginator"], context["page_obj"]
         )
         context["search_form"] = SearchForm()
+
+        bounding_box = (
+            context["feeds"]
+            .values("geocoded_column")
+            .aggregate(Extent("geocoded_column"))
+            .get("geocoded_column__extent", [])
+        )
+
+        if bounding_box:
+            context["bounding_box"] = [
+                [bounding_box[1], bounding_box[0]],
+                [bounding_box[3], bounding_box[2]],
+            ]
 
         return context
 
