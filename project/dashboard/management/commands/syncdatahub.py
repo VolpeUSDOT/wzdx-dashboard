@@ -200,7 +200,7 @@ class Command(BaseCommand):
 
             feed.save()
 
-            feed_data_model = feed.feed_data() or FeedData(feed=feed)
+            feed_data_model = feed.feeddata or FeedData(feed=feed)  # type: ignore
             request_status = 0
             feed_data = dict()
 
