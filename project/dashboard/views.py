@@ -1,5 +1,6 @@
 from typing import Optional, Union
 
+from django.contrib.gis.db.models import Extent
 from django.core.paginator import Page, Paginator
 from django.db.models import F
 from django.views.generic import DetailView, ListView
@@ -59,12 +60,7 @@ class FeedListView(ListView):
     def get_queryset(self):
         queryset = super().get_queryset()
 
-        queryset = queryset.only(
-            "state",
-            "issuingorganization",
-            "datafeed_frequency_update",
-            "version",
-        )
+        queryset = queryset.only("state", "issuingorganization", "geocoded_column")
 
         return queryset
 
@@ -81,6 +77,19 @@ class FeedListView(ListView):
 class FeedDetailView(DetailView):
     model = Feed
     context_object_name = "feed"
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        queryset = queryset.only(
+            "state",
+            "issuingorganization",
+            "version",
+            "datafeed_frequency_update",
+            "feedname",
+        )
+
+        return queryset
 
     # def get_object(self):
     #     obj = super().get_object()
