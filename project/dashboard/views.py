@@ -60,13 +60,7 @@ class FeedListView(ListView):
     def get_queryset(self):
         queryset = super().get_queryset()
 
-        queryset = queryset.only(
-            "state",
-            "issuingorganization",
-            "datafeed_frequency_update",
-            "version",
-            "geocoded_column",
-        )
+        queryset = queryset.only("state", "issuingorganization", "geocoded_column")
 
         return queryset
 
@@ -77,25 +71,25 @@ class FeedListView(ListView):
         )
         context["search_form"] = SearchForm()
 
-        bounding_box = (
-            context["feeds"]
-            .values("geocoded_column")
-            .aggregate(Extent("geocoded_column"))
-            .get("geocoded_column__extent", [])
-        )
-
-        if bounding_box:
-            context["bounding_box"] = [
-                [bounding_box[1], bounding_box[0]],
-                [bounding_box[3], bounding_box[2]],
-            ]
-
         return context
 
 
 class FeedDetailView(DetailView):
     model = Feed
     context_object_name = "feed"
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        queryset = queryset.only(
+            "state",
+            "issuingorganization",
+            "version",
+            "datafeed_frequency_update",
+            "feedname",
+        )
+
+        return queryset
 
     # def get_object(self):
     #     obj = super().get_object()
