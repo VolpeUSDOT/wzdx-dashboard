@@ -1,4 +1,5 @@
-from django.forms import ModelForm, Textarea, TextInput
+from django.db.models import F, Q
+from django.forms import ModelForm, Select, Textarea, TextInput
 from django.utils.translation import gettext_lazy as _
 
 from .models import DocsContent
@@ -7,7 +8,7 @@ from .models import DocsContent
 class DocsContentForm(ModelForm):
     class Meta:
         model = DocsContent
-        fields = ["title", "intro", "content", "ordering"]
+        fields = ["title", "intro", "content", "ordering", "parent_content"]
         widgets = {
             "title": TextInput(attrs={"class": "usa-input"}),
             "intro": Textarea(attrs={"class": "usa-textarea", "rows": "", "cols": ""}),
@@ -15,10 +16,12 @@ class DocsContentForm(ModelForm):
                 attrs={"class": "usa-textarea", "rows": "", "cols": ""}
             ),
             "ordering": TextInput(attrs={"class": "usa-input", "type": "number"}),
+            "parent_content": Select(attrs={"class": "usa-select"}),
         }
         labels = {
             "title": _("Title"),
             "intro": _("Intro"),
             "content": _("Content"),
             "ordering": _("Ordering"),
+            "parent_content": _("Parent Link"),
         }

@@ -1,0 +1,10 @@
+<li class="usa-sidenav__item">
+    <a href="/docs/{{ slug }}" class="{% if slug == docs_content.slug %}usa-current{% endif %}">{{ title }}</a>
+    {% if children%}
+        <ul class="usa-sidenav__sublist">
+        {% for doc_child in children %}
+            {% include "docs/sidebar_link.html" with slug=doc_child.slug title=doc_child.title children=doc_child.children %}
+        {% endfor %}
+        </ul>
+    {% endif %}
+</li>

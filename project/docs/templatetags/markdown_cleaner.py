@@ -6,7 +6,7 @@ from docs.markdown_extensions import SlugFieldExtension
 
 register = template.Library()
 
-MD_EXTENSIONS = ["fenced_code", "toc", "codehilite", SlugFieldExtension()]
+MD_EXTENSIONS = ["fenced_code", "codehilite", SlugFieldExtension()]
 
 
 @register.filter
@@ -14,11 +14,3 @@ MD_EXTENSIONS = ["fenced_code", "toc", "codehilite", SlugFieldExtension()]
 def render_markdown(value):
     md = markdown.Markdown(extensions=MD_EXTENSIONS)
     return mark_safe(md.convert(value))
-
-
-@register.filter
-@stringfilter
-def get_toc(value):
-    md = markdown.Markdown(extensions=MD_EXTENSIONS)
-    html = md.convert(value)
-    return md.toc_tokens  # type: ignore
