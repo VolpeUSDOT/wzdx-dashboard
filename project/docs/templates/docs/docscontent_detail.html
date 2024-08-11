@@ -20,11 +20,11 @@
             <nav aria-label="Secondary navigation">
                 <ul class="usa-sidenav">
                 {% for docs_link in all_docs %}
-                    {% include 'docs/sidebar_link.html' with slug=docs_link.slug title=docs_link.title children=docs_link.children %}
+                    {% include 'docs/sidebar_link.html' with slug=docs_link.slug title=docs_link.title children=docs_link.children url=doc_child.get_absolute_url %}
                 {% endfor%}
                 {% if user.is_staff %}
                     <li class="usa-sidenav__item">
-                        <a href="/docs/add">
+                        <a href="{% url 'docs-add' %}">
                             <svg class="usa-icon bottom-neg-2px" aria-hidden="true" role="img">
                                 <use xlink:href="{% static 'uswds/img/sprite.svg' %}#add"></use>
                             </svg>
@@ -49,7 +49,7 @@
                 {% if user.is_staff %}
                     <div class="usa-button-group" role="toolbar">
                         <div class="usa-button-group__item">
-                            <a href="/docs/{{docs_content.slug}}/update" class="usa-button">
+                            <a href="{% url 'docs-update' docs_content.slug %}" class="usa-button">
                                 <svg class="usa-icon" aria-hidden="true" role="img">
                                     <use xlink:href="{% static 'uswds/img/sprite.svg' %}#edit"></use>
                                 </svg>
@@ -57,7 +57,7 @@
                             </a>
                         </div>
                         <div class="usa-button-group__item">
-                            <a href="/docs/{{docs_content.slug}}/delete" class="usa-button usa-button--secondary">
+                            <a href="{% url 'docs-delete' docs_content.slug %}" class="usa-button usa-button--secondary">
                                 <svg class="usa-icon" aria-hidden="true" role="img">
                                     <use xlink:href="{% static 'uswds/img/sprite.svg' %}#delete"></use>
                                 </svg>
@@ -80,11 +80,11 @@
         <nav aria-label="Secondary navigation">
             <ul class="usa-sidenav">
                 {% for docs_link in all_docs %}
-                {% include 'docs/sidebar_link.html' with slug=docs_link.slug title=docs_link.title children=docs_link.children %}
+                {% include 'docs/sidebar_link.html' with docs_link=docs_link %}
                     {% endfor%}
                     {% if user.is_staff %}
                         <li class="usa-sidenav__item">
-                            <a href="/docs/add">
+                            <a href="{% url 'docs-add' %}">
                                 <svg class="usa-icon bottom-neg-2px" aria-hidden="true" role="img">
                                     <use xlink:href="{% static 'uswds/img/sprite.svg' %}#add"></use>
                                 </svg>

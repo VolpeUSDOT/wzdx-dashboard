@@ -38,7 +38,7 @@
                             {% for feed in feeds %}
                                 <tr>
                                     <td>{%if feed.state %}{{ feed.state }}{%else%}N/A{%endif%}</td>
-                                    <td>{{ feed.issuingorganization }}</td>
+                                    <td><a href="{% url 'feed-detail' feed.pk%}">{{ feed.issuingorganization }}</a></td>
                                     <td class="{% if feed.feed_status.is_error %}text-red{% else %}text-green{% endif %}">{{ feed.feed_status.status_type.label|upper }}</td>
                                     <td>{{ feed.feed_status.status_since|naturaltime }}</td>
                                 </tr>

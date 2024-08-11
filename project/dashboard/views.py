@@ -57,13 +57,6 @@ class FeedListView(ListView):
     paginate_by = 8
     context_object_name = "feeds"
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-
-        queryset = queryset.only("state", "issuingorganization", "geocoded_column")
-
-        return queryset
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["page_range"] = get_page_button_array(
@@ -77,19 +70,6 @@ class FeedListView(ListView):
 class FeedDetailView(DetailView):
     model = Feed
     context_object_name = "feed"
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-
-        queryset = queryset.only(
-            "state",
-            "issuingorganization",
-            "version",
-            "datafeed_frequency_update",
-            "feedname",
-        )
-
-        return queryset
 
     # def get_object(self):
     #     obj = super().get_object()

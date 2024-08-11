@@ -21,7 +21,7 @@ def docs_redirect(request):
     docs_first = DocsContent.objects.first()
 
     if docs_first is None:
-        raise Http404("No docs exit.")
+        raise Http404("No docs exist.")
 
     return redirect(docs_first)
 

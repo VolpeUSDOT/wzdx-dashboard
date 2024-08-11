@@ -42,5 +42,5 @@ urlpatterns = [
     path("feeds/", include("dashboard.urls")),
     path("docs/", include("docs.urls")),
     path("api/", include("api.api")),
-    path("", RedirectView.as_view(url="feeds/")),
+    path("", RedirectView.as_view(pattern_name="feed-list")),
 ]

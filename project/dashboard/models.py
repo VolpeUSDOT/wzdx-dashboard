@@ -174,7 +174,7 @@ class Feed(models.Model):
         return state_tuple[state_index][1]
 
     def get_absolute_url(self):
-        return reverse("feed_detail", kwargs={"pk": self.feedname})
+        return reverse("feed-detail", kwargs={"pk": self.feedname})
 
 
 class FeedData(models.Model):
