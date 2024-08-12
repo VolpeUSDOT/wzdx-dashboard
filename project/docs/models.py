@@ -17,6 +17,7 @@ class DocsContent(models.Model):
     parent_content = models.ForeignKey(
         "self",
         on_delete=models.SET_NULL,
+        blank=True,
         null=True,
     )
 
