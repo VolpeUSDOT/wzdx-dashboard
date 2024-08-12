@@ -20,7 +20,7 @@
             <nav aria-label="Secondary navigation">
                 <ul class="usa-sidenav">
                 {% for docs_link in all_docs %}
-                    {% include 'docs/sidebar_link.html' with slug=docs_link.slug title=docs_link.title children=docs_link.children url=doc_child.get_absolute_url %}
+                    {% include 'docs/sidebar_link.html' with docs_link=docs_link %}
                 {% endfor%}
                 {% if user.is_staff %}
                     <li class="usa-sidenav__item">
