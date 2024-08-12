@@ -91,7 +91,7 @@ class FeedDetailView(DetailView):
         context["status_summary"] = [
             (
                 FeedStatus.StatusType(status["status_type"]).label,
-                status["count"] / total_status_count * 100,
+                str(round(status["count"] / total_status_count * 100, 2)),
             )
             for status in (
                 FeedStatus.objects.filter(
