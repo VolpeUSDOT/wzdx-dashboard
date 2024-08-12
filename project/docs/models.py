@@ -19,7 +19,7 @@ class DocsContent(models.Model):
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
-    )
+    )  # type: models.ForeignKey[DocsContent] # type: ignore
 
     def clean(self):
         if self.parent_content and self.parent_content.pk == self.pk:
@@ -44,3 +44,17 @@ class DocsContent(models.Model):
 
     def children(self):
         return DocsContent.objects.filter(parent_content=self)
+
+    def all_children_slugs(self):
+        return [self.slug] + [
+            children_slug
+            for children_slugs in self.children()
+            for children_slug in children_slugs.all_children_slugs()
+        ]
+
+    def all_parent_slugs(self):
+        return [
+            slug
+            for slug in self.parent_content.all_parent_slugs()
+            if self.parent_content
+        ]
