@@ -11,7 +11,7 @@ FEED_CHOICES = [("", "Find a feed!")] + [
 
 
 class SearchForm(forms.Form):
-    template_name = "dashboard/search_feeds.html"
+    template_name = "dashboard/components/search_feeds.html"
 
     search_feed = forms.ChoiceField(
         choices=FEED_CHOICES,

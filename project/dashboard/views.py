@@ -1,12 +1,12 @@
+from datetime import date, timedelta
 from typing import Optional, Union
 
-from django.contrib.gis.db.models import Extent
+from django.contrib.gis.db.models import Count, Extent, F
 from django.core.paginator import Page, Paginator
-from django.db.models import F
 from django.views.generic import DetailView, ListView
 
 from .forms import SearchForm
-from .models import Feed
+from .models import Feed, FeedStatus
 
 
 def get_page_button_array(
@@ -80,5 +80,28 @@ class FeedDetailView(DetailView):
         context = super().get_context_data(**kwargs)
 
         context["search_form"] = SearchForm(initial={"search_feed": context["feed"].pk})
+
+        enddate = date.today()
+        startdate = enddate - timedelta(days=14)
+
+        total_status_count = FeedStatus.objects.filter(
+            feed=context["feed"].pk, datetime_checked__range=[startdate, enddate]
+        ).count()
+
+        context["status_summary"] = [
+            (
+                FeedStatus.StatusType(status["status_type"]).label,
+                status["count"] / total_status_count * 100,
+            )
+            for status in (
+                FeedStatus.objects.filter(
+                    feed=context["feed"].pk,
+                    datetime_checked__range=[startdate, enddate],
+                )
+                .values("status_type")
+                .annotate(count=Count("status_type"))
+                .order_by("-count")
+            )
+        ]
 
         return context
