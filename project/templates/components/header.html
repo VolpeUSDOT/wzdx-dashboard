@@ -17,31 +17,31 @@
       </button>
       <ul class="usa-nav__primary usa-accordion">
         <li class="usa-nav__primary-item">
-          <a href="/feeds/" class="usa-nav-link{% if '/feeds/' in request.path %} usa-current{%endif%}"
+          <a href="{% url 'feed-list' %}" class="usa-nav-link{% if '/feeds/' in request.path %} usa-current{%endif%}"
             ><span>Home</span></a
           >
         </li>
         <li class="usa-nav__primary-item">
-          <a href="/docs/" class="usa-nav-link{% if '/docs/' in request.path %} usa-current{%endif%}"
+          <a href="{% url 'docs-redirect' %}" class="usa-nav-link{% if '/docs/' in request.path %} usa-current{%endif%}"
             ><span>Docs</span></a
           >
         </li>
         {% if user.is_authenticated %}
           {% if user.is_staff %}
             <li class="usa-nav__primary-item">
-              <a href="/admin/" class="usa-nav-link {% if '/admin/' in request.path %} usa-current{%endif%}"
+              <a href="{% url 'admin:index' %}" class="usa-nav-link {% if '/admin/' in request.path %} usa-current{%endif%}"
                 ><span>Admin</span></a
               >
             </li>
           {% endif %}
           <li class="usa-nav__primary-item">
-            <a href="/accounts/logout/" class="usa-nav-link {% if '/accounts/logout/' in request.path %} usa-current{%endif%}"
+            <a href="{% url 'logout' %}" class="usa-nav-link {% if '/accounts/logout/' in request.path %} usa-current{%endif%}"
               ><span>Logout</span></a
             >
           </li>
         {% else %}
         <li class="usa-nav__primary-item">
-          <a href="/accounts/login/" class="usa-nav-link {% if '/accounts/login/' in request.path %} usa-current{%endif%}"
+          <a href="{% url 'login' %}" class="usa-nav-link {% if '/accounts/login/' in request.path %} usa-current{%endif%}"
             ><span>Login</span></a
           >
         </li>

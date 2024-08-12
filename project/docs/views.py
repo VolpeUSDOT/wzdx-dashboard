@@ -21,7 +21,7 @@ def docs_redirect(request):
     docs_first = DocsContent.objects.first()
 
     if docs_first is None:
-        raise Http404("No docs exit.")
+        raise Http404("No docs exist.")
 
     return redirect(docs_first)
 
@@ -33,7 +33,9 @@ class DocsContentView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context["all_docs"] = DocsContent.objects.values("title", "slug")
+        context["all_docs"] = DocsContent.objects.filter(parent_content_id=None).only(
+            "title", "slug"
+        )
         return context
 
 

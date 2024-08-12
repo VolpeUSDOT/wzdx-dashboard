@@ -24,109 +24,110 @@
 {% endblock %}
 
 {% block content %}
-    <div class="usa-section">
-        <div class="grid-container">
-                <div class="usa-alert usa-alert--info margin-bottom-2">
-                    <div class="usa-alert__body">
-                    <h4 class="usa-alert__heading">Work in progress</h4>
-                    <p class="usa-alert__text">
-                        This page is still being expanded. If you have feedback, feel free to <a class="usa-link" href="mailto:diego.temkin@dot.gov">send the developers a comment</a>.
-                    </p>
-                    </div>
-                </div>
-            <div class="grid-row grid-gap">
-                <main
-                    class="desktop:grid-col flex-6" id="main-content"
-                >
+  <div class="usa-section">
+      <div class="grid-container">
+          <div class="grid-row grid-gap">
+              <main
+                  class="tablet:grid-col" id="main-content"
+              >
                 <h1>{{feed.issuingorganization}} - <span class="{% if feed.feed_status.is_error %}text-red{% else %}text-green{% endif %}">{{ feed.feed_status.status_type.label|title }}</span></h1>
                 <ul class="usa-icon-list">
+                  {% if feed.state %}
+                  <li class="usa-icon-list__item">
+                    <div class="usa-icon-list__icon text-blue">
+                      <svg class="usa-icon" aria-hidden="true" role="img">
+                        <use xlink:href="{% static '/uswds/img/sprite.svg' %}#account_balance"></use>
+                      </svg>
+                    </div>
+                    <div class="usa-icon-list__content">
+                      <span class="text-bold">State:</span> {{feed.state_name}}
+                    </div>
+                  </li>
+                  {% endif %}
 
-                    {% if feed.state %}
-                    <li class="usa-icon-list__item">
-                      <div class="usa-icon-list__icon text-blue">
-                        <svg class="usa-icon" aria-hidden="true" role="img">
-                          <use xlink:href="{% static '/uswds/img/sprite.svg' %}#account_balance"></use>
-                        </svg>
-                      </div>
-                      <div class="usa-icon-list__content">
-                        <span class="text-bold">State:</span> {{feed.state_name}}
-                      </div>
-                    </li>
-                    {% endif %}
+                  {% if feed.feed_status %}
+                  <li class="usa-icon-list__item">
+                    <div class="usa-icon-list__icon text-blue">
+                      <svg class="usa-icon" aria-hidden="true" role="img">
+                        <use xlink:href="{% static '/uswds/img/sprite.svg' %}#construction"></use>
+                      </svg>
+                    </div>
+                    <div class="usa-icon-list__content">
+                      <span class="text-bold">Detailed Status:</span> {{ feed.feed_status.details }}
+                    </div>
+                  </li>
+                  {% endif %}
 
-                    {% if feed.feed_status %}
-                    <li class="usa-icon-list__item">
-                      <div class="usa-icon-list__icon text-blue">
-                        <svg class="usa-icon" aria-hidden="true" role="img">
-                          <use xlink:href="{% static '/uswds/img/sprite.svg' %}#construction"></use>
-                        </svg>
-                      </div>
-                      <div class="usa-icon-list__content">
-                        <span class="text-bold">Detailed Status:</span> {{ feed.feed_status.details }}
-                      </div>
-                    </li>
-                    {% endif %}
+                  {% if feed.feed_status.status_since %}
+                  <li class="usa-icon-list__item">
+                    <div class="usa-icon-list__icon text-blue">
+                      <svg class="usa-icon" aria-hidden="true" role="img">
+                        <use xlink:href="{% static '/uswds/img/sprite.svg' %}#event"></use>
+                      </svg>
+                    </div>
+                    <div class="usa-icon-list__content">
+                      <span class="text-bold">Status Since:</span> {{ feed.feed_status.status_since }} ({{ feed.feed_status.status_since|naturaltime }})
+                    </div>
+                  </li>
+                  {% endif %}
 
-                    {% if feed.feed_status.status_since %}
-                    <li class="usa-icon-list__item">
-                      <div class="usa-icon-list__icon text-blue">
-                        <svg class="usa-icon" aria-hidden="true" role="img">
-                          <use xlink:href="{% static '/uswds/img/sprite.svg' %}#event"></use>
-                        </svg>
-                      </div>
-                      <div class="usa-icon-list__content">
-                        <span class="text-bold">Status Since:</span> {{ feed.feed_status.status_since }} ({{ feed.feed_status.status_since|naturaltime }})
-                      </div>
-                    </li>
-                    {% endif %}
+                  {% if feed.version %}
+                  <li class="usa-icon-list__item">
+                    <div class="usa-icon-list__icon text-blue">
+                      <svg class="usa-icon" aria-hidden="true" role="img">
+                        <use xlink:href="{% static '/uswds/img/sprite.svg' %}#code"></use>
+                      </svg>
+                    </div>
+                    <div class="usa-icon-list__content">
+                      <span class="text-bold">Spec Version:</span> {{ feed.version }}
+                    </div>
+                  </li>
+                  {% endif %}
 
-                    {% if feed.version %}
-                    <li class="usa-icon-list__item">
-                      <div class="usa-icon-list__icon text-blue">
-                        <svg class="usa-icon" aria-hidden="true" role="img">
-                          <use xlink:href="{% static '/uswds/img/sprite.svg' %}#code"></use>
-                        </svg>
-                      </div>
-                      <div class="usa-icon-list__content">
-                        <span class="text-bold">Spec Version:</span> {{ feed.version }}
-                      </div>
-                    </li>
-                    {% endif %}
+                  {% if feed.datafeed_frequency_update %}
+                  <li class="usa-icon-list__item">
+                    <div class="usa-icon-list__icon text-blue">
+                      <svg class="usa-icon" aria-hidden="true" role="img">
+                        <use xlink:href="{% static '/uswds/img/sprite.svg' %}#timer"></use>
+                      </svg>
+                    </div>
+                    <div class="usa-icon-list__content">
+                      <span class="text-bold">Update Frequency:</span> {{ feed.datafeed_frequency_update|precisedelta }}
+                    </div>
+                  </li>
+                  {% endif %}
 
-                    {% if feed.datafeed_frequency_update %}
-                    <li class="usa-icon-list__item">
-                      <div class="usa-icon-list__icon text-blue">
-                        <svg class="usa-icon" aria-hidden="true" role="img">
-                          <use xlink:href="{% static '/uswds/img/sprite.svg' %}#timer"></use>
-                        </svg>
-                      </div>
-                      <div class="usa-icon-list__content">
-                        <span class="text-bold">Update Frequency:</span> {{ feed.datafeed_frequency_update|precisedelta }}
-                      </div>
-                    </li>
-                    {% endif %}
+                  {% if feed.last_checked %}
+                  <li class="usa-icon-list__item">
+                    <div class="usa-icon-list__icon text-blue">
+                      <svg class="usa-icon" aria-hidden="true" role="img">
+                        <use xlink:href="{% static '/uswds/img/sprite.svg' %}#file_download"></use>
+                      </svg>
+                    </div>
+                    <div class="usa-icon-list__content">
+                      <span class="text-bold">Last Pulled:</span> {{ feed.last_checked|naturaltime }}
+                    </div>
+                  </li>
+                {% endif %}
 
-                    {% if feed.last_checked %}
-                    <li class="usa-icon-list__item">
-                      <div class="usa-icon-list__icon text-blue">
-                        <svg class="usa-icon" aria-hidden="true" role="img">
-                          <use xlink:href="{% static '/uswds/img/sprite.svg' %}#file_download"></use>
-                        </svg>
-                      </div>
-                      <div class="usa-icon-list__content">
-                        <span class="text-bold">Last Pulled:</span> {{ feed.last_checked|naturaltime }}
-                      </div>
-                    </li>
-                    {% endif %}
-                  </ul>
-            </main>
-            <div class="display-none desktop:display-block desktop:grid-col flex-6">
-                {% leaflet_map "feed_map_desktop" callback="window.map_init" %}
-            </div>
-        </div>
-        <div class="desktop:display-none height-mobile">
-            {% leaflet_map "feed_map_mobile" callback="window.map_init" %}
-        </div>
+                {% if status_summary %}
+                  <li class="usa-icon-list__item">
+                    <div class="usa-icon-list__icon text-blue">
+                      <svg class="usa-icon" aria-hidden="true" role="img">
+                        <use xlink:href="{% static '/uswds/img/sprite.svg' %}#history"></use>
+                      </svg>
+                    </div>
+                    <div class="usa-icon-list__content">
+                      <span class="text-bold">Status History (14 Days):</span> {% for status in status_summary %}{{status.0|title}}: {{status.1}}%{% if not forloop.last%}, {% endif %}{% endfor %}
+                    </div>
+                  </li>
+                {% endif %}
+              </ul>
+          </main>
+          <div class="tablet:grid-col">
+              {% leaflet_map "feed_map_desktop" callback="window.map_init" %}
+          </div>
+      </div>
     </div>
-</div>
+  </div>
 {% endblock %}

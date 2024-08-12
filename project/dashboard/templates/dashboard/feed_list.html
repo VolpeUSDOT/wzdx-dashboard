@@ -25,7 +25,7 @@
                 class="desktop:grid-col flex-8" id="main-content"
             >
                 <div class="overflow-x" tabindex="0">
-                    <table class="usa-table usa-table--borderless usa-table--compact">
+                    <table class="usa-table usa-table--borderless usa-table--compact width-full">
                         <thead>
                             <tr>
                                 <th scope="col">State</th>
@@ -38,7 +38,7 @@
                             {% for feed in feeds %}
                                 <tr>
                                     <td>{%if feed.state %}{{ feed.state }}{%else%}N/A{%endif%}</td>
-                                    <td>{{ feed.issuingorganization }}</td>
+                                    <td><a href="{% url 'feed-detail' feed.pk%}">{{ feed.issuingorganization }}</a></td>
                                     <td class="{% if feed.feed_status.is_error %}text-red{% else %}text-green{% endif %}">{{ feed.feed_status.status_type.label|upper }}</td>
                                     <td>{{ feed.feed_status.status_since|naturaltime }}</td>
                                 </tr>

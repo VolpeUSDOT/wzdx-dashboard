@@ -1,12 +1,12 @@
+from datetime import date, timedelta
 from typing import Optional, Union
 
-from django.contrib.gis.db.models import Extent
+from django.contrib.gis.db.models import Count, Extent, F
 from django.core.paginator import Page, Paginator
-from django.db.models import F
 from django.views.generic import DetailView, ListView
 
 from .forms import SearchForm
-from .models import Feed
+from .models import Feed, FeedStatus
 
 
 def get_page_button_array(
@@ -57,13 +57,6 @@ class FeedListView(ListView):
     paginate_by = 8
     context_object_name = "feeds"
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-
-        queryset = queryset.only("state", "issuingorganization", "geocoded_column")
-
-        return queryset
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["page_range"] = get_page_button_array(
@@ -78,19 +71,6 @@ class FeedDetailView(DetailView):
     model = Feed
     context_object_name = "feed"
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-
-        queryset = queryset.only(
-            "state",
-            "issuingorganization",
-            "version",
-            "datafeed_frequency_update",
-            "feedname",
-        )
-
-        return queryset
-
     # def get_object(self):
     #     obj = super().get_object()
     #     # Get more data here!
@@ -100,5 +80,28 @@ class FeedDetailView(DetailView):
         context = super().get_context_data(**kwargs)
 
         context["search_form"] = SearchForm(initial={"search_feed": context["feed"].pk})
+
+        enddate = date.today()
+        startdate = enddate - timedelta(days=14)
+
+        total_status_count = FeedStatus.objects.filter(
+            feed=context["feed"].pk, datetime_checked__range=[startdate, enddate]
+        ).count()
+
+        context["status_summary"] = [
+            (
+                FeedStatus.StatusType(status["status_type"]).label,
+                status["count"] / total_status_count * 100,
+            )
+            for status in (
+                FeedStatus.objects.filter(
+                    feed=context["feed"].pk,
+                    datetime_checked__range=[startdate, enddate],
+                )
+                .values("status_type")
+                .annotate(count=Count("status_type"))
+                .order_by("-count")
+            )
+        ]
 
         return context

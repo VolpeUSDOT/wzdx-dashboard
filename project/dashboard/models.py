@@ -1,6 +1,7 @@
 import requests
 from django.contrib.gis.db import models
 from django.core.exceptions import ObjectDoesNotExist
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from localflavor.us import models as us_models
 from localflavor.us import us_states
@@ -171,6 +172,9 @@ class Feed(models.Model):
             return None
 
         return state_tuple[state_index][1]
+
+    def get_absolute_url(self):
+        return reverse("feed-detail", kwargs={"pk": self.feedname})
 
 
 class FeedData(models.Model):

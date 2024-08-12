@@ -1,0 +1,10 @@
+<li class="usa-sidenav__item">
+    <a href="{% url 'docs-view' docs_link.slug%}" class="{% if docs_link.slug == docs_content.slug %}usa-current{% endif %}">{{ docs_link.title }}</a>
+    {% if docs_link.children %}
+        <ul class="usa-sidenav__sublist">
+        {% for doc_child in docs_link.children %}
+            {% include "docs/sidebar_link.html" with docs_link=doc_child %}
+        {% endfor %}
+        </ul>
+    {% endif %}
+</li>

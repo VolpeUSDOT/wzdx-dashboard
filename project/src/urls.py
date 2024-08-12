@@ -16,15 +16,31 @@ Including another URLconf
 """
 
 from django.contrib import admin
+from django.contrib.sitemaps import views
+from django.contrib.sitemaps.views import sitemap
 from django.urls import include, path
 from django.views.generic.base import RedirectView
 
+from .sitemaps import sitemaps
+
 urlpatterns = [
+    path(
+        "sitemap.xml",
+        views.index,
+        {"sitemaps": sitemaps},
+        name="django.contrib.sitemaps.views.index",
+    ),
+    path(
+        "sitemap-<section>.xml",
+        views.sitemap,
+        {"sitemaps": sitemaps},
+        name="django.contrib.sitemaps.views.sitemap",
+    ),
     path("admin/doc/", include("django.contrib.admindocs.urls")),
     path("admin/", admin.site.urls),
     path("accounts/", include("django.contrib.auth.urls")),
     path("feeds/", include("dashboard.urls")),
     path("docs/", include("docs.urls")),
     path("api/", include("api.api")),
-    path("", RedirectView.as_view(url="feeds/")),
+    path("", RedirectView.as_view(pattern_name="feed-list")),
 ]
