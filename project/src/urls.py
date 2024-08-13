@@ -17,7 +17,6 @@ Including another URLconf
 
 from django.contrib import admin
 from django.contrib.sitemaps import views
-from django.contrib.sitemaps.views import sitemap
 from django.urls import include, path
 from django.views.generic.base import RedirectView
 
@@ -42,5 +41,5 @@ urlpatterns = [
     path("feeds/", include("dashboard.urls")),
     path("docs/", include("docs.urls")),
     path("api/", include("api.api")),
-    path("", RedirectView.as_view(pattern_name="feed-list")),
+    path("", RedirectView.as_view(pattern_name="feed-list"), name="root"),
 ]

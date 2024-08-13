@@ -153,6 +153,11 @@ FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 LOGIN_REDIRECT_URL = "/feeds"
 LOGOUT_REDIRECT_URL = "/accounts/login"
 
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False
+SECURE_SSL_REDIRECT = False
+CSRF_TRUSTED_ORIGIN = []
+
 try:
     from .local_settings import *
 except ImportError:

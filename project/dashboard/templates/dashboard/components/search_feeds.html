@@ -1,17 +1,13 @@
 {% load static %}
-
 <form class="usa-search usa-search--small" id="search_feeds" role="search">
     {% for field in form %}
         <label class="usa-sr-only" for="{{ field.auto_id }}">{{ field.label }}</label>
         {{ field }}
     {% endfor %}
-  <button class="usa-button" type="submit">
-    <img
-      src="{% static '/uswds/img/usa-icons-bg/navigate_next--white.svg' %}"
-      class="usa-search__submit-icon"
-      alt="Search"
-    />
-  </button>
+    <button class="usa-button" type="submit">
+        <img src="{% static '/uswds/img/usa-icons-bg/navigate_next--white.svg' %}"
+             class="usa-search__submit-icon"
+             alt="Search" />
+    </button>
 </form>
-
 <script src={% static 'dashboard/search_url.js' %}></script>

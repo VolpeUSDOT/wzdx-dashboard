@@ -92,7 +92,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if os.environ.get("DATAHUB_APP_TOKEN") is None:
-            self.stdout.write(self.style.WARNING(f"No app token found for DataHub."))
+            self.stdout.write(self.style.WARNING("No app token found for DataHub."))
 
         try:
             datahub_request = requests.get(
@@ -113,7 +113,7 @@ class Command(BaseCommand):
         else:
             self.stdout.write(
                 self.style.HTTP_SUCCESS(
-                    f"DataHub returned a valid list of feeds! Scanning now..."
+                    "DataHub returned a valid list of feeds! Scanning now..."
                 )
             )
 
@@ -224,7 +224,7 @@ class Command(BaseCommand):
                     else:
                         try:
                             feed_data = feed_data_request.json()
-                        except:
+                        except ValueError:
                             self.stdout.write(
                                 self.style.ERROR(
                                     f"Feed {feed_requested.get('feedname')} was unable to be converted to JSON."
