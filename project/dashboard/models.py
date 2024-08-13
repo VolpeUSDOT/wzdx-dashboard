@@ -3,8 +3,7 @@ from django.contrib.gis.db import models
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from localflavor.us import models as us_models
-from localflavor.us import us_states
+from localflavor.us import models as us_models, us_states
 
 # Create your models here.
 
@@ -349,13 +348,13 @@ class OfflineErrorStatus(FeedStatus):
         response_code, json_data = self.feed.response_code(), self.feed.feed_data()
 
         if response_code == 0:
-            return f"Feed is unreachable at URL due to request error."
+            return "Feed is unreachable at URL due to request error."
 
         if response_code != requests.codes.ok:
             return f"Feed is unreachable at URL due to HTTP status code {response_code}"
 
         if not bool(json_data):
-            return f"Feed is unreachable at URL due to JSON decode error."
+            return "Feed is unreachable at URL due to JSON decode error."
 
         return "Feed unreachable at URL."
 

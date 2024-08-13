@@ -1,7 +1,7 @@
 from datetime import date, timedelta
 from typing import Optional, Union
 
-from django.contrib.gis.db.models import Count, Extent, F
+from django.contrib.gis.db.models import Count
 from django.core.paginator import Page, Paginator
 from django.views.generic import DetailView, ListView
 

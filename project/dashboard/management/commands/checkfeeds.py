@@ -269,4 +269,4 @@ class Command(BaseCommand):
                 feed_status.status_since = previous_status.status_since
                 feed_status.save()
 
-        self.style.SUCCESS(f"Finished analyzing feeds!")
+        self.style.SUCCESS("Finished analyzing feeds!")

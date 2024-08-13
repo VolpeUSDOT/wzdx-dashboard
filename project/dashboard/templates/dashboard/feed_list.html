@@ -1,62 +1,62 @@
-{% extends 'base.html' %}
-
+{% extends "base.html" %}
 {% load humanize %}
-
 {% load humanize_extra %}
-
 {% load static %}
-
 {% load leaflet_tags %}
-
-{% block title %}Home{% endblock %}
-
-{% block head%}
+{% block title %}
+    Home
+{% endblock title %}
+{% block head %}
     {% leaflet_js %}
     {% leaflet_css %}
-    
     <script src="{% static 'dashboard/map_list.js' %}"></script>
-{% endblock%}
-
+{% endblock head %}
 {% block content %}
-<div class="usa-section">
-    <div class="grid-container">
-        <div class="grid-row grid-gap">
-            <main
-                class="desktop:grid-col flex-8" id="main-content"
-            >
-                <div class="overflow-x" tabindex="0">
-                    <table class="usa-table usa-table--borderless usa-table--compact width-full">
-                        <thead>
-                            <tr>
-                                <th scope="col">State</th>
-                                <th scope="col">Issuing Organization</th>
-                                <th scope="col">Status</th>
-                                <th scope="col">Status Since</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for feed in feeds %}
+    <div class="usa-section">
+        <div class="grid-container">
+            <div class="grid-row grid-gap">
+                <main class="desktop:grid-col flex-8" id="main-content">
+                    <div class="overflow-x" tabindex="0">
+                        <table class="usa-table usa-table--borderless usa-table--compact width-full">
+                            <thead>
                                 <tr>
-                                    <td>{%if feed.state %}{{ feed.state }}{%else%}N/A{%endif%}</td>
-                                    <td><a href="{% url 'feed-detail' feed.pk%}">{{ feed.issuingorganization }}</a></td>
-                                    <td class="{% if feed.feed_status.is_error %}text-red{% else %}text-green{% endif %}">{{ feed.feed_status.status_type.label|upper }}</td>
-                                    <td>{{ feed.feed_status.status_since|naturaltime }}</td>
+                                    <th scope="col">State</th>
+                                    <th scope="col">Issuing Organization</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Status Since</th>
                                 </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                {% for feed in feeds %}
+                                    <tr>
+                                        <td>
+                                            {% if feed.state %}
+                                                {{ feed.state }}
+                                            {% else %}
+                                                N/A
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'feed-detail' feed.pk %}">{{ feed.issuingorganization }}</a>
+                                        </td>
+                                        <td class="{% if feed.feed_status.is_error %}text-red{% else %}text-green{% endif %}">
+                                            {{ feed.feed_status.status_type.label|upper }}
+                                        </td>
+                                        <td>{{ feed.feed_status.status_since|naturaltime }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </main>
+                <div class="display-none desktop:display-block desktop:grid-col flex-4">
+                    {% leaflet_map "points_map_desktop" callback="window.map_init" %}
                 </div>
-            </main>
-            <div class="display-none desktop:display-block desktop:grid-col flex-4">
-                {% leaflet_map "points_map_desktop" callback="window.map_init" %}
             </div>
-        </div>
-        {% if is_paginated%}
-            {% include 'components/pagination.html' %}
-        {% endif %}
-        <div class="desktop:display-none height-mobile">
-            {% leaflet_map "points_map_mobile" callback="window.map_init" %}
+            {% if is_paginated %}
+                {% include "components/pagination.html" %}
+            {% endif %}
+            <div class="desktop:display-none height-mobile">{% leaflet_map "points_map_mobile" callback="window.map_init" %}</div>
         </div>
     </div>
-</div>
-{% endblock %}
+{% endblock content %}

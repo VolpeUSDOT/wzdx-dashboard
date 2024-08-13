@@ -15,7 +15,7 @@ uswds.settings.version = 3;
 /**
 * Path settings
 * Set as many as you need
-*/ 
+*/
 uswds.paths.src.projectSass = './project/static/uswds/sass';
 uswds.paths.dist.theme = './project/static/uswds/sass';
 uswds.paths.dist.img = './project/static/uswds/img';

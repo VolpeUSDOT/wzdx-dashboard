@@ -1,74 +1,59 @@
 {% extends "base.html" %}
-
 {% block content %}
-<div class='usa-section'>
-<div class="grid-container">
-
-{% if form.errors %}
-<div class="usa-alert usa-alert--error usa-alert--slim" role="alert">
-  <div class="usa-alert__body">
-    <p class="usa-alert__text">
-      Your username and password didn't match. Please try again.
-    </p>
-  </div>
-</div>
-{% endif %}
-
-{% if next %}
-<div class="usa-alert usa-alert--info usa-alert--slim">
-  <div class="usa-alert__body">
-    <p class="usa-alert__text">
-    {% if user.is_authenticated %}
-      Your account doesn't have access to this page. To proceed,
-      please login with an account that has access.
-    {% else %}
-      Please login to see this page.
-    {% endif %}
-    </p>
-  </div>
-</div>
-{% endif %}
-
-<form class="usa-form" action="{% url 'login' %}" method="post">
-    {% csrf_token %}
-    <fieldset class="usa-fieldset">
-      <legend class="usa-legend usa-legend--large">Access your account</legend>
-      <label class="usa-label" for="{{ form.username.auto_id }}">{{ form.username.label_tag }}</label>
-      <input
-        class="usa-input"
-        id="{{ form.username.auto_id }}"
-        name="username"
-        type="text"
-        autocapitalize="off"
-        autocorrect="off"
-        required
-      />
-      <label class="usa-label" for="{{ form.password.auto_id }}">{{ form.password.label_tag }}</label>
-      <input
-        class="usa-input"
-        id="{{ form.password.auto_id }}"
-        name="password"
-        type="password"
-        required
-      />
-      <button
-        title=""
-        type="button"
-        class="usa-show-password"
-        aria-controls="{{ form.password.auto_id }}"
-        data-show-text="Show password"
-        data-hide-text="Hide password"
-      >
-        Show password
-      </button>
-      <input class="usa-button" type="submit" value="Sign in" />
-      <input type="hidden" name="next" value="{{ next }}">
-      <p>
-        <a href="{% url 'password_reset' %}" title="Forgot password">Forgot password?</a>
-      </p>
-    </fieldset>
-  </form>
-
-</div>
-</div>
-{% endblock %}
+    <div class="usa-section">
+        <div class="grid-container">
+            {% if form.errors %}
+                <div class="usa-alert usa-alert--error usa-alert--slim" role="alert">
+                    <div class="usa-alert__body">
+                        <p class="usa-alert__text">Your username and password didn't match. Please try again.</p>
+                    </div>
+                </div>
+            {% endif %}
+            {% if next %}
+                <div class="usa-alert usa-alert--info usa-alert--slim">
+                    <div class="usa-alert__body">
+                        <p class="usa-alert__text">
+                            {% if user.is_authenticated %}
+                                Your account doesn't have access to this page. To proceed,
+                                please login with an account that has access.
+                            {% else %}
+                                Please login to see this page.
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            {% endif %}
+            <form class="usa-form" action="{% url 'login' %}" method="post">
+                {% csrf_token %}
+                <fieldset class="usa-fieldset">
+                    <legend class="usa-legend usa-legend--large">Access your account</legend>
+                    <label class="usa-label" for="{{ form.username.auto_id }}">{{ form.username.label_tag }}</label>
+                    <input class="usa-input"
+                           id="{{ form.username.auto_id }}"
+                           name="username"
+                           type="text"
+                           autocapitalize="off"
+                           autocorrect="off"
+                           required />
+                    <label class="usa-label" for="{{ form.password.auto_id }}">{{ form.password.label_tag }}</label>
+                    <input class="usa-input"
+                           id="{{ form.password.auto_id }}"
+                           name="password"
+                           type="password"
+                           required />
+                    <button title=""
+                            type="button"
+                            class="usa-show-password"
+                            aria-controls="{{ form.password.auto_id }}"
+                            data-show-text="Show password"
+                            data-hide-text="Hide password">Show password</button>
+                    <input class="usa-button" type="submit" value="Sign in" />
+                    <input type="hidden" name="next" value="{{ next }}">
+                    <p>
+                        <a href="{% url 'password_reset' %}" title="Forgot password">Forgot password?</a>
+                    </p>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+{% endblock content %}

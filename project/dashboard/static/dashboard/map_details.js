@@ -15,7 +15,7 @@ function map_details(map, options, feedname, version) {
         {
           onEachFeature: (feature, layer) => {
             layer.bindPopup(
-                version.startsWith("4") ? 
+                version.startsWith("4") ?
               `<ul class="usa-list usa-list--unstyled">
                 <li>Event Type: ${
                   feature.properties.core_details.event_type

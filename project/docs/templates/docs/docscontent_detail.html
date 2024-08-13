@@ -1,100 +1,93 @@
-{% extends 'base.html' %}
-
+{% extends "base.html" %}
 {% load static %}
-
 {% load markdown_cleaner %}
-
-{% block head%}
-<link rel="stylesheet" type="text/css" href="{% static 'docs/styles.css' %}">
-{% endblock %}
-
-{% block title %}{{ docs_content.title }}{% endblock %}
-
+{% block head %}
+    <link rel="stylesheet"
+          type="text/css"
+          href="{% static 'docs/styles.css' %}">
+{% endblock head %}
+{% block title %}
+    {{ docs_content.title }}
+{% endblock title %}
 {% block content %}
-<div class="usa-section">
-    <div class="grid-container">
-        <div class="grid-row grid-gap">
-            <div
-            class="usa-layout-docs__sidenav display-none desktop:display-block desktop:grid-col-3"
-            >
-            <nav aria-label="Secondary navigation">
-                <ul class="usa-sidenav">
-                {% for docs_link in all_docs %}
-                    {% include 'docs/sidebar_link.html' with docs_link=docs_link %}
-                {% endfor%}
-                {% if user.is_staff %}
-                    <li class="usa-sidenav__item">
-                        <a href="{% url 'docs-add' %}">
-                            <svg class="usa-icon bottom-neg-2px" aria-hidden="true" role="img">
-                                <use xlink:href="{% static 'uswds/img/sprite.svg' %}#add"></use>
-                            </svg>
-                            Add new page
-                        </a>
-                    </li>
-                {% endif %}
-                </ul> 
-            </nav>
-        </div>
-        <div class="usa-in-page-nav-container desktop:grid-col-9">
-            <aside
-                class="usa-in-page-nav"
-                data-title-text="On this page"
-                data-title-heading-level="h4"
-                data-scroll-offset="0"
-                data-root-margin="0px 0px 0px 0px"
-                data-threshold="1"
-            ></aside>
-            <main class="usa-prose" id="main-content">
-                <h1>{{ docs_content.title }}</h1>
-                {% if user.is_staff %}
-                    <div class="usa-button-group" role="toolbar">
-                        <div class="usa-button-group__item">
-                            <a href="{% url 'docs-update' docs_content.slug %}" class="usa-button">
-                                <svg class="usa-icon" aria-hidden="true" role="img">
-                                    <use xlink:href="{% static 'uswds/img/sprite.svg' %}#edit"></use>
-                                </svg>
-                                Edit this page
-                            </a>
-                        </div>
-                        <div class="usa-button-group__item">
-                            <a href="{% url 'docs-delete' docs_content.slug %}" class="usa-button usa-button--secondary">
-                                <svg class="usa-icon" aria-hidden="true" role="img">
-                                    <use xlink:href="{% static 'uswds/img/sprite.svg' %}#delete"></use>
-                                </svg>
-                                Delete this page
-                            </a>
-                        </div>
-                    </div>
-                {%endif%}
-                {% if docs_content.intro%}
-                    <p class="usa-intro">
-                        {{ docs_content.intro }}
-                    </p>
-                {% endif %}
-                {{ docs_content.content|render_markdown }}
-                <p class="text-italic">Last updated: {{docs_content.last_editted.date}}</p>
-            </main>
-        </div>
-    </div>
-    <div class="usa-layout-docs__sidenav desktop:display-none">
-        <nav aria-label="Secondary navigation">
-            <ul class="usa-sidenav">
-                {% for docs_link in all_docs %}
-                {% include 'docs/sidebar_link.html' with docs_link=docs_link %}
-                    {% endfor%}
-                    {% if user.is_staff %}
-                        <li class="usa-sidenav__item">
-                            <a href="{% url 'docs-add' %}">
-                                <svg class="usa-icon bottom-neg-2px" aria-hidden="true" role="img">
-                                    <use xlink:href="{% static 'uswds/img/sprite.svg' %}#add"></use>
-                                </svg>
-                                Add new page
-                            </a>
-                        </li>
-                    {% endif %}
-                </ul> 
-            </nav>
+    <div class="usa-section">
+        <div class="grid-container">
+            <div class="grid-row grid-gap">
+                <div class="usa-layout-docs__sidenav display-none desktop:display-block desktop:grid-col-3">
+                    <nav aria-label="Secondary navigation">
+                        <ul class="usa-sidenav">
+                            {% for docs_link in all_docs %}
+                                {% include "docs/sidebar_link.html" with docs_link=docs_link %}
+                            {% endfor %}
+                            {% if user.is_staff %}
+                                <li class="usa-sidenav__item">
+                                    <a href="{% url 'docs-add' %}">
+                                        <svg class="usa-icon bottom-neg-2px" aria-hidden="true" role="img">
+                                            <use xlink:href="{% static 'uswds/img/sprite.svg' %}#add"></use>
+                                        </svg>
+                                        Add new page
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
+                <div class="usa-in-page-nav-container desktop:grid-col-9">
+                    <aside class="usa-in-page-nav"
+                           data-title-text="On this page"
+                           data-title-heading-level="h4"
+                           data-scroll-offset="0"
+                           data-root-margin="0px 0px 0px 0px"
+                           data-threshold="1">
+                    </aside>
+                    <main class="usa-prose" id="main-content">
+                        <h1>{{ docs_content.title }}</h1>
+                        {% if user.is_staff %}
+                            <div class="usa-button-group" role="toolbar">
+                                <div class="usa-button-group__item">
+                                    <a href="{% url 'docs-update' docs_content.slug %}" class="usa-button">
+                                        <svg class="usa-icon" aria-hidden="true" role="img">
+                                            <use xlink:href="{% static 'uswds/img/sprite.svg' %}#edit"></use>
+                                        </svg>
+                                        Edit this page
+                                    </a>
+                                </div>
+                                <div class="usa-button-group__item">
+                                    <a href="{% url 'docs-delete' docs_content.slug %}"
+                                       class="usa-button usa-button--secondary">
+                                        <svg class="usa-icon" aria-hidden="true" role="img">
+                                            <use xlink:href="{% static 'uswds/img/sprite.svg' %}#delete"></use>
+                                        </svg>
+                                        Delete this page
+                                    </a>
+                                </div>
+                            </div>
+                        {% endif %}
+                        {% if docs_content.intro %}<p class="usa-intro">{{ docs_content.intro }}</p>{% endif %}
+                        {{ docs_content.content|render_markdown }}
+                        <p class="text-italic">Last updated: {{ docs_content.last_editted.date }}</p>
+                    </main>
+                </div>
+            </div>
+            <div class="usa-layout-docs__sidenav desktop:display-none">
+                <nav aria-label="Secondary navigation">
+                    <ul class="usa-sidenav">
+                        {% for docs_link in all_docs %}
+                            {% include "docs/sidebar_link.html" with docs_link=docs_link %}
+                        {% endfor %}
+                        {% if user.is_staff %}
+                            <li class="usa-sidenav__item">
+                                <a href="{% url 'docs-add' %}">
+                                    <svg class="usa-icon bottom-neg-2px" aria-hidden="true" role="img">
+                                        <use xlink:href="{% static 'uswds/img/sprite.svg' %}#add"></use>
+                                    </svg>
+                                    Add new page
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
         </div>
     </div>
-</div>
-{% endblock %}
+{% endblock content %}
