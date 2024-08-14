@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load render_table from django_tables2 %}
+{% load static %}
+{% block title %}
+    Archive
+{% endblock title %}
+{% block content %}
+    <div class="usa-section">
+        <div class="grid-container">
+            <div class="grid-row grid-gap">
+                <main id="main-content">
+                    <h1>WZDx Feed Archive</h1>
+                    <p>
+                        Feeds are archived approximately once every 12 hours. For a historical record going back to 2019, please view the
+                        <a href="https://usdot-its-workzone-publicdata.s3.amazonaws.com/index.html"
+                           class="usa-link usa-link--external">U.S. DOT ITS Work Zone Sandbox</a>. This is sorted by date archived.
+                    </p>
+                    {% if filter %}
+                        <form method="get" class="usa-form">
+                            {% for field in filter.form %}
+                                <label class="usa-label" for="{{ field.auto_id }}">Filter by {{ field.label }}</label>
+                                <div class="usa-combo-box">{{ field }}</div>
+                            {% endfor %}
+                            <input type="submit" class="usa-button" />
+                        </form>
+                    {% endif %}
+                    {% render_table table %}
+                </main>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

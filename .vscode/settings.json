@@ -5,11 +5,19 @@
       "source.organizeImports": "explicit"
     }
   },
+  "[django-html][handlebars][hbs][mustache][jinja][jinja-html][nj][njk][nunjucks][twig]": {
+    "editor.defaultFormatter": "monosans.djlint"
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
   "isort.args": ["--profile", "django"],
   "python.analysis.typeCheckingMode": "basic",
   "python.analysis.autoImportCompletions": true,
   "files.associations": {
     "**/templates/**/*.html": "django-html",
     "**/*.html": "html"
+  },
+  "editor.formatOnSave": true,
+  "[yaml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   }
 }

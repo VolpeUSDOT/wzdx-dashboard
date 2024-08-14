@@ -39,6 +39,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("django.contrib.auth.urls")),
     path("feeds/", include("dashboard.urls")),
+    path("archive/", include("archive.urls")),
     path("docs/", include("docs.urls")),
     path("api/", include("api.api")),
     path("", RedirectView.as_view(pattern_name="feed-list"), name="root"),

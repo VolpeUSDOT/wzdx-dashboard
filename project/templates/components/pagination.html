@@ -29,14 +29,15 @@
         {% endfor %}
         {% if page_obj.has_next %}
             <li class="usa-pagination__item usa-pagination__arrow">
-            <a href="?page={{ page_obj.next_page_number }}"
-               class="usa-pagination__link usa-pagination__next-page"
-               aria-label="next page"><span class="usa-pagination__link-text">Next</span>
-            <svg class="usa-icon" aria-hidden="true" role="img">
-                <use xlink:href="{% static '/uswds/img/sprite.svg' %}#navigate_next"></use>
-            </svg>
-        </a>
-    </li>
-{% endif %}
-</ul>
+                <a href="?page={{ page_obj.next_page_number }}"
+                   class="usa-pagination__link usa-pagination__next-page"
+                   aria-label="next page">
+                    <span class="usa-pagination__link-text">Next</span>
+                    <svg class="usa-icon" aria-hidden="true" role="img">
+                        <use xlink:href="{% static '/uswds/img/sprite.svg' %}#navigate_next"></use>
+                    </svg>
+                </a>
+            </li>
+        {% endif %}
+    </ul>
 </nav>
