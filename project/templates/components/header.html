@@ -23,6 +23,10 @@
                     <a href="{% url 'docs-redirect' %}"
                        class="usa-nav-link{% if '/docs/' in request.path %} usa-current{% endif %}"><span>Docs</span></a>
                 </li>
+                <li class="usa-nav__primary-item">
+                    <a href="{% url 'archive-list' %}"
+                       class="usa-nav-link{% if '/archive/' in request.path %} usa-current{% endif %}"><span>Archive</span></a>
+                </li>
                 {% if user.is_authenticated %}
                     {% if user.is_staff %}
                         <li class="usa-nav__primary-item">

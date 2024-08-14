@@ -47,9 +47,12 @@ INSTALLED_APPS = [
     "rest_framework_gis",
     "leaflet",
     "localflavor",
+    "django_tables2",
+    "django_filters",
     "docs.apps.DocsConfig",
     "dashboard.apps.DashboardConfig",
     "api.apps.ApiConfig",
+    "archive.apps.ArchiveConfig",
 ]
 
 MIDDLEWARE = [

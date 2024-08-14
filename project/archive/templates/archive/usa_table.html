@@ -1,0 +1,127 @@
+{% load static %}
+{% load django_tables2 %}
+{% load i18n l10n %}
+{% block table-wrapper %}
+    <div class="overflow-x-auto" tabindex="0">
+        {% block table %}
+            <table {% render_attrs table.attrs class="usa-table" %}>
+                {% block table.thead %}
+                    {% if table.show_header %}
+                        <thead {{ table.attrs.thead.as_html }}>
+                            <tr>
+                                {% for column in table.columns %}
+                                    <th {{ column.attrs.th.as_html }}>
+                                        {% if column.orderable %}
+                                            <a href="{% querystring table.prefixed_order_by_field=column.order_by_alias.next %}"
+                                               class="usa-link">{{ column.header }}</a>
+                                        {% else %}
+                                            {{ column.header }}
+                                        {% endif %}
+                                    </th>
+                                {% endfor %}
+                            </tr>
+                        </thead>
+                    {% endif %}
+                {% endblock table.thead %}
+                {% block table.tbody %}
+                    <tbody {{ table.attrs.tbody.as_html }}>
+                        {% for row in table.paginated_rows %}
+                            {% block table.tbody.row %}
+                                <tr {{ row.attrs.as_html }}>
+                                    {% for column, cell in row.items %}
+                                        <td {{ column.attrs.td.as_html }} {% if table.order_by_field is not None and column.header in table.order_by_field %}data-sort-active="true"{% endif %}>
+                                            {% if column.localize == None %}
+                                                {{ cell }}
+                                            {% else %}
+                                                {% if column.localize %}
+                                                    {{ cell|localize }}
+                                                {% else %}
+                                                    {{ cell|unlocalize }}
+                                                {% endif %}
+                                            {% endif %}
+                                        </td>
+                                    {% endfor %}
+                                </tr>
+                            {% endblock table.tbody.row %}
+                        {% empty %}
+                            {% if table.empty_text %}
+                                {% block table.tbody.empty_text %}
+                                    <tr>
+                                        <td colspan="{{ table.columns|length }}">{{ table.empty_text }}</td>
+                                    </tr>
+                                {% endblock table.tbody.empty_text %}
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                {% endblock table.tbody %}
+                {% block table.tfoot %}
+                    <tfoot {{ table.attrs.tfoot.as_html }}>
+                        {% if table.has_footer %}
+                            <tr>
+                                {% for column in table.columns %}
+                                    <td {{ column.attrs.tf.as_html }}>{{ column.footer }}
+                                    </td>
+                                {% endfor %}
+                            </tr>
+                        {% endif %}
+                        {% block pagination %}
+                            {% if table.page and table.paginator.num_pages > 1 %}
+                                <nav aria-label="Pagination" class="usa-pagination">
+                                    <ul class="usa-pagination__list">
+                                        {% if table.page.has_previous %}
+                                            {% block pagination.previous %}
+                                                <li class="usa-pagination__item usa-pagination__arrow">
+                                                    <a href="{% querystring table.prefixed_page_field=table.page.previous_page_number %}"
+                                                       class="usa-pagination__link usa-pagination__previous-page"
+                                                       aria-label="Previous page">
+                                                        <svg class="usa-icon" aria-hidden="true" role="img">
+                                                            <use xlink:href="{% static '/uswds/img/sprite.svg' %}#navigate_before"></use>
+                                                        </svg>
+                                                        <span class="usa-pagination__link-text">Previous</span>
+                                                    </a>
+                                                </li>
+                                            {% endblock pagination.previous %}
+                                        {% endif %}
+                                        {% if table.page.has_previous or table.page.has_next %}
+                                            {% block pagination.range %}
+                                                {% for p in table.page|table_page_range:table.paginator %}
+                                                    {% if p == '...' %}
+                                                        <li class="usa-pagination__item usa-pagination__overflow"
+                                                            aria-label="ellipsis indicating non-visible pages">
+                                                            <span>…</span>
+                                                        </li>
+                                                    {% else %}
+                                                        <li class="usa-pagination__item usa-pagination__page-no">
+                                                            <a href="{% querystring table.prefixed_page_field=p %}"
+                                                               class="usa-pagination__button{% if p == table.page.number %} usa-current{% endif %}"
+                                                               aria-label="Page {{ p }}"
+                                                               {% if p == table.page.number %}aria-current="page"{% endif %}>{{ p }}</a>
+                                                        </li>
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endblock pagination.range %}
+                                        {% endif %}
+                                        {% if table.page.has_next %}
+                                            {% block pagination.next %}
+                                                <li class="usa-pagination__item usa-pagination__arrow">
+                                                    <a href="{% querystring table.prefixed_page_field=table.page.next_page_number %}"
+                                                       class="usa-pagination__link usa-pagination__next-page"
+                                                       aria-label="next page">
+                                                        <span class="usa-pagination__link-text">Next</span>
+                                                        <svg class="usa-icon" aria-hidden="true" role="img">
+                                                            <use xlink:href="{% static '/uswds/img/sprite.svg' %}#navigate_next"></use>
+                                                        </svg>
+                                                    </a>
+                                                </li>
+                                            {% endblock pagination.next %}
+                                        {% endif %}
+                                    </ul>
+                                </nav>
+                            {% endif %}
+                        {% endblock pagination %}
+                    </tfoot>
+                {% endblock table.tfoot %}
+            </table>
+        {% endblock table %}
+    </div>
+{% endblock table-wrapper %}
