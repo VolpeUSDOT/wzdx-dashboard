@@ -33,7 +33,13 @@ async function map_init(map, options) {
       })
         .bindPopup(
           (layer) =>
-            `${layer.feature.properties.issuingorganization}: <span class="${layer.feature.properties.status_type == "OK" ? 'text-green' : 'text-red'}">${STATUS_TYPES[layer.feature.properties.status_type].toUpperCase()}</span>`
+            `${layer.feature.properties.issuingorganization}: <span class="${
+              layer.feature.properties.status_type == "OK"
+                ? "text-green"
+                : "text-red"
+            }">${STATUS_TYPES[
+              layer.feature.properties.status_type
+            ].toUpperCase()}</span>`
         )
         .addTo(layerGroup);
 
