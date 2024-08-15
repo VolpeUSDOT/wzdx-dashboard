@@ -37,7 +37,7 @@
                                             {% endif %}
                                         </td>
                                         <td>
-                                            <a href="{% url 'feed-detail' feed.pk %}">{{ feed.issuingorganization }}</a>
+                                            <a href="{% url 'feed-detail' feed.pk %}" class="usa-link">{{ feed.issuingorganization }}</a>
                                         </td>
                                         <td class="{% if feed.feed_status.is_error %}text-red{% else %}text-green{% endif %}">
                                             {{ feed.feed_status.status_type.label|upper }}
