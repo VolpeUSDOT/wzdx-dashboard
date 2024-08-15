@@ -21,7 +21,7 @@ class ArchiveTable(tables.Table):
     feed = tables.Column(attrs={"th": {"scope": "col", "role": "columnheader"}})
     datetime_archived = tables.Column(
         attrs={"th": {"scope": "col", "role": "columnheader"}},
-        verbose_name="Date Archived",
+        verbose_name="Date/Time Archived",
     )
     size = tables.Column(attrs={"th": {"scope": "col", "role": "columnheader"}})
 
