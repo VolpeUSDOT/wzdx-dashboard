@@ -21,7 +21,7 @@
   "homepage": "https://github.com/VolpeUSDOT/wzdx-dashboard#readme",
   "devDependencies": {
     "@uswds/compile": "^1.1.0",
-    "@uswds/uswds": "^3.8.1",
+    "@uswds/uswds": "^3.8.2",
     "binaryextensions": "^6.11.0",
     "css-tree": "^2.3.1",
     "es5-ext": "^0.10.64",
