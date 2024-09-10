@@ -25,9 +25,12 @@ in the form $setting: value,
 // $volpeGold: "#c49e27";
 // $volpeParchment: "#f3efde";
 
-
 @use "uswds-core" with (
-    $theme-show-notifications: false,
-    $theme-banner-background-color: 'base-darkest',
-    $theme-identifier-background-color: 'blue-80v'
-)
+  $theme-show-notifications: false,
+  $theme-banner-background-color: "base-darkest",
+  $theme-identifier-background-color: "blue-80v",
+
+  $theme-respect-user-font-size: true,
+  $theme-font-type-sans: "open-sans",
+  $theme-font-role-ui: "sans"
+);
