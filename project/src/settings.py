@@ -161,6 +161,8 @@ CSRF_COOKIE_SECURE = False
 SECURE_SSL_REDIRECT = False
 CSRF_TRUSTED_ORIGIN = []
 
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
 try:
     from .local_settings import *
 except ImportError:
