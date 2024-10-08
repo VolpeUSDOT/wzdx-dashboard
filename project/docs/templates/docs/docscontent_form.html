@@ -23,12 +23,13 @@
                                 </div>
                             </div>
                         {% endif %}
-                        <div class="fieldWrapper">
+                        <div class="fieldWrapper usa-character-count">
                             {{ form.title.errors }}
                             <label for="{{ form.title.id_for_label }}" class="usa-label">
                                 {{ form.title.label }} <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                             </label>
                             {{ form.title }}
+                            <span id="title-char-count" class="usa-character-count__message">{{ form.title.help_text }}</span>
                         </div>
                         <div class="fieldWrapper">
                             {{ form.intro.errors }}
