@@ -7,8 +7,9 @@
 {% block head %}
     <script>
         function processDates() {
-            document.getElementById("{{ filter.form.datetime_archived.auto_id }}_0").value = document.getElementById("{{ filter.form.datetime_archived.auto_id }}_0").value.replaceAll("/", "-")
-            document.getElementById("{{ filter.form.datetime_archived.auto_id }}_1").value = document.getElementById("{{ filter.form.datetime_archived.auto_id }}_1").value.replaceAll("/", "-")
+            let pattern = /(\d{2})\-(\d{2})\-(\d{4})/;
+            document.getElementById("{{ filter.form.datetime_archived.auto_id }}_0").value = document.getElementById("{{ filter.form.datetime_archived.auto_id }}_0").value.replaceAll("/", "-").replace(pattern, "$3-$1-$2");
+            document.getElementById("{{ filter.form.datetime_archived.auto_id }}_1").value = document.getElementById("{{ filter.form.datetime_archived.auto_id }}_1").value.replaceAll("/", "-").replace(pattern, "$3-$1-$2");
             return true;
         }
     </script>
@@ -31,8 +32,6 @@
                                 <div class="usa-combo-box">{{ field }}</div>
                             {% endwith %}
                             {% with field=filter.form.datetime_archived %}
-                                {% comment %} <label class="usa-label" for="{{ field.auto_id }}">Filter by {{ field.label }}</label>
-                                <div class="usa-combo-box">{{ field }}</div> {% endcomment %}
                                 <div class="usa-date-range-picker">
                                     <div class="usa-form-group">
                                         <label class="usa-label"
