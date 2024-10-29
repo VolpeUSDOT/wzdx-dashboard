@@ -17,10 +17,42 @@
                     </p>
                     {% if filter %}
                         <form method="get" class="usa-form">
-                            {% for field in filter.form %}
+                            {% with field=filter.form.feed %}
                                 <label class="usa-label" for="{{ field.auto_id }}">Filter by {{ field.label }}</label>
                                 <div class="usa-combo-box">{{ field }}</div>
-                            {% endfor %}
+                            {% endwith %}
+                            {% with field=filter.form.archive_datetime %}
+                                {% comment %} <label class="usa-label" for="{{ field.auto_id }}">Filter by {{ field.label }}</label>
+                                <div class="usa-combo-box">{{ field }}</div> {% endcomment %}
+                                <div class="usa-date-range-picker">
+                                    <div class="usa-form-group">
+                                        <label class="usa-label"
+                                               id="{{ field.auto_id }}_0_label"
+                                               for="{{ field.auto_id }}_0">Filter by {{ field.label }} (from)</label>
+                                        <div class="usa-hint" id="{{ field.auto_id }}_0_hint">mm/dd/yyyy</div>
+                                        <div class="usa-date-picker">
+                                            <input class="usa-input"
+                                                   id="{{ field.auto_id }}_0"
+                                                   name="{{ field.auto_id }}_0"
+                                                   aria-labelledby="{{ field.auto_id }}_0_label"
+                                                   aria-describedby="{{ field.auto_id }}_0_hint" />
+                                        </div>
+                                    </div>
+                                    <div class="usa-form-group">
+                                        <label class="usa-label"
+                                               id="{{ field.auto_id }}_1_label"
+                                               for="{{ field.auto_id }}_1">Filter by {{ field.label }} (to)</label>
+                                        <div class="usa-hint" id="{{ field.auto_id }}_1_hint">mm/dd/yyyy</div>
+                                        <div class="usa-date-picker">
+                                            <input class="usa-input"
+                                                   id="{{ field.auto_id }}_1"
+                                                   name="{{ field.auto_id }}_1"
+                                                   aria-labelledby="{{ field.auto_id }}_1_label"
+                                                   aria-describedby="{{ field.auto_id }}_1_hint" />
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endwith %}
                             <input type="submit" class="usa-button" />
                         </form>
                     {% endif %}
