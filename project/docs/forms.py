@@ -9,7 +9,12 @@ class DocsContentForm(ModelForm):
         model = DocsContent
         fields = ["title", "intro", "content", "ordering", "parent_content"]
         widgets = {
-            "title": TextInput(attrs={"class": "usa-input"}),
+            "title": TextInput(
+                attrs={
+                    "class": "usa-input usa-character-count__field",
+                    "aria-describedby": "title-char-count",
+                }
+            ),
             "intro": Textarea(attrs={"class": "usa-textarea", "rows": "", "cols": ""}),
             "content": Textarea(
                 attrs={"class": "usa-textarea", "rows": "", "cols": ""}

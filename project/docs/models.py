@@ -8,7 +8,9 @@ from django.utils.translation import gettext_lazy as _
 
 
 class DocsContent(models.Model):
-    title = models.CharField(max_length=100, unique=True)
+    title = models.CharField(
+        max_length=100, unique=True, help_text="You can enter up to 100 characters"
+    )
     intro = models.TextField(blank=True)
     content = models.TextField(blank=True)
     slug = models.SlugField(unique=True)
