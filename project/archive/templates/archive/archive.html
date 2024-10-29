@@ -4,6 +4,15 @@
 {% block title %}
     Archive
 {% endblock title %}
+{% block head %}
+    <script>
+        function processDates() {
+            document.getElementById("{{ filter.form.datetime_archived.auto_id }}_0").value = document.getElementById("{{ filter.form.datetime_archived.auto_id }}_0").value.replaceAll("/", "-")
+            document.getElementById("{{ filter.form.datetime_archived.auto_id }}_1").value = document.getElementById("{{ filter.form.datetime_archived.auto_id }}_1").value.replaceAll("/", "-")
+            return true;
+        }
+    </script>
+{% endblock head %}
 {% block content %}
     <div class="usa-section">
         <div class="grid-container">
@@ -16,12 +25,12 @@
                            class="usa-link usa-link--external">U.S. DOT ITS Work Zone Sandbox</a>.
                     </p>
                     {% if filter %}
-                        <form method="get" class="usa-form">
+                        <form method="get" class="usa-form" onsubmit="processDates();">
                             {% with field=filter.form.feed %}
                                 <label class="usa-label" for="{{ field.auto_id }}">Filter by {{ field.label }}</label>
                                 <div class="usa-combo-box">{{ field }}</div>
                             {% endwith %}
-                            {% with field=filter.form.archive_datetime %}
+                            {% with field=filter.form.datetime_archived %}
                                 {% comment %} <label class="usa-label" for="{{ field.auto_id }}">Filter by {{ field.label }}</label>
                                 <div class="usa-combo-box">{{ field }}</div> {% endcomment %}
                                 <div class="usa-date-range-picker">

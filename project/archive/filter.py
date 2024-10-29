@@ -1,7 +1,7 @@
 from archive.models import Archive
 from dashboard.models import Feed
 from django.forms import Select
-from django_filters import DateTimeFromToRangeFilter, FilterSet, ModelChoiceFilter
+from django_filters import DateFromToRangeFilter, FilterSet, ModelChoiceFilter
 
 FEED_CHOICES = [("", "Find a feed!")] + [
     (feedname, f"{state + ' - ' if state else ''}{issuingorganization}")
@@ -18,10 +18,10 @@ class ArchiveFilter(FilterSet):
         widget=Select(attrs={"class": "usa-select", "name": "feed"}),
     )
 
-    archive_datetime = DateTimeFromToRangeFilter(
+    datetime_archived = DateFromToRangeFilter(
         field_name="datetime_archived", label="Date/Time Archived"
     )
 
     class Meta:
         model = Archive
-        fields = ["feed", "archive_datetime"]
+        fields = ["feed", "datetime_archived"]
