@@ -61,7 +61,12 @@
                                     </div>
                                 </div>
                             {% endwith %}
-                            <input type="submit" class="usa-button" />
+                            <div>
+                                <input type="submit" class="usa-button" />
+                                <a type="button"
+                                   class="usa-button  usa-button--outline"
+                                   onclick="window.location='zip'+window.location.search;">Download Feeds</a>
+                            </div>
                         </form>
                     {% endif %}
                     {% render_table table %}
