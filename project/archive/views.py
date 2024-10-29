@@ -1,12 +1,13 @@
 from typing import Optional, Union
 
 from django.core.paginator import Page, Paginator
-from django.http import JsonResponse
+from django.http import FileResponse, HttpResponseBadRequest, JsonResponse
 from django.shortcuts import get_object_or_404
 from django_filters.views import FilterView
 from django_tables2 import SingleTableMixin
 
 from .filter import ArchiveFilter
+from .makefile import mkZipFile
 from .models import Archive
 from .tables import ArchiveTable
 
@@ -16,7 +17,8 @@ from .tables import ArchiveTable
 def get_page_button_array(
     paginator: Optional[Paginator], page: Page
 ) -> list[Union[int, str]]:
-    """Create what pages to use, based on guidelines from USWDS page https://designsystem.digital.gov/components/pagination/"""
+    """Create what pages to use, based on guidelines from USWDS page
+    https://designsystem.digital.gov/components/pagination/"""
 
     if paginator is None:
         return []
@@ -70,3 +72,13 @@ def archive_json(request, pk):
     data = get_object_or_404(Archive.objects, pk=pk)
 
     return JsonResponse(data.data)
+
+
+def download_all_in_zip(request):
+    filter = ArchiveFilter(request.GET, queryset=Archive.objects.all())
+
+    zfile = mkZipFile(filter.qs.values("id", "data"))
+    if not zfile:
+        return HttpResponseBadRequest("Invalid zip file")
+
+    return FileResponse(zfile, as_attachment=True, filename="download.zip")
