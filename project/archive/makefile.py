@@ -44,7 +44,7 @@ def mkZipFile(values):
 
     # Create the in-memory zip image
     data = io.BytesIO()
-    with zipfile.ZipFile(data, mode="w") as z:
+    with zipfile.ZipFile(data, mode="w", compression=zipfile.ZIP_DEFLATED) as z:
         for fname in os.listdir("."):
             z.write(fname)
             os.unlink(fname)
