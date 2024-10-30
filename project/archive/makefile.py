@@ -1,4 +1,5 @@
 import io
+import json
 import os
 import tempfile
 import zipfile
@@ -35,7 +36,11 @@ def mkZipFile(values):
     os.chdir(zipdir)
 
     for row in values:
-        makeFile(zipdir, row.id, row.data)
+        makeFile(
+            zipdir,
+            f"{row['id']}.json",
+            json.dumps(row["data"], indent=4),
+        )
 
     # Create the in-memory zip image
     data = io.BytesIO()
