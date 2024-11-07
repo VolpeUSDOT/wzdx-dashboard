@@ -8,6 +8,7 @@ import requests
 import semver
 from dashboard.models import APIKey, Feed, FeedData
 from django.contrib.gis.geos import Point
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.management.base import BaseCommand, CommandError
 from localflavor.us import us_states
 
@@ -200,7 +201,11 @@ class Command(BaseCommand):
 
             feed.save()
 
-            feed_data_model = feed.feeddata or FeedData(feed=feed)  # type: ignore
+            try:
+                feed_data_model = feed.feeddata  # type: ignore
+            except ObjectDoesNotExist:
+                feed_data_model = FeedData(feed=feed)
+
             request_status = 0
             feed_data = dict()
 
