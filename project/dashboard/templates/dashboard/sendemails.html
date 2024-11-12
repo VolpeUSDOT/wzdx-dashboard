@@ -1,0 +1,94 @@
+{% load humanize %}
+{% load humanize_extra %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta name="viewport" content="width=device-width" />
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta name="description" content="" />
+        <title>WZDx Status Update</title>
+        <style>
+            /* Inline CSS */
+            body {
+                font-family: Arial, sans-serif;
+                background-color: #f0f0f0;
+            }
+
+            .email-container {
+                width: 100%;
+                max-width: 600px;
+                margin: 0 auto;
+                background-color: #ffffff;
+                border: 1px solid #dddddd;
+                border-radius: 5px;
+            }
+
+            .header {
+                background-color: #162e51;
+                color: #ffffff;
+                text-align: center;
+                padding: 20px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .image {
+                max-width: 100%;
+                height: auto;
+            }
+
+            .footer {
+                background-color: #f0f0f0;
+                text-align: center;
+                padding: 10px;
+                font-size: 12px;
+            }
+            .text-red {
+                color: #e52207;
+            }
+            .text-green {
+                color: #538200;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="email-container">
+            <div class="header">
+                <h1>WZDx Status Update</h1>
+            </div>
+            <div class="content">
+                <p>Hello!</p>
+                <p>You are receiving this email because you are listed as a staff user on the WZDx Dashboard.</p>
+                <p>This email serves as a weekly reminder of feed statuses.</p>
+                <ul>
+                    {% for feed in feeds %}
+                        <li>
+                            {{ feed.issuingorganization }}: <span class="{% if feed.feed_status.is_error %}text-red{% else %}text-green{% endif %}">
+                        {{ feed.feed_status.status_type.label|upper }}</span>
+                        <ul>
+                            <li>Detailed Status - {{ feed.feed_status.details }}</li>
+                            <li>
+                                Status over 14 Days -
+                                {% for status_key, status_item in status_summary.items %}
+                                    {% if status_key == feed.pk %}
+                                        {% for status in status_item %}
+                                            {{ status.0|title }}: {{ status.1 }}%
+                                            {% if not forloop.last %},{% endif %}
+                                        {% endfor %}
+                                    {% endif %}
+                                {% endfor %}
+                            </li>
+                        </ul>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="footer">
+            Please reach out to <a href="mailto:diego.temkin@dot.gov">diego.temkin@dot.gov</a> with any issues.
+        </div>
+    </div>
+</body>
+</html>
