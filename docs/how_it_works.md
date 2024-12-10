@@ -1,8 +1,9 @@
 # How This Dashboard Works
 
-Before contuing, reading [the Django glossary](https://docs.djangoproject.com/en/4.2/glossary/) may be helpful.
+Before continuing, reading [the Django glossary](https://docs.djangoproject.com/en/4.2/glossary/) may be helpful.
 
 This application is built using [Django](https://djangoproject.com), a Python framework for rending database-backed websites. Specifically, it uses the Model-Template-View model, meaning that when a browser makes a request, the following steps happen:
+
 - The request is received by server, and passes it to the appropriate view (eg. the type of page to be rendered)
 - The view requests data from the model (eg. gets the specific data from the database tables)
 - The model sends back the applicable information to the view
