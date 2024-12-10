@@ -63,7 +63,7 @@
                                 </div>
                             </div>
                         {% endif %}
-                        {% if docs_content.intro %}<p class="usa-intro">{{ docs_content.intro }}</p>{% endif %}
+                        {% if docs_content.intro %}<p class="usa-intro">{{ docs_content.intro|render_markdown }}</p>{% endif %}
                         {{ docs_content.content|render_markdown }}
                         <p class="text-italic">Last updated: {{ docs_content.last_editted.date }}</p>
                     </main>
