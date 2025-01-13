@@ -6,7 +6,7 @@ markdown==3.7
 djangorestframework==3.15.2
 djangorestframework-gis==1.1
 django-filter==24.3
-Pygments==2.19.0
+Pygments==2.19.1
 django-leaflet==0.31.0
 humanize==4.11.0
 jsonschema==4.23.0
