@@ -211,6 +211,13 @@ class Command(BaseCommand):
 
             if feed_data_url is not None:
                 try:
+                    feed_data_request = requests.get(feed_data_url, timeout=20)
+                except requests.exceptions.SSLError:
+                    self.stdout.write(
+                        self.style.WARNING(
+                            f"Feed {feed_requested.get('feedname')} returned an SSL error. Retrying..."
+                        )
+                    )
                     feed_data_request = requests.get(
                         feed_data_url, timeout=20, verify=False
                     )
