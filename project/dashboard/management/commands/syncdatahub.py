@@ -142,17 +142,25 @@ class Command(BaseCommand):
 
             feed.issuingorganization = feed_requested.get("issuingorganization")
             feed.feedname = feed_requested.get("feedname")
-            feed.url = feed_requested.get("url").get("url", "")
+            feed.url = (
+                feed_requested.get("url", {}).get("url", "")
+                if "url" in feed_requested
+                else ""
+            )
             feed.format = feed_requested.get("format")
             feed.active = feed_requested.get("active")
             feed.datafeed_frequency_update = parse_time(
                 feed_requested.get("datafeed_frequency_update")
             )
-            feed.version = str(
-                semver.Version.parse(
-                    feed_requested.get("version"), optional_minor_and_patch=True
-                )
-            )[0:3]
+            feed.version = (
+                str(
+                    semver.Version.parse(
+                        feed_requested.get("version"), optional_minor_and_patch=True
+                    )
+                )[0:3]
+                if "version" in feed_requested
+                else ""
+            )
 
             feed.sdate = (
                 datetime.fromisoformat(feed_requested.get("sdate"))
@@ -191,13 +199,13 @@ class Command(BaseCommand):
                 else None
             )
             api_key = get_api_key(feed_requested.get("feedname"))
-            if feed_requested.get("apikeyurl"):
+            if feed_requested.get("apikeyurl") and "url" in feed_requested:
                 feed_data_url = get_feed_full_url(
                     api_key[1],
                     (feed_requested.get("url").get("url")),
                 )
             else:
-                feed_data_url = feed_requested.get("url").get("url")
+                feed_data_url = feed_requested.get("url", {}).get("url", None)
 
             feed.save()
 
