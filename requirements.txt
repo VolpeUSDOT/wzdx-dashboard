@@ -10,7 +10,7 @@ Pygments==2.19.1
 django-leaflet==0.31.0
 humanize==4.11.0
 jsonschema==4.23.0
-semver==3.0.2
+semver==3.0.4
 iso8601==2.1.0
 docutils==0.21.2
 django-localflavor==4.0
