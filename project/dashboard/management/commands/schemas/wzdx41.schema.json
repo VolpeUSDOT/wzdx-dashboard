@@ -28,7 +28,7 @@
                 "update_frequency": {
                     "description": "The frequency in seconds at which the data feed is updated",
                     "type": "integer",
-                    "minimum": 1
+                    "minimum": 0
                 },
                 "update_date": {
                     "description": "The UTC date and time when the GeoJSON file (representing the instance of the feed) was generated",
@@ -87,7 +87,7 @@
                         "update_frequency": {
                             "description": "The frequency in seconds at which the data source is updated",
                             "type": "integer",
-                            "minimum": 1
+                            "minimum": 0
                         },
                         "update_date": {
                             "description": "The UTC date and time when the data source was last updated",
