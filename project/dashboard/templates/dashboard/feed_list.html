@@ -10,6 +10,11 @@
     {% leaflet_js %}
     {% leaflet_css %}
     <script src="{% static 'dashboard/map_list.js' %}"></script>
+    <script>
+        function map_init_events(map, options) {
+          return map_events(map, options, {% autoescape off %}{{feeds_pk}}{% endautoescape %})
+        }
+    </script>
 {% endblock head %}
 {% block content %}
     <div class="usa-section">
@@ -49,8 +54,9 @@
                         </table>
                     </div>
                 </main>
-                <div class="display-none desktop:display-block desktop:grid-col flex-4">
-                    {% leaflet_map "points_map_desktop" callback="window.map_init" %}
+                <div class="display-none desktop:display-block desktop:grid-col flex-4 flex-column">
+                    <div>{% leaflet_map "points_map_desktop" callback="window.map_init_points" %}</div>
+                    <div>{% leaflet_map "event_details_desktop" callback="window.map_init_events" %}</div>
                 </div>
             </div>
             {% if is_paginated %}
