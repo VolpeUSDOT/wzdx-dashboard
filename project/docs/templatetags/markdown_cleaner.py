@@ -1,3 +1,5 @@
+import re
+
 import markdown
 from django import template
 from django.template.defaultfilters import stringfilter
@@ -14,3 +16,11 @@ MD_EXTENSIONS = ["fenced_code", "codehilite", SlugFieldExtension()]
 def render_markdown(value):
     md = markdown.Markdown(extensions=MD_EXTENSIONS)
     return mark_safe(md.convert(value))
+
+
+@register.filter
+@stringfilter
+def render_no_p_markdown(value):
+    return mark_safe(
+        re.sub("(^<P>|</P>$)", "", markdown.markdown(value), flags=re.IGNORECASE)
+    )
