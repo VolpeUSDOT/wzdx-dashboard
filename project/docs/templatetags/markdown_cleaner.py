@@ -8,19 +8,25 @@ from docs.markdown_extensions import SlugFieldExtension
 
 register = template.Library()
 
-MD_EXTENSIONS = ["fenced_code", "codehilite", SlugFieldExtension()]
+MD_EXTENSIONS = [
+    "fenced_code",
+    "codehilite",
+    "footnotes",
+    "smarty",
+    "nl2br",
+    SlugFieldExtension(),
+]
+md = markdown.Markdown(extensions=MD_EXTENSIONS)
 
 
 @register.filter
 @stringfilter
 def render_markdown(value):
-    md = markdown.Markdown(extensions=MD_EXTENSIONS)
+
     return mark_safe(md.convert(value))
 
 
 @register.filter
 @stringfilter
 def render_no_p_markdown(value):
-    return mark_safe(
-        re.sub("(^<P>|</P>$)", "", markdown.markdown(value), flags=re.IGNORECASE)
-    )
+    return mark_safe(re.sub("(^<P>|</P>$)", "", md.convert(value), flags=re.IGNORECASE))
