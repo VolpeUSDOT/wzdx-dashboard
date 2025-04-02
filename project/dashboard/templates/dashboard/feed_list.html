@@ -54,15 +54,20 @@
                         </table>
                     </div>
                 </main>
-                <div class="display-none desktop:display-block desktop:grid-col flex-4 flex-column">
-                    <div>{% leaflet_map "points_map_desktop" callback="window.map_init_points" %}</div>
-                    <div>{% leaflet_map "event_details_desktop" callback="window.map_init_events" %}</div>
+                <div class="display-none desktop:display-flex desktop:grid-col flex-4 flex-column">
+                    <div class="flex-fill">{% leaflet_map "points_map_desktop" callback="window.map_init_points" %}</div>
+                    {% comment %} <div class="flex-fill">{% leaflet_map "event_details_desktop" callback="window.map_init_events" %}</div> {% endcomment %}
                 </div>
             </div>
             {% if is_paginated %}
                 {% include "components/pagination.html" %}
             {% endif %}
-            <div class="desktop:display-none height-mobile">{% leaflet_map "points_map_mobile" callback="window.map_init" %}</div>
+            <div class="desktop:display-none height-mobile">
+                {% leaflet_map "points_map_mobile" callback="window.map_init_points" %}
+            </div>
+            {% comment %} <div class="desktop:display-none height-mobile">
+                {% leaflet_map "event_details_mobile" callback="window.map_init_events" %}
+            </div> {% endcomment %}
         </div>
     </div>
 {% endblock content %}
