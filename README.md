@@ -6,6 +6,23 @@ At the time of writing, 25 different organizations provide data feeds that align
 
 This project aims to address this by creating an internal dashboard that will regularly query the public data hub for all available feeds and their metadata, validate individual feeds, and alert Volpe WZDx team members whenever an error or warning is found.
 
+## Getting Started
+1. Ensure the following dependencies are installed:
+    - Python 3, at least 3.9
+    - NodeJS, at least NodeJS 20
+    - Spatial database software (either PostGIS or SpatiaLite) and relevant software (eg. GEOS, PROJ, GDAL, etc.)
+2. Install packages
+    - `pip install -r requirements.txt` (and `requirements-dev.txt` for development)
+    - `npm install`
+3. Create `local_settings.py` in `./project/src`
+    - This file should hold any relevant overrides for local development/production. This can include enabling `DEBUG`, adding `env` variables, adding a local `SECRET_KEY`, etc.
+    - If you'd like a template, email please contact [diego.temkin@dot.gov](mailto:diego.temkin@dot.gov)
+4. Create database and run server
+    - Django commands can be run in your terminal using the `./project/manage.py` file
+    - Run `python3 manage.py migrate` to create the database of your choice and `python3 manage.py runserver` to run a local development server
+    - Debug issues with your local installation consult Django documentation as needed
+
+
 ## Suport
 For support, please contact [diego.temkin@dot.gov](mailto:diego.temkin@dot.gov) or [avdx@dot.gov](mailto:avdx@dot.gov).
 
