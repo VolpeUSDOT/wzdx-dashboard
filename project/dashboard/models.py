@@ -302,7 +302,7 @@ class OutdatedErrorStatus(FeedStatus):
 
     def details(self):
         """Returns a string with detailed status. In this case, details last time event data was updated."""
-        return f"Event data last updated: {self.update_date.date().strftime('%x')}"
+        return f"Event data last updated: {self.update_date.strftime('%m/%d/%Y')}"
 
     class Meta:
         ordering = ["-update_date"]
