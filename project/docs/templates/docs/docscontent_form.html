@@ -24,33 +24,33 @@
                             </div>
                         {% endif %}
                         <div class="fieldWrapper usa-character-count">
-                            {{ form.title.errors }}
                             <label for="{{ form.title.id_for_label }}" class="usa-label">
                                 {{ form.title.label }} <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                             </label>
+                            {{ form.title.errors }}
                             {{ form.title }}
                             <span id="title-char-count" class="usa-character-count__message">{{ form.title.help_text }}</span>
                         </div>
                         <div class="fieldWrapper">
-                            {{ form.intro.errors }}
                             <label for="{{ form.intro.id_for_label }}" class="usa-label">{{ form.intro.label }}</label>
+                            {{ form.intro.errors }}
                             {{ form.intro }}
                         </div>
                         <div class="fieldWrapper">
-                            {{ form.content.errors }}
                             <label for="{{ form.content.id_for_label }}" class="usa-label">{{ form.content.label }}</label>
+                            {{ form.content.errors }}
                             {{ form.content }}
                         </div>
                         <div class="fieldWrapper">
-                            {{ form.ordering.errors }}
                             <label for="{{ form.ordering.id_for_label }}" class="usa-label">
                                 {{ form.ordering.label }} <abbr title="required" class="usa-hint usa-hint--required">*</abbr>
                             </label>
+                            {{ form.ordering.errors }}
                             {{ form.ordering }}
                         </div>
                         <div class="fieldWrapper">
-                            {{ form.parent_content.errors }}
                             <label for="{{ form.parent_content.id_for_label }}" class="usa-label">{{ form.parent_content.label }}</label>
+                            {{ form.parent_content.errors }}
                             {{ form.parent_content }}
                         </div>
                         <input class="usa-button" type="submit" value="Submit" />

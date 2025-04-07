@@ -172,3 +172,17 @@ except ImportError:
 
 if SECRET_KEY is None:
     raise KeyError("SECRET_KEY")
+
+LEAFLET_CONFIG = {
+    "PLUGINS": {
+        "fullscreen": {
+            "css": [
+                "/staticfiles/css/Control.FullScreen.css",
+            ],
+            "js": [
+                "/staticfiles/js/Control.FullScreen.js",
+            ],
+            "auto-include": True,
+        },
+    }
+}

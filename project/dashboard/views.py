@@ -63,6 +63,7 @@ class FeedListView(ListView):
             context["paginator"], context["page_obj"]
         )
         context["search_form"] = SearchForm()
+        context["feeds_pk"] = [pk for pk in Feed.objects.values_list("pk", flat=True)]
 
         return context
 

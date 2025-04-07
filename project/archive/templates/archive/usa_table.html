@@ -29,7 +29,8 @@
                             {% block table.tbody.row %}
                                 <tr {{ row.attrs.as_html }}>
                                     {% for column, cell in row.items %}
-                                        <td {{ column.attrs.td.as_html }} {% if table.order_by_field is not None and column.header in table.order_by_field %}data-sort-active="true"{% endif %}>
+                                        <td {{ column.attrs.td.as_html }}
+                                            {% if table.order_by_field is not None and column.header in table.order_by_field %}data-sort-active="true"{% endif %}>
                                             {% if column.localize == None %}
                                                 {{ cell }}
                                             {% else %}

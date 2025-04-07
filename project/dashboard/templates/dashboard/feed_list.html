@@ -10,6 +10,11 @@
     {% leaflet_js %}
     {% leaflet_css %}
     <script src="{% static 'dashboard/map_list.js' %}"></script>
+    <script>
+        function map_init_events(map, options) {
+          return map_events(map, options, {% autoescape off %}{{feeds_pk}}{% endautoescape %})
+        }
+    </script>
 {% endblock head %}
 {% block content %}
     <div class="usa-section">
@@ -49,14 +54,20 @@
                         </table>
                     </div>
                 </main>
-                <div class="display-none desktop:display-block desktop:grid-col flex-4">
-                    {% leaflet_map "points_map_desktop" callback="window.map_init" %}
+                <div class="display-none desktop:display-flex desktop:grid-col flex-4 flex-column">
+                    <div class="flex-fill">{% leaflet_map "points_map_desktop" callback="window.map_init_points" %}</div>
+                    {% comment %} <div class="flex-fill">{% leaflet_map "event_details_desktop" callback="window.map_init_events" %}</div> {% endcomment %}
                 </div>
             </div>
             {% if is_paginated %}
                 {% include "components/pagination.html" %}
             {% endif %}
-            <div class="desktop:display-none height-mobile">{% leaflet_map "points_map_mobile" callback="window.map_init" %}</div>
+            <div class="desktop:display-none height-mobile">
+                {% leaflet_map "points_map_mobile" callback="window.map_init_points" %}
+            </div>
+            {% comment %} <div class="desktop:display-none height-mobile">
+                {% leaflet_map "event_details_mobile" callback="window.map_init_events" %}
+            </div> {% endcomment %}
         </div>
     </div>
 {% endblock content %}
