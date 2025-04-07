@@ -8,7 +8,7 @@ djangorestframework-gis==1.1
 django-filter==24.3
 Pygments==2.19.1
 django-leaflet==0.31.0
-humanize==4.12.1
+humanize==4.12.2
 jsonschema==4.23.0
 semver==3.0.4
 iso8601==2.1.0
@@ -18,4 +18,4 @@ gunicorn==23.0.0
 uvicorn==0.34.0
 uvicorn-worker==0.3.0
 django-tables2==2.7.5
-django-admin-interface==0.29.4
+django-admin-interface==0.30.0
