@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/VolpeUSDOT/wzdx-dashboard#readme",
   "devDependencies": {
-    "@uswds/compile": "^1.2.1",
+    "@uswds/compile": "^1.2.2",
     "@uswds/uswds": "^3.12.0"
   }
 }
