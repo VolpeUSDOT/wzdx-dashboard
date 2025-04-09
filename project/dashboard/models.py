@@ -345,6 +345,10 @@ class OfflineErrorStatus(FeedStatus):
 
     def details(self):
         """Returns a string with detailed status. Rather than storing information twice, uses stored feed data to generate message."""
+
+        if self.feed.url is None or self.feed.url == "" or not self.feed.active:
+            return "Feed is not active."
+
         response_code, json_data = self.feed.response_code(), self.feed.feed_data()
 
         if response_code == 0:
