@@ -121,6 +121,12 @@ REGISTRY = Registry(retrieve=retrieve_via_web).with_resources(
 def is_offline(feed: Feed):
     """Checks if feed response code was 200 and that JSON data was written."""
 
+    if feed.url is None or feed.url == "":
+        return True
+
+    if not feed.active:
+        return True
+
     response_code = feed.response_code()
 
     if response_code is None:
