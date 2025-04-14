@@ -13,10 +13,7 @@ class FeedPointsSerializer(
 
     class Meta:
         model = Feed
-        fields = (
-            "status_type",
-            "issuingorganization",
-        )
+        fields = ("status_type", "issuingorganization", "pk")
         geo_field = "geocoded_column"
         auto_bbox = True
 

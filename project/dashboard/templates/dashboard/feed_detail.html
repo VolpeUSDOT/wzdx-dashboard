@@ -5,16 +5,16 @@
 {% block title %}
     {{ feed.issuingorganization }}
 {% endblock title %}
-{% load leaflet_tags %}
 {% block head %}
-    {% leaflet_js %}
-    {% leaflet_css %}
-    <script src="{% static 'dashboard/map_details.js' %}"></script>
+    <script src="https://unpkg.com/maplibre-gl@^5.3.0/dist/maplibre-gl.js"></script>
+    <link href="https://unpkg.com/maplibre-gl@^5.3.0/dist/maplibre-gl.css"
+          rel="stylesheet" />
     <script>
-      function map_init(map, options) {
-        return map_details(map, options, '{{feed.feedname}}', '{{feed.version}}')
-      }
+          var coords = [{%for coord in feed.geocoded_column.coords %}{{coord}},{%endfor%}];
+          var version = '{{feed.version}}';
+          var points_url = `/api/feeds/{{feed.feedname}}`;
     </script>
+    <script src="{% static 'dashboard/map_details.js' %}"></script>
 {% endblock head %}
 {% block content %}
     <div class="usa-section">
@@ -115,7 +115,10 @@
                         {% endif %}
                     </ul>
                 </main>
-                <div class="tablet:grid-col">{% leaflet_map "feed_map_desktop" callback="window.map_init" %}</div>
+                <div class="tablet:grid-col">
+                    <div class="tablet:height-full height-mobile" id="map"></div>
+                    <script>makeMap("map")</script>
+                </div>
             </div>
         </div>
     </div>

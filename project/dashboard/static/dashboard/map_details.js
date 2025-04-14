@@ -1,39 +1,128 @@
-async function map_details(map, options, feedname, version) {
-  const layerGroup = L.featureGroup().addTo(map);
-  L.control.fullscreen().addTo(map);
+function makeMap(container) {
+  const map = new maplibregl.Map({
+    container: container, // container id
+    style: "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json", // style URL
+    center: coords, // starting position [lng, lat]
+    zoom: 1, // starting zoom
+  });
 
-  const points_url = `/api/feeds/${feedname}`;
+  map.addControl(
+    new maplibregl.FullscreenControl({
+      container: document.querySelector(container),
+    })
+  );
 
-  const resp = await fetch(points_url);
-  const data = await resp.json();
+  map.on("load", async () => {
+    const resp = await fetch(points_url);
+    const data = await resp.json();
 
-  const feed_data = data["feed_data"];
+    const feed_data = data["feed_data"];
 
-  L.geoJSON(feed_data, {
-    onEachFeature: (feature, layer) => {
-      layer.bindPopup(
-        version.startsWith("4")
-          ? `<ul class="usa-list usa-list--unstyled">
-                <li>Event Type: ${feature.properties.core_details.event_type}</li>
-                <li>Roads: ${feature.properties.core_details.road_names}</li>
-                <li>Direction: ${feature.properties.core_details.direction}</li>
-                <li>Start Date: ${feature.properties.start_date}</li>
-                <li>End Date: ${feature.properties.end_date}</li>
-                <li>Vehicle Impact: ${feature.properties.vehicle_impact}</li>
-                </ul>
-                `
-          : `<ul class="usa-list usa-list--unstyled">
-                <li>Event Type: ${feature.properties.event_type}</li>
-                <li>Roads: ${feature.properties.road_names}</li>
-                <li>Direction: ${feature.properties.direction}</li>
-                <li>Start Date: ${feature.properties.start_date}</li>
-                <li>End Date: ${feature.properties.end_date}</li>
-                <li>Vehicle Impact: ${feature.properties.vehicle_impact}</li>
-                </ul>
-                `
-      );
-    },
-  }).addTo(layerGroup);
+    map.addSource("geojson-source", {
+      type: "geojson",
+      data: feed_data,
+    });
 
-  map.fitBounds(layerGroup.getBounds());
+    map.addLayer({
+      id: "geojson-lines",
+      type: "line",
+      source: "geojson-source",
+      filter: ["==", "$type", "LineString"],
+    });
+
+    map.addLayer({
+      id: "geojson-points",
+      type: "circle",
+      source: "geojson-source",
+      filter: ["==", "$type", "Point"],
+    });
+
+    map.on("click", "geojson-points", (e) => {
+      console.log(e.features[0].properties);
+      const coordinates = e.features[0].geometry.coordinates.slice();
+
+      let description;
+
+      if (version.startsWith("4")) {
+        const core_details = JSON.parse(e.features[0].properties.core_details);
+        description = `<ul class="usa-list usa-list--unstyled">
+        <li>Event Type: ${core_details.event_type}</li>
+        <li>Roads: ${core_details.road_names}</li>
+        <li>Direction: ${core_details.direction}</li>
+        <li>Start Date: ${e.features[0].properties.start_date}</li>
+        <li>End Date: ${e.features[0].properties.end_date}</li>
+        <li>Vehicle Impact: ${e.features[0].properties.vehicle_impact}</li>
+        </ul>
+        `;
+      } else {
+        description = `<ul class="usa-list usa-list--unstyled">
+        <li>Event Type: ${e.features[0].properties.event_type}</li>
+        <li>Roads: ${e.features[0].properties.road_names}</li>
+        <li>Direction: ${e.features[0].properties.direction}</li>
+        <li>Start Date: ${e.features[0].properties.start_date}</li>
+        <li>End Date: ${e.features[0].properties.end_date}</li>
+        <li>Vehicle Impact: ${e.features[0].properties.vehicle_impact}</li>
+        </ul>
+        `;
+      }
+
+      // Ensure that if the map is zoomed out such that multiple
+      // copies of the feature are visible, the popup appears
+      // over the copy being pointed to.
+      while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+      }
+
+      new maplibregl.Popup()
+        .setLngLat(coordinates)
+        .setHTML(description)
+        .addTo(map);
+    });
+
+    map.on("click", "geojson-lines", (e) => {
+      const coordinates = e.lngLat;
+
+      let description;
+
+      if (version.startsWith("4")) {
+        const core_details = JSON.parse(e.features[0].properties.core_details);
+        description = `<ul class="usa-list usa-list--unstyled">
+        <li>Event Type: ${core_details.event_type}</li>
+        <li>Roads: ${core_details.road_names}</li>
+        <li>Direction: ${core_details.direction}</li>
+        <li>Start Date: ${e.features[0].properties.start_date}</li>
+        <li>End Date: ${e.features[0].properties.end_date}</li>
+        <li>Vehicle Impact: ${e.features[0].properties.vehicle_impact}</li>
+        </ul>
+        `;
+      } else {
+        description = `<ul class="usa-list usa-list--unstyled">
+        <li>Event Type: ${e.features[0].properties.event_type}</li>
+        <li>Roads: ${e.features[0].properties.road_names}</li>
+        <li>Direction: ${e.features[0].properties.direction}</li>
+        <li>Start Date: ${e.features[0].properties.start_date}</li>
+        <li>End Date: ${e.features[0].properties.end_date}</li>
+        <li>Vehicle Impact: ${e.features[0].properties.vehicle_impact}</li>
+        </ul>
+        `;
+      }
+
+      // Ensure that if the map is zoomed out such that multiple
+      // copies of the feature are visible, the popup appears
+      // over the copy being pointed to.
+      while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+        coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+      }
+
+      new maplibregl.Popup()
+        .setLngLat(coordinates)
+        .setHTML(description)
+        .addTo(map);
+    });
+
+    map
+      .getSource("geojson-source")
+      .getBounds()
+      .then((bounds) => map.fitBounds(bounds, { padding: 20 }));
+  });
 }
