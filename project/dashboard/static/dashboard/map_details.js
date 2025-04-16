@@ -1,3 +1,8 @@
+const US_CENTER = [-103.771556, 44.967243];
+
+const BASEMAP_URL =
+  "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json";
+
 /**
  *
  * @param {string} container
@@ -8,8 +13,8 @@
 function makeMap(container, coords, version, points_url) {
   const map = new maplibregl.Map({
     container: container, // container id
-    style: "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json", // style URL
-    center: coords, // starting position [lng, lat]
+    style: BASEMAP_URL, // style URL
+    center: coords ?? US_CENTER, // starting position [lng, lat]
     zoom: 4, // starting zoom
   });
 
@@ -35,6 +40,13 @@ function makeMap(container, coords, version, points_url) {
       type: "line",
       source: "geojson-source",
       filter: ["==", "$type", "LineString"],
+      layout: {
+        "line-join": "round",
+        "line-cap": "round",
+      },
+      paint: {
+        "line-width": 4,
+      },
     });
 
     map.addLayer({
@@ -42,6 +54,9 @@ function makeMap(container, coords, version, points_url) {
       type: "circle",
       source: "geojson-source",
       filter: ["==", "$type", "Point"],
+      paint: {
+        "circle-radius": 4,
+      },
     });
 
     map.on("click", "geojson-points", (e) => {

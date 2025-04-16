@@ -98,6 +98,26 @@ async function makeFeedsMap(container) {
 
 /**
  *
+ * @param {string} str
+ * @returns hex code
+ */
+function stringToHexCode(str) {
+  let hash = 0;
+  if (str.length === 0) return hash;
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    hash = hash & hash;
+  }
+  let color = "#";
+  for (let i = 0; i < 3; i++) {
+    let value = (hash >> (i * 8)) & 255;
+    color += ("00" + value.toString(16)).slice(-2);
+  }
+  return color;
+}
+
+/**
+ *
  * @param {string} container
  * @param {string[]} feeds
  */
@@ -138,6 +158,14 @@ async function makeEventsMap(container, feeds) {
               type: "line",
               source: layer_source,
               filter: ["==", "$type", "LineString"],
+              layout: {
+                "line-join": "round",
+                "line-cap": "round",
+              },
+              paint: {
+                "line-width": 4,
+                "line-color": stringToHexCode(feed),
+              },
             });
 
             map.addLayer({
@@ -145,18 +173,22 @@ async function makeEventsMap(container, feeds) {
               type: "circle",
               source: layer_source,
               filter: ["==", "$type", "Point"],
+              paint: {
+                "circle-radius": 4,
+                "circle-color": stringToHexCode(feed),
+              },
             });
 
             map.on("click", layer_points, (e) => {
               const coordinates = e.features[0].geometry.coordinates.slice();
 
-              let description;
+              let description = `<a class="usa-link" href="${feed}">View feed (${feed})</a>`;
 
               if (e.features[0].properties.core_details) {
                 const core_details = JSON.parse(
                   e.features[0].properties.core_details
                 );
-                description = `<ul class="usa-list usa-list--unstyled">
+                description += `<ul class="usa-list usa-list--unstyled">
         <li>Event Type: ${core_details.event_type}</li>
         <li>Roads: ${core_details.road_names}</li>
         <li>Direction: ${core_details.direction}</li>
@@ -166,7 +198,7 @@ async function makeEventsMap(container, feeds) {
         </ul>
         `;
               } else {
-                description = `<ul class="usa-list usa-list--unstyled">
+                description += `<ul class="usa-list usa-list--unstyled">
         <li>Event Type: ${e.features[0].properties.event_type}</li>
         <li>Roads: ${e.features[0].properties.road_names}</li>
         <li>Direction: ${e.features[0].properties.direction}</li>
@@ -193,13 +225,13 @@ async function makeEventsMap(container, feeds) {
             map.on("click", layer_lines, (e) => {
               const coordinates = e.lngLat;
 
-              let description;
+              let description = `<a class="usa-link" href="${feed}">View feed (${feed})</a>`;
 
               if (e.features[0].properties.core_details) {
                 const core_details = JSON.parse(
                   e.features[0].properties.core_details
                 );
-                description = `<ul class="usa-list usa-list--unstyled">
+                description += `<ul class="usa-list usa-list--unstyled">
         <li>Event Type: ${core_details.event_type}</li>
         <li>Roads: ${core_details.road_names}</li>
         <li>Direction: ${core_details.direction}</li>
@@ -209,7 +241,7 @@ async function makeEventsMap(container, feeds) {
         </ul>
         `;
               } else {
-                description = `<ul class="usa-list usa-list--unstyled">
+                description += `<ul class="usa-list usa-list--unstyled">
         <li>Event Type: ${e.features[0].properties.event_type}</li>
         <li>Roads: ${e.features[0].properties.road_names}</li>
         <li>Direction: ${e.features[0].properties.direction}</li>
