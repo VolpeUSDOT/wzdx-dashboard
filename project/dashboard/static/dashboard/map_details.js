@@ -1,9 +1,16 @@
-function makeMap(container) {
+/**
+ *
+ * @param {string} container
+ * @param {[number, number]} coords
+ * @param {string} version
+ * @param {string} points_url
+ */
+function makeMap(container, coords, version, points_url) {
   const map = new maplibregl.Map({
     container: container, // container id
     style: "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json", // style URL
     center: coords, // starting position [lng, lat]
-    zoom: 1, // starting zoom
+    zoom: 4, // starting zoom
   });
 
   map.addControl(

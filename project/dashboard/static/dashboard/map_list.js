@@ -7,11 +7,20 @@ const STATUS_TYPES = {
   OF: "offline",
 };
 
-function makeMap(container) {
+const US_CENTER = [-103.771556, 44.967243];
+
+const BASEMAP_URL =
+  "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json";
+
+/**
+ *
+ * @param {string} container
+ */
+async function makeFeedsMap(container) {
   const map = new maplibregl.Map({
     container: container, // container id
-    style: "https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json", // style URL
-    center: [-103.771556, 44.967243], // starting position [lng, lat]
+    style: BASEMAP_URL, // style URL
+    center: US_CENTER, // starting position [lng, lat]
     zoom: 1, // starting zoom
   });
 
@@ -82,61 +91,149 @@ function makeMap(container) {
         .addTo(map);
     });
 
-    map
-      .getSource("geojson-source")
-      .getBounds()
-      .then((bounds) => map.fitBounds(bounds, { padding: 20 }));
+    const bounds = await map.getSource("geojson-source").getBounds();
+    map.fitBounds(bounds, { padding: 20 });
   });
 }
 
-// async function map_events(map, options, feeds) {
-//   console.log(feeds);
+/**
+ *
+ * @param {string} container
+ * @param {string[]} feeds
+ */
+async function makeEventsMap(container, feeds) {
+  const map = new maplibregl.Map({
+    container: container, // container id
+    style: BASEMAP_URL, // style URL
+    center: US_CENTER, // starting position [lng, lat]
+    zoom: 1, // starting zoom
+  });
 
-//   const layerGroup = L.featureGroup().addTo(map);
+  map.addControl(
+    new maplibregl.FullscreenControl({
+      container: document.querySelector(container),
+    })
+  );
 
-//   L.setOptions(map, { preferCanvas: true });
+  map.on("load", async () => {
+    await Promise.all(
+      feeds.map((feed) => {
+        const points_url = `/api/feeds/${feed}`;
+        const layer_source = `geojson-source-${feed}`;
+        const layer_points = `geojson-points-${feed}`;
+        const layer_lines = `geojson-lines-${feed}`;
 
-//   L.control.fullscreen().addTo(map);
+        return fetch(points_url)
+          .then((resp) => resp.json())
+          .then((data) => {
+            const feed_data = data["feed_data"];
 
-//   for await (const feed of feeds) {
-//     const points_url = `/api/feeds/${feed}`;
-//     const resp = await fetch(points_url);
-//     const data = await resp.json();
+            map.addSource(layer_source, {
+              type: "geojson",
+              data: feed_data,
+            });
 
-//     const feed_data = data["feed_data"];
+            map.addLayer({
+              id: layer_lines,
+              type: "line",
+              source: layer_source,
+              filter: ["==", "$type", "LineString"],
+            });
 
-//     if (Object.keys(feed_data).length === 0) {
-//       continue;
-//     }
+            map.addLayer({
+              id: layer_points,
+              type: "circle",
+              source: layer_source,
+              filter: ["==", "$type", "Point"],
+            });
 
-//     L.geoJSON(feed_data, {
-//       onEachFeature: (feature, layer) => {
-//         layer.bindPopup(
-//           feed_data["feed_info"] ||
-//             (feed_data["road_event_feed_info"] &&
-//               feed_data["road_event_feed_info"]["version"].startsWith("4"))
-//             ? `<ul class="usa-list usa-list--unstyled">
-//                 <li>Event Type: ${feature.properties.core_details.event_type}</li>
-//                 <li>Roads: ${feature.properties.core_details.road_names}</li>
-//                 <li>Direction: ${feature.properties.core_details.direction}</li>
-//                 <li>Start Date: ${feature.properties.start_date}</li>
-//                 <li>End Date: ${feature.properties.end_date}</li>
-//                 <li>Vehicle Impact: ${feature.properties.vehicle_impact}</li>
-//                 </ul>
-//                 `
-//             : `<ul class="usa-list usa-list--unstyled">
-//                 <li>Event Type: ${feature.properties.event_type}</li>
-//                 <li>Roads: ${feature.properties.road_names}</li>
-//                 <li>Direction: ${feature.properties.direction}</li>
-//                 <li>Start Date: ${feature.properties.start_date}</li>
-//                 <li>End Date: ${feature.properties.end_date}</li>
-//                 <li>Vehicle Impact: ${feature.properties.vehicle_impact}</li>
-//                 </ul>
-//                 `
-//         );
-//       },
-//     }).addTo(layerGroup);
-//   }
+            map.on("click", layer_points, (e) => {
+              const coordinates = e.features[0].geometry.coordinates.slice();
 
-//   map.fitBounds(layerGroup.getBounds());
-// }
+              let description;
+
+              if (e.features[0].properties.core_details) {
+                const core_details = JSON.parse(
+                  e.features[0].properties.core_details
+                );
+                description = `<ul class="usa-list usa-list--unstyled">
+        <li>Event Type: ${core_details.event_type}</li>
+        <li>Roads: ${core_details.road_names}</li>
+        <li>Direction: ${core_details.direction}</li>
+        <li>Start Date: ${e.features[0].properties.start_date}</li>
+        <li>End Date: ${e.features[0].properties.end_date}</li>
+        <li>Vehicle Impact: ${e.features[0].properties.vehicle_impact}</li>
+        </ul>
+        `;
+              } else {
+                description = `<ul class="usa-list usa-list--unstyled">
+        <li>Event Type: ${e.features[0].properties.event_type}</li>
+        <li>Roads: ${e.features[0].properties.road_names}</li>
+        <li>Direction: ${e.features[0].properties.direction}</li>
+        <li>Start Date: ${e.features[0].properties.start_date}</li>
+        <li>End Date: ${e.features[0].properties.end_date}</li>
+        <li>Vehicle Impact: ${e.features[0].properties.vehicle_impact}</li>
+        </ul>
+        `;
+              }
+
+              // Ensure that if the map is zoomed out such that multiple
+              // copies of the feature are visible, the popup appears
+              // over the copy being pointed to.
+              while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+              }
+
+              new maplibregl.Popup()
+                .setLngLat(coordinates)
+                .setHTML(description)
+                .addTo(map);
+            });
+
+            map.on("click", layer_lines, (e) => {
+              const coordinates = e.lngLat;
+
+              let description;
+
+              if (e.features[0].properties.core_details) {
+                const core_details = JSON.parse(
+                  e.features[0].properties.core_details
+                );
+                description = `<ul class="usa-list usa-list--unstyled">
+        <li>Event Type: ${core_details.event_type}</li>
+        <li>Roads: ${core_details.road_names}</li>
+        <li>Direction: ${core_details.direction}</li>
+        <li>Start Date: ${e.features[0].properties.start_date}</li>
+        <li>End Date: ${e.features[0].properties.end_date}</li>
+        <li>Vehicle Impact: ${e.features[0].properties.vehicle_impact}</li>
+        </ul>
+        `;
+              } else {
+                description = `<ul class="usa-list usa-list--unstyled">
+        <li>Event Type: ${e.features[0].properties.event_type}</li>
+        <li>Roads: ${e.features[0].properties.road_names}</li>
+        <li>Direction: ${e.features[0].properties.direction}</li>
+        <li>Start Date: ${e.features[0].properties.start_date}</li>
+        <li>End Date: ${e.features[0].properties.end_date}</li>
+        <li>Vehicle Impact: ${e.features[0].properties.vehicle_impact}</li>
+        </ul>
+        `;
+              }
+
+              // Ensure that if the map is zoomed out such that multiple
+              // copies of the feature are visible, the popup appears
+              // over the copy being pointed to.
+              while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+              }
+
+              new maplibregl.Popup()
+                .setLngLat(coordinates)
+                .setHTML(description)
+                .addTo(map);
+            });
+          });
+      })
+    );
+  });
+}

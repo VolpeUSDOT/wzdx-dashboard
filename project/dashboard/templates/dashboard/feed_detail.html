@@ -6,14 +6,9 @@
     {{ feed.issuingorganization }}
 {% endblock title %}
 {% block head %}
-    <script src="https://unpkg.com/maplibre-gl@^5.3.0/dist/maplibre-gl.js"></script>
-    <link href="https://unpkg.com/maplibre-gl@^5.3.0/dist/maplibre-gl.css"
+    <script src="https://unpkg.com/maplibre-gl@^5.3.1/dist/maplibre-gl.js"></script>
+    <link href="https://unpkg.com/maplibre-gl@^5.3.1/dist/maplibre-gl.css"
           rel="stylesheet" />
-    <script>
-          var coords = [{%for coord in feed.geocoded_column.coords %}{{coord}},{%endfor%}];
-          var version = '{{feed.version}}';
-          var points_url = `/api/feeds/{{feed.feedname}}`;
-    </script>
     <script src="{% static 'dashboard/map_details.js' %}"></script>
 {% endblock head %}
 {% block content %}
@@ -117,7 +112,7 @@
                 </main>
                 <div class="tablet:grid-col">
                     <div class="tablet:height-full height-mobile" id="map"></div>
-                    <script>makeMap("map")</script>
+                    <script>makeMap("map", [{%for coord in feed.geocoded_column.coords %}{{coord}},{%endfor%}], '{{feed.version}}', '/api/feeds/{{feed.feedname}}')</script>
                 </div>
             </div>
         </div>

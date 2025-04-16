@@ -6,8 +6,8 @@
     Home
 {% endblock title %}
 {% block head %}
-    <script src="https://unpkg.com/maplibre-gl@^5.3.0/dist/maplibre-gl.js"></script>
-    <link href="https://unpkg.com/maplibre-gl@^5.3.0/dist/maplibre-gl.css"
+    <script src="https://unpkg.com/maplibre-gl@^5.3.1/dist/maplibre-gl.js"></script>
+    <link href="https://unpkg.com/maplibre-gl@^5.3.1/dist/maplibre-gl.css"
           rel="stylesheet" />
     <script src="{% static 'dashboard/map_list.js' %}"></script>
 {% endblock head %}
@@ -51,21 +51,25 @@
                 </main>
                 <div class="display-none desktop:display-flex desktop:grid-col flex-4 flex-column">
                     <div class="flex-fill">
-                        <div class="height-full" id="map_desktop"></div>
-                        <script>makeMap("map_desktop")</script>
+                        <div class="height-full" id="map_feeds_desktop"></div>
+                        <script>makeFeedsMap("map_feeds_desktop")</script>
                     </div>
-                    {% comment %} <div class="flex-fill">{% leaflet_map "event_details_desktop" callback="window.map_init_events" %}</div> {% endcomment %}
+                    {% comment %} <div class="flex-fill">
+                        <div class="height-full" id="map_events_desktop"></div>
+                        <script>makeEventsMap("map_events_desktop", {% autoescape off %}{{feeds_pk}}{% endautoescape %})</script>
+                    </div> {% endcomment %}
                 </div>
             </div>
             {% if is_paginated %}
                 {% include "components/pagination.html" %}
             {% endif %}
             <div class="desktop:display-none height-mobile">
-                <div class="height-full" id="map_mobile"></div>
-                <script>makeMap("map_mobile")</script>
+                <div class="height-full" id="map_feeds_mobile"></div>
+                <script>makeFeedsMap("map_feeds_mobile")</script>
             </div>
             {% comment %} <div class="desktop:display-none height-mobile">
-                {% leaflet_map "event_details_mobile" callback="window.map_init_events" %}
+                <div class="height-full" id="map_events_mobile"></div>
+                <script>makeEventsMap("map_events_mobile", {% autoescape off %}{{feeds_pk}}{% endautoescape %})</script>
             </div> {% endcomment %}
         </div>
     </div>
