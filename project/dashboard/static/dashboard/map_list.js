@@ -137,58 +137,57 @@ async function makeEventsMap(container, feeds) {
 
   map.on("load", async () => {
     await Promise.all(
-      feeds.map((feed) => {
+      feeds.map(async (feed) => {
         const points_url = `/api/feeds/${feed}`;
         const layer_source = `geojson-source-${feed}`;
         const layer_points = `geojson-points-${feed}`;
         const layer_lines = `geojson-lines-${feed}`;
 
-        return fetch(points_url)
-          .then((resp) => resp.json())
-          .then((data) => {
-            const feed_data = data["feed_data"];
+        const resp = await fetch(points_url);
+        const data = await resp.json();
 
-            map.addSource(layer_source, {
-              type: "geojson",
-              data: feed_data,
-            });
+        const feed_data = data["feed_data"];
 
-            map.addLayer({
-              id: layer_lines,
-              type: "line",
-              source: layer_source,
-              filter: ["==", "$type", "LineString"],
-              layout: {
-                "line-join": "round",
-                "line-cap": "round",
-              },
-              paint: {
-                "line-width": 4,
-                "line-color": stringToHexCode(feed),
-              },
-            });
+        map.addSource(layer_source, {
+          type: "geojson",
+          data: feed_data,
+        });
 
-            map.addLayer({
-              id: layer_points,
-              type: "circle",
-              source: layer_source,
-              filter: ["==", "$type", "Point"],
-              paint: {
-                "circle-radius": 4,
-                "circle-color": stringToHexCode(feed),
-              },
-            });
+        map.addLayer({
+          id: layer_lines,
+          type: "line",
+          source: layer_source,
+          filter: ["==", "$type", "LineString"],
+          layout: {
+            "line-join": "round",
+            "line-cap": "round",
+          },
+          paint: {
+            "line-width": 4,
+            "line-color": stringToHexCode(feed),
+          },
+        });
 
-            map.on("click", layer_points, (e) => {
-              const coordinates = e.features[0].geometry.coordinates.slice();
+        map.addLayer({
+          id: layer_points,
+          type: "circle",
+          source: layer_source,
+          filter: ["==", "$type", "Point"],
+          paint: {
+            "circle-radius": 4,
+            "circle-color": stringToHexCode(feed),
+          },
+        });
 
-              let description = `<a class="usa-link" href="${feed}">View feed (${feed})</a>`;
+        map.on("click", layer_points, (e) => {
+          const coordinates = e.lngLat;
+          let description = `<a class="usa-link" href="${feed}">View feed (${feed})</a>`;
 
-              if (e.features[0].properties.core_details) {
-                const core_details = JSON.parse(
-                  e.features[0].properties.core_details
-                );
-                description += `<ul class="usa-list usa-list--unstyled">
+          if (e.features[0].properties.core_details) {
+            const core_details = JSON.parse(
+              e.features[0].properties.core_details
+            );
+            description += `<ul class="usa-list usa-list--unstyled">
         <li>Event Type: ${core_details.event_type}</li>
         <li>Roads: ${core_details.road_names}</li>
         <li>Direction: ${core_details.direction}</li>
@@ -197,8 +196,8 @@ async function makeEventsMap(container, feeds) {
         <li>Vehicle Impact: ${e.features[0].properties.vehicle_impact}</li>
         </ul>
         `;
-              } else {
-                description += `<ul class="usa-list usa-list--unstyled">
+          } else {
+            description += `<ul class="usa-list usa-list--unstyled">
         <li>Event Type: ${e.features[0].properties.event_type}</li>
         <li>Roads: ${e.features[0].properties.road_names}</li>
         <li>Direction: ${e.features[0].properties.direction}</li>
@@ -207,31 +206,30 @@ async function makeEventsMap(container, feeds) {
         <li>Vehicle Impact: ${e.features[0].properties.vehicle_impact}</li>
         </ul>
         `;
-              }
+          }
 
-              // Ensure that if the map is zoomed out such that multiple
-              // copies of the feature are visible, the popup appears
-              // over the copy being pointed to.
-              while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-              }
+          // Ensure that if the map is zoomed out such that multiple
+          // copies of the feature are visible, the popup appears
+          // over the copy being pointed to.
+          while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+            coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+          }
 
-              new maplibregl.Popup()
-                .setLngLat(coordinates)
-                .setHTML(description)
-                .addTo(map);
-            });
+          new maplibregl.Popup()
+            .setLngLat(coordinates)
+            .setHTML(description)
+            .addTo(map);
+        });
 
-            map.on("click", layer_lines, (e) => {
-              const coordinates = e.lngLat;
+        map.on("click", layer_lines, (e) => {
+          const coordinates = e.lngLat;
+          let description = `<a class="usa-link" href="${feed}">View feed (${feed})</a>`;
 
-              let description = `<a class="usa-link" href="${feed}">View feed (${feed})</a>`;
-
-              if (e.features[0].properties.core_details) {
-                const core_details = JSON.parse(
-                  e.features[0].properties.core_details
-                );
-                description += `<ul class="usa-list usa-list--unstyled">
+          if (e.features[0].properties.core_details) {
+            const core_details = JSON.parse(
+              e.features[0].properties.core_details
+            );
+            description += `<ul class="usa-list usa-list--unstyled">
         <li>Event Type: ${core_details.event_type}</li>
         <li>Roads: ${core_details.road_names}</li>
         <li>Direction: ${core_details.direction}</li>
@@ -240,8 +238,8 @@ async function makeEventsMap(container, feeds) {
         <li>Vehicle Impact: ${e.features[0].properties.vehicle_impact}</li>
         </ul>
         `;
-              } else {
-                description += `<ul class="usa-list usa-list--unstyled">
+          } else {
+            description += `<ul class="usa-list usa-list--unstyled">
         <li>Event Type: ${e.features[0].properties.event_type}</li>
         <li>Roads: ${e.features[0].properties.road_names}</li>
         <li>Direction: ${e.features[0].properties.direction}</li>
@@ -250,21 +248,20 @@ async function makeEventsMap(container, feeds) {
         <li>Vehicle Impact: ${e.features[0].properties.vehicle_impact}</li>
         </ul>
         `;
-              }
+          }
 
-              // Ensure that if the map is zoomed out such that multiple
-              // copies of the feature are visible, the popup appears
-              // over the copy being pointed to.
-              while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-              }
+          // Ensure that if the map is zoomed out such that multiple
+          // copies of the feature are visible, the popup appears
+          // over the copy being pointed to.
+          while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+            coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+          }
 
-              new maplibregl.Popup()
-                .setLngLat(coordinates)
-                .setHTML(description)
-                .addTo(map);
-            });
-          });
+          new maplibregl.Popup()
+            .setLngLat(coordinates)
+            .setHTML(description)
+            .addTo(map);
+        });
       })
     );
   });

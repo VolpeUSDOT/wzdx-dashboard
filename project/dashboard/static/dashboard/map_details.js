@@ -60,9 +60,7 @@ function makeMap(container, coords, version, points_url) {
     });
 
     map.on("click", "geojson-points", (e) => {
-      console.log(e.features[0].properties);
-      const coordinates = e.features[0].geometry.coordinates.slice();
-
+      const coordinates = e.lngLat;
       let description;
 
       if (version.startsWith("4")) {
@@ -103,7 +101,6 @@ function makeMap(container, coords, version, points_url) {
 
     map.on("click", "geojson-lines", (e) => {
       const coordinates = e.lngLat;
-
       let description;
 
       if (version.startsWith("4")) {
