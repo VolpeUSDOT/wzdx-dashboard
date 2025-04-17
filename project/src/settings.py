@@ -47,7 +47,6 @@ INSTALLED_APPS = [
     "django.forms",
     "rest_framework",
     "rest_framework_gis",
-    "leaflet",
     "localflavor",
     "django_tables2",
     "django_filters",
@@ -172,17 +171,3 @@ except ImportError:
 
 if SECRET_KEY is None:
     raise KeyError("SECRET_KEY")
-
-LEAFLET_CONFIG = {
-    "PLUGINS": {
-        "fullscreen": {
-            "css": [
-                "/staticfiles/css/Control.FullScreen.css",
-            ],
-            "js": [
-                "/staticfiles/js/Control.FullScreen.js",
-            ],
-            "auto-include": True,
-        },
-    }
-}
