@@ -2,7 +2,7 @@ from typing import Optional, Union
 
 from django.core.paginator import Page, Paginator
 from django.http import FileResponse, HttpResponseBadRequest, JsonResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import aget_object_or_404
 from django_filters.views import FilterView
 from django_tables2 import SingleTableMixin
 
@@ -68,8 +68,8 @@ class ArchiveListView(SingleTableMixin, FilterView):
     filterset_class = ArchiveFilter
 
 
-def archive_json(request, pk):
-    data = get_object_or_404(Archive.objects, pk=pk)
+async def archive_json(request, pk):
+    data = await aget_object_or_404(Archive.objects, pk=pk)
 
     return JsonResponse(data.data)
 
