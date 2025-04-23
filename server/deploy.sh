@@ -6,7 +6,7 @@ PYTHON_COMMAND="python3.11"
 cd $BASE_DIR || exit
 
 git pull
-pip install -r requirements.txt
+$PYTHON_COMMAND -m pip install -r requirements.txt
 
 cd $BASE_DIR/project || exit | exit
 
