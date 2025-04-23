@@ -8,7 +8,7 @@ This project aims to address this by creating an internal dashboard that will re
 
 ## Getting Started
 1. Ensure the following dependencies are installed:
-    - Python 3, at least 3.9
+    - Python 3, at least 3.11
     - NodeJS, at least NodeJS 20
     - Spatial database software (either PostGIS or SpatiaLite) and relevant software (eg. GEOS, PROJ, GDAL, etc.)
 2. Install packages
