@@ -1,6 +1,8 @@
 #!/bin/bash
 
 BASE_DIR="/var/www/wzdx-dashboard"
+PYTHON_COMMAND="python3.11"
+
 cd $BASE_DIR || exit
 
 git pull
@@ -8,8 +10,8 @@ pip install -r requirements.txt
 
 cd $BASE_DIR/project || exit | exit
 
-python3 manage.py makemigrations
-python3 manage.py migrate
-python3 manage.py collectstatic --noinput --clear
+$PYTHON_COMMAND manage.py makemigrations
+$PYTHON_COMMAND manage.py migrate
+$PYTHON_COMMAND manage.py collectstatic --noinput --clear
 
 systemctl restart gunicorn

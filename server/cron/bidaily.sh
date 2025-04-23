@@ -1,6 +1,8 @@
 #!/bin/bash
 
 PROJECT_PATH="/var/www/wzdx-dashboard/project"
+PYTHON_COMMAND="python3.11"
+
 cd $PROJECT_PATH || exit
 
-python3 ./manage.py archivefeeds
+$PYTHON_COMMAND ./manage.py archivefeeds
