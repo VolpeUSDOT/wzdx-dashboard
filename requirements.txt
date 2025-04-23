@@ -5,7 +5,7 @@ tzdata==2025.2
 markdown==3.8
 djangorestframework==3.15.2
 djangorestframework-gis==1.1
-django-filter==24.3
+django-filter==25.1
 Pygments==2.19.1
 humanize==4.12.2
 jsonschema==4.23.0
