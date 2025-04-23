@@ -30,6 +30,10 @@ function makeMap(container, coords, version, points_url) {
 
     const feed_data = data["feed_data"];
 
+    if (Object.keys(feed_data).length === 0) {
+      return;
+    }
+
     map.addSource("geojson-source", {
       type: "geojson",
       data: feed_data,

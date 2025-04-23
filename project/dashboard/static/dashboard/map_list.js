@@ -148,6 +148,10 @@ async function makeEventsMap(container, feeds) {
 
         const feed_data = data["feed_data"];
 
+        if (Object.keys(feed_data).length === 0) {
+          return;
+        }
+
         map.addSource(layer_source, {
           type: "geojson",
           data: feed_data,
