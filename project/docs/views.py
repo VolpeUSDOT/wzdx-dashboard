@@ -16,8 +16,8 @@ class StaffMemberRequiredMixin(UserPassesTestMixin):
         return self.request.user.is_staff  # type: ignore
 
 
-def docs_redirect(request):
-    docs_first = DocsContent.objects.first()
+async def docs_redirect(request):
+    docs_first = await DocsContent.objects.afirst()
 
     if docs_first is None:
         raise Http404("No docs exist.")
