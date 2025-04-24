@@ -2,12 +2,15 @@ from django import forms
 
 from .models import Feed
 
-FEED_CHOICES = [("", "Find a feed!")] + [
-    (feedname, f"{state + ' - ' if state else ''}{issuingorganization}")
-    for (feedname, state, issuingorganization) in Feed.objects.values_list(
-        "feedname", "state", "issuingorganization"
-    )
-]
+
+# Use function to prevent it from running until needed...
+def FEED_CHOICES():
+    return [("", "Find a feed!")] + [
+        (feedname, f"{state + ' - ' if state else ''}{issuingorganization}")
+        for (feedname, state, issuingorganization) in Feed.objects.values_list(
+            "feedname", "state", "issuingorganization"
+        )
+    ]
 
 
 class SearchForm(forms.Form):
