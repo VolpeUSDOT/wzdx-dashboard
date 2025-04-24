@@ -9,7 +9,12 @@ class FeedPointsSerializer(
     status_type = serializers.SerializerMethodField()
 
     def get_status_type(self, obj):
-        return obj.feed_status().status_type
+        feed_status = obj.feed_status()
+
+        if feed_status:
+            return feed_status.status_type
+
+        return ""
 
     class Meta:
         model = Feed
