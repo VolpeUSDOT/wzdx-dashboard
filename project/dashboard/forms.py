@@ -4,7 +4,7 @@ from .models import Feed
 
 
 # Use function to prevent it from running until needed...
-def FEED_CHOICES():
+def get_feed_choices():
     return [("", "Find a feed!")] + [
         (feedname, f"{state + ' - ' if state else ''}{issuingorganization}")
         for (feedname, state, issuingorganization) in Feed.objects.values_list(
@@ -17,7 +17,7 @@ class SearchForm(forms.Form):
     template_name = "dashboard/components/search_feeds.html"
 
     search_feed = forms.ChoiceField(
-        choices=FEED_CHOICES,
+        choices=get_feed_choices,
         widget=forms.Select(
             attrs={
                 "class": "usa-select",
