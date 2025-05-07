@@ -1,6 +1,8 @@
 import requests
 from django.contrib.gis.db import models
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Value
+from django.db.models.functions import NullIf
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from localflavor.us import models as us_models, us_states
@@ -64,7 +66,7 @@ class Feed(models.Model):
     )
 
     class Meta:
-        ordering = ["state"]
+        ordering = [NullIf("state", Value("")).asc(nulls_last=True), "feedname"]
         verbose_name_plural = _("feeds")
 
     def __str__(self):
