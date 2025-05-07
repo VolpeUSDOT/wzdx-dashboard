@@ -30,6 +30,7 @@ VERSION_TO_SCHEMA = {
     "3.1": "https://raw.githubusercontent.com/usdot-jpo-ode/wzdx/main/schemas/3.1/WZDxFeed.json",
     "3.0": "https://raw.githubusercontent.com/usdot-jpo-ode/wzdx/main/schemas/3.0/WZDxFeed.json",
     "2.0": "https://raw.githubusercontent.com/usdot-jpo-ode/wzdx/main/schemas/2.0/WZDxFeed.json",
+    # TODO: HANDLE NON-WZDX FEEDS (CWZ)
 }
 
 
@@ -98,6 +99,10 @@ def get_formatted_errors(errors: list[ValidationError], feedname: str):
 REGISTRY = Registry(retrieve=retrieve_via_web).with_resources(
     [
         (
+            "hhttps://raw.githubusercontent.com/ite-org/cwz/refs/heads/main/schemas/1.0/WorkZoneFeed.json",
+            Resource.from_contents(get_schema_json("cwz10.schema.json")),
+        ),
+        (
             "https://raw.githubusercontent.com/usdot-jpo-ode/wzdx/main/schemas/4.2/WorkZoneFeed.json",
             Resource.from_contents(get_schema_json("wzdx42.schema.json")),
         ),
@@ -112,6 +117,14 @@ REGISTRY = Registry(retrieve=retrieve_via_web).with_resources(
         (
             "https://raw.githubusercontent.com/usdot-jpo-ode/wzdx/main/schemas/3.1/WZDxFeed.json",
             Resource.from_contents(get_schema_json("wzdx31.schema.json")),
+        ),
+        (
+            "https://raw.githubusercontent.com/usdot-jpo-ode/wzdx/main/schemas/2.0/WZDxFeed.json",
+            Resource.from_contents(get_schema_json("wzdx30.schema.json")),
+        ),
+        (
+            "https://raw.githubusercontent.com/usdot-jpo-ode/wzdx/main/schemas/2.0/WZDxFeed.json",
+            Resource.from_contents(get_schema_json("wzdx20.schema.json")),
         ),
     ]
 )
