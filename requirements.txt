@@ -1,4 +1,4 @@
-Django==5.2
+Django==5.2.1
 requests==2.32.3
 psycopg[binary]==3.2.7
 tzdata==2025.2
