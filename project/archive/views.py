@@ -69,7 +69,7 @@ class ArchiveListView(SingleTableMixin, FilterView):
 
 
 async def archive_json(request, pk):
-    data = await aget_object_or_404(Archive.objects, pk=pk)
+    data = await aget_object_or_404(Archive, pk=pk)
 
     return JsonResponse(data.data)
 
