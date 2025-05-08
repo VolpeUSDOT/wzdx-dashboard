@@ -32,5 +32,9 @@ in the form $setting: value,
 
   $theme-respect-user-font-size: true,
   $theme-font-type-sans: "open-sans",
-  $theme-font-role-ui: "sans"
+  $theme-font-role-ui: "sans",
+
+  $height-settings: (
+    responsive: true,
+  )
 );
