@@ -1,9 +1,5 @@
-import json
-import os
 from collections import Counter
 from datetime import datetime, timedelta, timezone
-from pathlib import Path
-from typing import Any, Optional, Sequence
 
 import iso8601
 import requests
@@ -16,122 +12,16 @@ from dashboard.models import (
     StaleErrorStatus,
 )
 from django.core.management.base import BaseCommand
-from jsonschema import Draft7Validator, ValidationError
-from jsonschema.exceptions import best_match
-from referencing import Registry, Resource
-
-# CONSTANTS
-SCHEMA_FOLDER = Path(os.path.dirname(__file__)) / "schemas"
-
-VERSION_TO_SCHEMA = {
-    "4.2": "https://raw.githubusercontent.com/usdot-jpo-ode/wzdx/main/schemas/4.2/WorkZoneFeed.json",
-    "4.1": "https://raw.githubusercontent.com/usdot-jpo-ode/wzdx/main/schemas/4.1/WorkZoneFeed.json",
-    "4.0": "https://raw.githubusercontent.com/usdot-jpo-ode/wzdx/main/schemas/4.0/WZDxFeed.json",
-    "3.1": "https://raw.githubusercontent.com/usdot-jpo-ode/wzdx/main/schemas/3.1/WZDxFeed.json",
-    "3.0": "https://raw.githubusercontent.com/usdot-jpo-ode/wzdx/main/schemas/3.0/WZDxFeed.json",
-    "2.0": "https://raw.githubusercontent.com/usdot-jpo-ode/wzdx/main/schemas/2.0/WZDxFeed.json",
-    # TODO: HANDLE NON-WZDX FEEDS (CWZ)
-}
-
-
-# HELPER CLASSES
-
-
-def get_schema_json(filename: str):
-    with open(SCHEMA_FOLDER / filename, "r") as f:
-        return json.load(f)
-
-
-def retrieve_via_web(uri: str):
-    print(f"requesting {uri}...")
-    response = requests.get(uri)
-    return Resource.from_contents(response.json())
-
-
-def format_as_index(container: str, indices: Sequence):
-    """Construct a single string containing indexing operations for the indices."""
-    if not indices:
-        return container
-    return f"{container}[{']['.join(repr(index) for index in indices)}]"
-
-
-def find_all_instances_key(
-    obj: dict[str, Any], key: str, key_to_skip: Optional[str] = None
-) -> list:
-    values_found = []
-
-    if key in obj:
-        values_found.append(obj[key])
-    for k, v in obj.items():
-        if (k is None or k != key_to_skip) and isinstance(v, dict):
-            item = find_all_instances_key(v, key, key_to_skip)
-            if item:
-                values_found += item
-
-    return values_found
-
-
-def get_formatted_errors(errors: list[ValidationError], feedname: str):
-    error_list: list[tuple[str, str]] = []
-
-    for error in errors:
-        if error.context is None or len(error.context) == 0:
-            # No sub errors
-            error_list.append((error.message, format_as_index(feedname, error.path)))
-        else:
-            # Get most relevant suberror, save that
-            best_error: ValidationError = best_match(error.context)
-            if type(best_error) is ValidationError:
-                error_list.append(
-                    (
-                        best_error.message,
-                        format_as_index(
-                            format_as_index(feedname, error.path),
-                            best_error.path,
-                        ),
-                    )
-                )
-
-    return error_list
-
-
-# GET ALL SCHEMAS AND SAVE IN REGISTRY (minimizes time to analyze schema)
-REGISTRY = Registry(retrieve=retrieve_via_web).with_resources(
-    [
-        (
-            "hhttps://raw.githubusercontent.com/ite-org/cwz/refs/heads/main/schemas/1.0/WorkZoneFeed.json",
-            Resource.from_contents(get_schema_json("cwz10.schema.json")),
-        ),
-        (
-            "https://raw.githubusercontent.com/usdot-jpo-ode/wzdx/main/schemas/4.2/WorkZoneFeed.json",
-            Resource.from_contents(get_schema_json("wzdx42.schema.json")),
-        ),
-        (
-            "https://raw.githubusercontent.com/usdot-jpo-ode/wzdx/main/schemas/4.1/WorkZoneFeed.json",
-            Resource.from_contents(get_schema_json("wzdx41.schema.json")),
-        ),
-        (
-            "https://raw.githubusercontent.com/usdot-jpo-ode/wzdx/main/schemas/4.0/WZDxFeed.json",
-            Resource.from_contents(get_schema_json("wzdx40.schema.json")),
-        ),
-        (
-            "https://raw.githubusercontent.com/usdot-jpo-ode/wzdx/main/schemas/3.1/WZDxFeed.json",
-            Resource.from_contents(get_schema_json("wzdx31.schema.json")),
-        ),
-        (
-            "https://raw.githubusercontent.com/usdot-jpo-ode/wzdx/main/schemas/2.0/WZDxFeed.json",
-            Resource.from_contents(get_schema_json("wzdx30.schema.json")),
-        ),
-        (
-            "https://raw.githubusercontent.com/usdot-jpo-ode/wzdx/main/schemas/2.0/WZDxFeed.json",
-            Resource.from_contents(get_schema_json("wzdx20.schema.json")),
-        ),
-    ]
+from shared.schema_check import (
+    find_all_instances_key,
+    get_formatted_errors,
+    get_schema_errors,
 )
 
+# FEED CHECKER FUNCTIONS
 
-# FEED CHECKER CLASSES
-def is_offline(feed: Feed):
+
+def is_offline(feed: Feed) -> bool:
     """Checks if feed response code was 200 and that JSON data was written."""
 
     if feed.url is None or feed.url == "":
@@ -157,18 +47,11 @@ def is_offline(feed: Feed):
     )
 
 
-def get_schema_errors(feed: Feed):
-    """If feed fails to validate against JSON schema"""
+def get_feed_schema_errors(feed: Feed):
     feed_data = feed.feed_data()
     feed_version = feed.version
 
-    errors: list[ValidationError] = []
-    v = Draft7Validator({"$ref": VERSION_TO_SCHEMA[feed_version]}, registry=REGISTRY)
-
-    for error in sorted(v.iter_errors(feed_data), key=str):
-        errors.append(error)
-
-    return errors
+    return get_schema_errors(feed_data, feed_version)
 
 
 def outdated(feed: Feed):
@@ -178,7 +61,9 @@ def outdated(feed: Feed):
     # Recursively get all instances of "update_date"
     all_update_dates = [
         iso8601.parse_date(update_date_string, default_timezone=timezone.utc)
-        for update_date_string in find_all_instances_key(feed.feed_data(), "update_date")  # type: ignore
+        for update_date_string in find_all_instances_key(
+            feed.feed_data(), "update_date"  # type: ignore
+        )
     ]
 
     is_outdated = (
@@ -227,7 +112,7 @@ class Command(BaseCommand):
 
             else:
                 # ERROR
-                errors = get_schema_errors(feed)
+                errors = get_feed_schema_errors(feed)
                 if len(errors) > 0:
                     self.stdout.write(
                         self.style.WARNING(
