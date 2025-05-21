@@ -15,7 +15,7 @@ from django.core.management.base import BaseCommand
 from shared.schema_check import (
     find_all_instances_key,
     get_formatted_errors,
-    get_schema_errors,
+    get_version_schema_errors,
 )
 
 # FEED CHECKER FUNCTIONS
@@ -51,7 +51,7 @@ def get_feed_schema_errors(feed: Feed):
     feed_data = feed.feed_data()
     feed_version = feed.version
 
-    return get_schema_errors(feed_data, feed_version)
+    return get_version_schema_errors(feed_data, feed_version)
 
 
 def outdated(feed: Feed):

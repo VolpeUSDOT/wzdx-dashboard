@@ -1,7 +1,7 @@
 import json
 import os
 from pathlib import Path
-from typing import Any, Optional, Sequence
+from typing import Any, Mapping, Optional, Sequence
 
 import requests
 from jsonschema import Draft7Validator, ValidationError
@@ -74,7 +74,7 @@ def get_formatted_errors(errors: list[ValidationError], feedname: str):
 REGISTRY = Registry(retrieve=retrieve_via_web).with_resources(
     [
         (
-            "hhttps://raw.githubusercontent.com/ite-org/cwz/refs/heads/main/schemas/1.0/WorkZoneFeed.json",
+            "https://raw.githubusercontent.com/ite-org/cwz/refs/heads/main/schemas/1.0/WorkZoneFeed.json",
             Resource.from_contents(get_schema_json("cwz10.schema.json")),
         ),
         (
@@ -105,9 +105,17 @@ REGISTRY = Registry(retrieve=retrieve_via_web).with_resources(
 )
 
 
-def get_schema_errors(data: Any, version: str) -> list[ValidationError]:
+def get_version_schema_errors(data: Any, version: str) -> list[ValidationError]:
     """If feed data fails to validate against JSON schema (with schema version)"""
 
-    v = Draft7Validator({"$ref": VERSION_TO_SCHEMA[version]}, registry=REGISTRY)
+    return get_schema_errors(data, {"$ref": VERSION_TO_SCHEMA[version]})
+
+
+def get_schema_errors(
+    data: Any, schema: Mapping[str, Any] | bool
+) -> list[ValidationError]:
+    """If feed data fails to validate against JSON schema (with schema version)"""
+
+    v = Draft7Validator(schema, registry=REGISTRY)
 
     return sorted(v.iter_errors(data), key=str)
