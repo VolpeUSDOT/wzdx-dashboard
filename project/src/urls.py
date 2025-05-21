@@ -42,5 +42,6 @@ urlpatterns = [
     path("archive/", include("archive.urls")),
     path("docs/", include("docs.urls")),
     path("api/", include("api.api")),
+    path("schema/", include("schema.urls")),
     path("", RedirectView.as_view(pattern_name="feed-list"), name="root"),
 ]
