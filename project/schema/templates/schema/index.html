@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}
+    Schema Checker
+{% endblock title %}
+{% block content %}
+    <div class="usa-section">
+        <div class="grid-container">
+            <div class="grid-row grid-gap">
+                <main class="grid-col" id="main-content">
+                    <form method="post" class="usa-form usa-form--large">
+                        {% csrf_token %}
+                        <fieldset class="usa-fieldset">
+                            <legend class="usa-legend usa-legend--large">WZDx Schema Checker</legend>
+                            <p>Use this form to validate a feed against a schema.</p>
+                            {% if form.non_field_errors %}
+                                <div class="usa-alert usa-alert--error">
+                                    <div class="usa-alert__body">
+                                        <p class="usa-alert__text">Form submission errors were found!</p>
+                                        <ul class="usa-list usa-alert__text">
+                                            {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            {% for field in form %}
+                                <label class="usa-label" for="{{ field.auto_id }}">{{ field.label }}</label>
+                                {{ field }}
+                            {% endfor %}
+                        </fieldset>
+                        <input type="submit"  class="usa-button" value="Submit">
+                    </form>
+                    {% if errors %}
+                        <ul class="usa-list">
+                            {% for error in errors %}<li>{{ error }}</li>{% endfor %}
+                        </ul>
+                    {% endif %}
+                </main>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

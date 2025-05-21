@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     "dashboard.apps.DashboardConfig",
     "api.apps.ApiConfig",
     "archive.apps.ArchiveConfig",
+    "schema.apps.SchemaConfig",
 ]
 
 MIDDLEWARE = [
@@ -163,6 +164,8 @@ SECURE_SSL_REDIRECT = False
 CSRF_TRUSTED_ORIGIN = []
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880
 
 try:
     from .local_settings import *
