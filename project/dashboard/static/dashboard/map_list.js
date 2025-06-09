@@ -206,6 +206,7 @@ async function makeEventsMap(container, feeds) {
             e.features[0].properties.core_details
           );
           description += `<ul class="usa-list usa-list--unstyled">
+        <li>ID: ${e.features[0].id} </li>
         <li>Event Type: ${core_details.event_type}</li>
         <li>Roads: ${core_details.road_names}</li>
         <li>Direction: ${core_details.direction}</li>
@@ -216,6 +217,7 @@ async function makeEventsMap(container, feeds) {
         `;
         } else {
           description += `<ul class="usa-list usa-list--unstyled">
+        <li>ID: ${e.features[0].id} </li>
         <li>Event Type: ${e.features[0].properties.event_type}</li>
         <li>Roads: ${e.features[0].properties.road_names}</li>
         <li>Direction: ${e.features[0].properties.direction}</li>
@@ -248,6 +250,7 @@ async function makeEventsMap(container, feeds) {
             e.features[0].properties.core_details
           );
           description += `<ul class="usa-list usa-list--unstyled">
+        <li>ID: ${e.features[0].id} </li>
         <li>Event Type: ${core_details.event_type}</li>
         <li>Roads: ${core_details.road_names}</li>
         <li>Direction: ${core_details.direction}</li>
@@ -258,6 +261,7 @@ async function makeEventsMap(container, feeds) {
         `;
         } else {
           description += `<ul class="usa-list usa-list--unstyled">
+        <li>ID: ${e.features[0].id} </li>        
         <li>Event Type: ${e.features[0].properties.event_type}</li>
         <li>Roads: ${e.features[0].properties.road_names}</li>
         <li>Direction: ${e.features[0].properties.direction}</li>
