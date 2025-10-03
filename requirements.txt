@@ -8,7 +8,7 @@ djangorestframework-gis==1.1
 django-filter==25.1
 Pygments==2.19.1
 humanize==4.12.3
-jsonschema==4.23.0
+jsonschema==4.25.1
 semver==3.0.4
 iso8601==2.1.0
 docutils==0.21.2
