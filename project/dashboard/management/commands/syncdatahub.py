@@ -258,7 +258,7 @@ class Command(BaseCommand):
             if feed_data_url is not None:
                 try:
                     feed_data_request = requests.get(
-                        feed_data_url, timeout=20, verify=False
+                        feed_data_url, timeout=60, verify=False
                     )
                 except requests.exceptions.RequestException as e:
                     self.stdout.write(
