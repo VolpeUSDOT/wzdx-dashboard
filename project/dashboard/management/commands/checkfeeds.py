@@ -101,6 +101,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         for feed in Feed.objects.all():
             self.stdout.write(self.style.NOTICE(f"Checking {feed.feedname}..."))
+            self.stdout.write(self.style.NOTICE(f"At URL {feed.url}..."))
             previous_status = feed.feed_status()
 
             # OFFLINE
