@@ -4,7 +4,7 @@ psycopg[binary]==3.2.9
 tzdata==2025.2
 markdown==3.8
 djangorestframework==3.16.1
-djangorestframework-gis==1.1
+djangorestframework-gis==1.2.0
 django-filter==25.1
 Pygments==2.19.1
 humanize==4.12.3
