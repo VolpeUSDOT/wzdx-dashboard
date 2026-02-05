@@ -229,7 +229,7 @@ class Command(BaseCommand):
                     else None
                 )
                 api_key = get_api_key(feed_requested.get("feedname"))
-                if feed_requested.get("apikeyurl") and "url" in feed_requested:
+                if feed_requested.get("needapikey") and "url" in feed_requested:
                     feed_data_url = get_feed_full_url(
                         api_key[1],
                         (feed_requested.get("url").get("url")),
