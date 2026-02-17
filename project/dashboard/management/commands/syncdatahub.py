@@ -230,10 +230,13 @@ class Command(BaseCommand):
                 )
                 api_key = get_api_key(feed_requested.get("feedname"))
                 if feed_requested.get("needapikey") and "url" in feed_requested:
-                    feed_data_url = get_feed_full_url(
-                        api_key[1],
-                        (feed_requested.get("url").get("url")),
-                    )
+                    if feed.feedname == "mdot_4":
+                        feed_data_url = feed_requested.get("url", {}).get("url", None)
+                    else:
+                        feed_data_url = get_feed_full_url(
+                            api_key[1],
+                            (feed_requested.get("url").get("url")),
+                        )
                 else:
                     feed_data_url = feed_requested.get("url", {}).get("url", None)
 
@@ -257,9 +260,13 @@ class Command(BaseCommand):
 
             if feed_data_url is not None:
                 try:
-                    feed_data_request = requests.get(
-                        feed_data_url, timeout=60, verify=False
-                    )
+                    if feed.feedname == "mdot_4":
+                        header = {"api_key": api_key[1]}
+                        feed_data_request = requests.get(feed_data_url, headers=header)
+                    else:
+                        feed_data_request = requests.get(
+                            feed_data_url, timeout=60, verify=False
+                        )
                 except requests.exceptions.RequestException as e:
                     self.stdout.write(
                         self.style.HTTP_BAD_REQUEST(
@@ -285,6 +292,13 @@ class Command(BaseCommand):
                             )
 
             feed_data_model.response_code = request_status
+            if feed.feedname == "mdot_4":
+                import pdb
+
+                pdb.set_trace()
+                feed_data_model.feed_data = feed_data[0]
+            else:
+                feed_data_model.feed_data = feed_data
             feed_data_model.feed_data = feed_data
             feed_data_model.save()
 
