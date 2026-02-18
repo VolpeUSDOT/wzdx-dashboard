@@ -65,7 +65,6 @@ def outdated(feed: Feed):
             feed.feed_data(), "update_date"  # type: ignore
         )
     ]
-    print(all_update_dates)
 
     is_outdated = (
         all([update_date < fourteen_days_ago for update_date in all_update_dates])
