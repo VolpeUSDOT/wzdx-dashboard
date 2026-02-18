@@ -293,9 +293,6 @@ class Command(BaseCommand):
 
             feed_data_model.response_code = request_status
             if feed.feedname == "mdot_4":
-                import pdb
-
-                pdb.set_trace()
                 feed_data_model.feed_data = feed_data[0]
             else:
                 feed_data_model.feed_data = feed_data
