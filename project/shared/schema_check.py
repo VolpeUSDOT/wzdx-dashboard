@@ -1,7 +1,7 @@
 import json
 import os
 from pathlib import Path
-from typing import Any, Mapping, Optional, Sequence
+from typing import Any, Generator, Mapping, Optional, Sequence
 
 import requests
 from jsonschema import Draft7Validator, ValidationError
@@ -40,15 +40,31 @@ def format_as_index(container: str, indices: Sequence):
 
 
 def find_all_instances_key(
-    obj: dict[str, Any], key: str, key_to_skip: Optional[str] = None
-):
-    if key in obj:
-        yield obj[key]
-    for k, v in obj.items():
-        if (k is None or k != key_to_skip) and isinstance(v, dict):
-            item = find_all_instances_key(v, key, key_to_skip)
-            if item:
-                yield from item
+    obj: Any, key: str, key_to_skip: Optional[str] = None
+) -> Generator[Any, None, None]:
+    """
+    Recursively finds all values for a specific key within nested
+    dictionaries and lists.
+    """
+    # Case 1: If the current object is a Dictionary
+    if isinstance(obj, dict):
+        # If the key exists at this level, yield its value
+        if key in obj:
+            yield obj[key]
+
+        # Iterate through the dictionary to go deeper
+        for k, v in obj.items():
+            # Skip the entire branch if the key matches 'key_to_skip'
+            if k == key_to_skip:
+                continue
+            # Recursively call the function on the value
+            yield from find_all_instances_key(v, key, key_to_skip)
+
+    # Case 2: If the current object is a List (the missing piece!)
+    elif isinstance(obj, list):
+        for item in obj:
+            # Recursively call the function on every item in the list
+            yield from find_all_instances_key(item, key, key_to_skip)
 
 
 def get_formatted_errors(errors: list[ValidationError], feedname: str):
