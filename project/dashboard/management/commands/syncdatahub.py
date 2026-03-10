@@ -293,10 +293,13 @@ class Command(BaseCommand):
 
             feed_data_model.response_code = request_status
             if feed.feedname == "mdot_4":
-                feed_data_model.feed_data = feed_data[0]
+                if feed_data_request.status_code == requests.codes.ok:
+                    feed_data_model.feed_data = feed_data[0]
+                else:
+                    feed_data_model.feed_data = {}
             else:
                 feed_data_model.feed_data = feed_data
-            feed_data_model.feed_data = feed_data
+
             feed_data_model.save()
 
             if feed_requested.get("needapikey") and api_key[0] is None:
