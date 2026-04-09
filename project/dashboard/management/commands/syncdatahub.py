@@ -177,15 +177,32 @@ class Command(BaseCommand):
                 feed.datafeed_frequency_update = parse_time(
                     feed_requested.get("datafeed_frequency_update")
                 )
-                feed.version = (
-                    str(
-                        semver.Version.parse(
-                            feed_requested.get("version"), optional_minor_and_patch=True
+
+                # CHECK VERSION - including CWZ
+                # 1. Grab the raw string
+                raw_version = feed_requested.get("version", "") or ""
+
+                # 2. Extract just the numbers (e.g., "CWZ 1.0" -> "1.0", "v4.1.2" -> "4.1.2")
+                version_match = re.search(r"(\d+\.\d+(?:\.\d+)?)", raw_version)
+                clean_version = version_match.group(1) if version_match else raw_version
+
+                # 3. Parse with semver safely
+                if clean_version:
+                    try:
+                        feed.version = str(
+                            semver.Version.parse(
+                                clean_version, optional_minor_and_patch=True
+                            )
+                        )[0:3]
+                    except ValueError:
+                        self.stdout.write(
+                            self.style.WARNING(
+                                f"Could not parse version: {raw_version}"
+                            )
                         )
-                    )[0:3]
-                    if "version" in feed_requested
-                    else ""
-                )
+                        feed.version = ""
+                else:
+                    feed.version = ""
 
                 feed.sdate = (
                     datetime.fromisoformat(feed_requested.get("sdate"))
