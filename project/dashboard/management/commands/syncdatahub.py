@@ -247,7 +247,7 @@ class Command(BaseCommand):
                 )
                 api_key = get_api_key(feed_requested.get("feedname"))
                 if feed_requested.get("needapikey") and "url" in feed_requested:
-                    if feed.feedname == "mdot_4":
+                    if feed.feedname in ["mdot_4", "massdot__cwz"]:
                         feed_data_url = feed_requested.get("url", {}).get("url", None)
                     else:
                         feed_data_url = get_feed_full_url(
@@ -280,6 +280,14 @@ class Command(BaseCommand):
                     if feed.feedname == "mdot_4":
                         header = {"api_key": api_key[1]}
                         feed_data_request = requests.get(feed_data_url, headers=header)
+                    elif feed.feedname == "massdot__cwz":
+                        header = {
+                            "accept": "application/json",
+                            "Authorization": f"Bearer {api_key[1]}",
+                        }
+                        feed_data_request = requests.get(
+                            feed_data_url, headers=header, timeout=60
+                        )
                     else:
                         feed_data_request = requests.get(
                             feed_data_url, timeout=60, verify=False
