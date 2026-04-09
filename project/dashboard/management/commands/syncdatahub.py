@@ -309,13 +309,36 @@ class Command(BaseCommand):
                             )
 
             feed_data_model.response_code = request_status
+
+            # --- NEW CODE: Helper to copy top-level ID to properties ---
+            def inject_dashboard_id(geojson_data):
+                # Ensure the data is actually a GeoJSON dict with a "features" list
+                if isinstance(geojson_data, dict) and "features" in geojson_data:
+                    for index, feature in enumerate(geojson_data.get("features", [])):
+                        if "properties" not in feature or not isinstance(
+                            feature["properties"], dict
+                        ):
+                            feature["properties"] = {}
+
+                        original_id = feature.get("id")
+
+                        if original_id is not None:
+                            # Forces uniqueness by appending the index (e.g., "XYZ-123_0", "XYZ-123_1")
+                            feature["properties"][
+                                "ID_for_dashboard"
+                            ] = f"{original_id}_{index}"
+
+                return geojson_data
+
+            # -----------------------------------------------------------
+
             if feed.feedname == "mdot_4":
                 if feed_data_request.status_code == requests.codes.ok:
-                    feed_data_model.feed_data = feed_data[0]
+                    feed_data_model.feed_data = inject_dashboard_id(feed_data[0])
                 else:
                     feed_data_model.feed_data = {}
             else:
-                feed_data_model.feed_data = feed_data
+                feed_data_model.feed_data = inject_dashboard_id(feed_data)
 
             feed_data_model.save()
 
