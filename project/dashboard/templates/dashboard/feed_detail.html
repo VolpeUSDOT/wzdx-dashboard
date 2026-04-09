@@ -100,7 +100,7 @@
                                     </svg>
                                 </div>
                                 <div class="usa-icon-list__content">
-                                    <span class="text-bold">Status History (14 Days):</span>
+                                    <span class="text-bold">Status History (last 14 Days):</span>
                                     {% for status in status_summary %}
                                         {{ status.0|title }}: {{ status.1 }}%
                                         {% if not forloop.last %},{% endif %}

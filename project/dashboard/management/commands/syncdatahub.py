@@ -88,6 +88,30 @@ def parse_time(time_str: Union[str, None]):
     return timedelta(**time_params)
 
 
+def parse_bool(val):
+    """
+    Normalize typical boolean-ish values coming from the table/JSON.
+    Returns True, False or None (when blank/unrecognized).
+    """
+    if isinstance(val, bool):
+        return val
+    if val is None:
+        return None
+    # if numeric-like
+    if isinstance(val, (int, float)):
+        return bool(val)
+    if isinstance(val, str):
+        v = val.strip().lower()
+        if v in ("t", "true", "1", "yes"):
+            return True
+        if v in ("f", "false", "0", "no"):
+            return False
+        # treat empty-like as None so DB null is used for unknown
+        if v == "" or v in ("null", "none", "na"):
+            return None
+    return None
+
+
 class Command(BaseCommand):
     help = "Syncs every entry in Feed with the current feeds on https://data.transportation.gov/d/69qe-yiui/"
 
@@ -121,6 +145,7 @@ class Command(BaseCommand):
         feeds_prior = [feed.feedname for feed in Feed.objects.all()]
         datahub_json: list[DataHubResponse] = datahub_request.json()
         for feed_requested in datahub_json:
+            self.stdout.write("looking for " + str(feed_requested.get("feedname")))
             try:
                 feed = Feed.objects.get(pk=feed_requested.get("feedname"))
             except Feed.DoesNotExist:
@@ -133,81 +158,114 @@ class Command(BaseCommand):
                         )
                     )
                     feed = Feed()
+            try:
+                state = feed_requested.get("state")
+                if state is not None and state in us_states.STATES_NORMALIZED.keys():
+                    feed.state = us_states.STATES_NORMALIZED[state]
+                else:
+                    feed.state = ""
 
-            state = feed_requested.get("state")
-            if state is not None and state in us_states.STATES_NORMALIZED.keys():
-                feed.state = us_states.STATES_NORMALIZED[state]
-            else:
-                feed.state = ""
+                feed.issuingorganization = feed_requested.get("issuingorganization")
+                feed.feedname = feed_requested.get("feedname")
+                feed.url = (
+                    feed_requested.get("url", {}).get("url", "")
+                    if "url" in feed_requested
+                    else ""
+                )
+                feed.format = feed_requested.get("format")
+                feed.active = parse_bool(feed_requested.get("active")) or True
+                feed.datafeed_frequency_update = parse_time(
+                    feed_requested.get("datafeed_frequency_update")
+                )
 
-            feed.issuingorganization = feed_requested.get("issuingorganization")
-            feed.feedname = feed_requested.get("feedname")
-            feed.url = (
-                feed_requested.get("url", {}).get("url", "")
-                if "url" in feed_requested
-                else ""
-            )
-            feed.format = feed_requested.get("format")
-            feed.active = feed_requested.get("active")
-            feed.datafeed_frequency_update = parse_time(
-                feed_requested.get("datafeed_frequency_update")
-            )
-            feed.version = (
-                str(
-                    semver.Version.parse(
-                        feed_requested.get("version"), optional_minor_and_patch=True
+                # CHECK VERSION - including CWZ
+                # 1. Grab the raw string
+                raw_version = feed_requested.get("version", "") or ""
+
+                # 2. Extract just the numbers (e.g., "CWZ 1.0" -> "1.0", "v4.1.2" -> "4.1.2")
+                version_match = re.search(r"(\d+\.\d+(?:\.\d+)?)", raw_version)
+                clean_version = version_match.group(1) if version_match else raw_version
+
+                # 3. Parse with semver safely
+                if clean_version:
+                    try:
+                        feed.version = str(
+                            semver.Version.parse(
+                                clean_version, optional_minor_and_patch=True
+                            )
+                        )[0:3]
+                    except ValueError:
+                        self.stdout.write(
+                            self.style.WARNING(
+                                f"Could not parse version: {raw_version}"
+                            )
+                        )
+                        feed.version = ""
+                else:
+                    feed.version = ""
+
+                feed.sdate = (
+                    datetime.fromisoformat(feed_requested.get("sdate"))
+                    .replace(tzinfo=eastern_tz)
+                    .date()
+                )
+                feed.edate = (
+                    datetime.fromisoformat(feed_requested.get("edate") or "")
+                    .replace(tzinfo=eastern_tz)
+                    .date()
+                    if feed_requested.get("edate")
+                    else None
+                )
+                feed.needapikey = parse_bool(feed_requested.get("needapikey")) or False
+                feed.apikeyurl = (
+                    (feed_requested.get("apikeyurl") or {}).get("url", "") or ""
+                    if feed_requested.get("apikeyurl")
+                    else None
+                )
+                feed.pipedtosandbox = (
+                    parse_bool(feed_requested.get("pipedtosandbox")) or False
+                )
+                feed.lastingestedtosandbox = (
+                    datetime.fromisoformat(
+                        feed_requested.get("lastingestedtosandbox") or ""
+                    ).replace(tzinfo=timezone.utc)
+                    if feed_requested.get("lastingestedtosandbox")
+                    else None
+                )
+                feed.pipedtosocrata = (
+                    parse_bool(feed_requested.get("pipedtosocrata")) or False
+                )
+                feed.socratadatasetid = feed_requested.get("socratadatasetid") or ""
+                feed.geocoded_column = (
+                    Point(
+                        feed_requested.get("geocoded_column").get("coordinates"),
+                        srid=4326,
                     )
-                )[0:3]
-                if "version" in feed_requested
-                else ""
-            )
-
-            feed.sdate = (
-                datetime.fromisoformat(feed_requested.get("sdate"))
-                .replace(tzinfo=eastern_tz)
-                .date()
-            )
-            feed.edate = (
-                datetime.fromisoformat(feed_requested.get("edate") or "")
-                .replace(tzinfo=eastern_tz)
-                .date()
-                if feed_requested.get("edate")
-                else None
-            )
-            feed.needapikey = feed_requested.get("needapikey")
-            feed.apikeyurl = (
-                (feed_requested.get("apikeyurl") or {}).get("url", "") or ""
-                if feed_requested.get("apikeyurl")
-                else None
-            )
-            feed.pipedtosandbox = feed_requested.get("pipedtosandbox")
-            feed.lastingestedtosandbox = (
-                datetime.fromisoformat(
-                    feed_requested.get("lastingestedtosandbox") or ""
-                ).replace(tzinfo=timezone.utc)
-                if feed_requested.get("lastingestedtosandbox")
-                else None
-            )
-            feed.pipedtosocrata = feed_requested.get("pipedtosocrata")
-            feed.socratadatasetid = feed_requested.get("socratadatasetid") or ""
-            feed.geocoded_column = (
-                Point(
-                    feed_requested.get("geocoded_column").get("coordinates"), srid=4326
+                    if feed_requested.get("geocoded_column")
+                    and feed_requested.get("geocoded_column").get("coordinates")
+                    else None
                 )
-                if feed_requested.get("geocoded_column")
-                and feed_requested.get("geocoded_column").get("coordinates")
-                else None
-            )
-            api_key = get_api_key(feed_requested.get("feedname"))
-            if feed_requested.get("apikeyurl") and "url" in feed_requested:
-                feed_data_url = get_feed_full_url(
-                    api_key[1],
-                    (feed_requested.get("url").get("url")),
-                )
-            else:
-                feed_data_url = feed_requested.get("url", {}).get("url", None)
+                api_key = get_api_key(feed_requested.get("feedname"))
+                if feed_requested.get("needapikey") and "url" in feed_requested:
+                    if feed.feedname in ["mdot_4", "massdot__cwz"]:
+                        feed_data_url = feed_requested.get("url", {}).get("url", None)
+                    else:
+                        feed_data_url = get_feed_full_url(
+                            api_key[1],
+                            (feed_requested.get("url").get("url")),
+                        )
+                else:
+                    feed_data_url = feed_requested.get("url", {}).get("url", None)
 
-            feed.save()
+                feed.save()
+            except Exception as e:
+                self.stdout.write(
+                    self.style.WARNING(
+                        f"Failed to process feed {feed_requested.get('feedname')}: {e}"
+                    )
+                )
+                # optional: log stack trace using traceback module
+                continue
 
             try:
                 feed_data_model = feed.feeddata  # type: ignore
@@ -219,9 +277,21 @@ class Command(BaseCommand):
 
             if feed_data_url is not None:
                 try:
-                    feed_data_request = requests.get(
-                        feed_data_url, timeout=20, verify=False
-                    )
+                    if feed.feedname == "mdot_4":
+                        header = {"api_key": api_key[1]}
+                        feed_data_request = requests.get(feed_data_url, headers=header)
+                    elif feed.feedname == "massdot__cwz":
+                        header = {
+                            "accept": "application/json",
+                            "Authorization": f"Bearer {api_key[1]}",
+                        }
+                        feed_data_request = requests.get(
+                            feed_data_url, headers=header, timeout=60
+                        )
+                    else:
+                        feed_data_request = requests.get(
+                            feed_data_url, timeout=60, verify=False
+                        )
                 except requests.exceptions.RequestException as e:
                     self.stdout.write(
                         self.style.HTTP_BAD_REQUEST(
@@ -247,7 +317,37 @@ class Command(BaseCommand):
                             )
 
             feed_data_model.response_code = request_status
-            feed_data_model.feed_data = feed_data
+
+            # --- NEW CODE: Helper to copy top-level ID to properties ---
+            def inject_dashboard_id(geojson_data):
+                # Ensure the data is actually a GeoJSON dict with a "features" list
+                if isinstance(geojson_data, dict) and "features" in geojson_data:
+                    for index, feature in enumerate(geojson_data.get("features", [])):
+                        if "properties" not in feature or not isinstance(
+                            feature["properties"], dict
+                        ):
+                            feature["properties"] = {}
+
+                        original_id = feature.get("id")
+
+                        if original_id is not None:
+                            # Forces uniqueness by appending the index (e.g., "XYZ-123_0", "XYZ-123_1")
+                            feature["properties"][
+                                "ID_for_dashboard"
+                            ] = f"{original_id}_{index}"
+
+                return geojson_data
+
+            # -----------------------------------------------------------
+
+            if feed.feedname == "mdot_4":
+                if feed_data_request.status_code == requests.codes.ok:
+                    feed_data_model.feed_data = inject_dashboard_id(feed_data[0])
+                else:
+                    feed_data_model.feed_data = {}
+            else:
+                feed_data_model.feed_data = inject_dashboard_id(feed_data)
+
             feed_data_model.save()
 
             if feed_requested.get("needapikey") and api_key[0] is None:

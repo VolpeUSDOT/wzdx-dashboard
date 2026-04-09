@@ -27,7 +27,7 @@ async function makeFeedsMap(container) {
   map.addControl(
     new maplibregl.FullscreenControl({
       container: document.querySelector(container),
-    })
+    }),
   );
 
   map.on("load", async () => {
@@ -126,7 +126,7 @@ async function makeEventsMap(container, feeds) {
   map.addControl(
     new maplibregl.FullscreenControl({
       container: document.querySelector(container),
-    })
+    }),
   );
 
   map.on("load", async () => {
@@ -137,6 +137,7 @@ async function makeEventsMap(container, feeds) {
           const layer_source = `geojson-source-${feed}`;
           const layer_points = `geojson-points-${feed}`;
           const layer_lines = `geojson-lines-${feed}`;
+          const layer_line_arrows = `geojson-line-arrows-${feed}`;
 
           const resp = await fetch(points_url);
           const data = await resp.json();
@@ -147,24 +148,32 @@ async function makeEventsMap(container, feeds) {
             return;
           }
 
-          /** @type {[string, string, string, string, any]} */
+          /** @type {[string, string, string, string, string, any]} */
           const return_data = [
             feed,
             layer_source,
             layer_points,
             layer_lines,
+            layer_line_arrows,
             feed_data,
           ];
 
           return return_data;
-        })
+        }),
       )
     ).forEach((data) => {
       if (!data) {
         return;
       }
 
-      const [feed, layer_source, layer_points, layer_lines, feed_data] = data;
+      const [
+        feed,
+        layer_source,
+        layer_points,
+        layer_lines,
+        layer_line_arrows,
+        feed_data,
+      ] = data;
 
       map.addSource(layer_source, {
         type: "geojson",
@@ -187,6 +196,29 @@ async function makeEventsMap(container, feeds) {
       });
 
       map.addLayer({
+        id: layer_line_arrows,
+        type: "symbol",
+        source: layer_source,
+        minzoom: 8,
+        filter: ["==", "$type", "LineString"],
+        layout: {
+          "symbol-placement": "line",
+          "symbol-spacing": 250, // Adjusted for better visibility
+          "text-field": "▶", // Unicode right-pointing triangle
+          "text-font": ["Open Sans Regular", "Arial Unicode MS Regular"],
+          "text-size": 200,
+          "text-allow-overlap": true,
+          "text-ignore-placement": true,
+          "text-keep-upright": false, // Ensures the arrow points along the line, not just "up"
+        },
+        paint: {
+          "text-color": stringToHexCode(feed),
+          "text-halo-color": "#ffffff",
+          "text-halo-width": 1.5,
+        },
+      });
+
+      map.addLayer({
         id: layer_points,
         type: "circle",
         source: layer_source,
@@ -203,9 +235,10 @@ async function makeEventsMap(container, feeds) {
 
         if (e.features[0].properties.core_details) {
           const core_details = JSON.parse(
-            e.features[0].properties.core_details
+            e.features[0].properties.core_details,
           );
           description += `<ul class="usa-list usa-list--unstyled">
+        <li>ID: ${e.features[0].id} </li>
         <li>Event Type: ${core_details.event_type}</li>
         <li>Roads: ${core_details.road_names}</li>
         <li>Direction: ${core_details.direction}</li>
@@ -216,6 +249,7 @@ async function makeEventsMap(container, feeds) {
         `;
         } else {
           description += `<ul class="usa-list usa-list--unstyled">
+        <li>ID: ${e.features[0].id} </li>
         <li>Event Type: ${e.features[0].properties.event_type}</li>
         <li>Roads: ${e.features[0].properties.road_names}</li>
         <li>Direction: ${e.features[0].properties.direction}</li>
@@ -245,9 +279,10 @@ async function makeEventsMap(container, feeds) {
 
         if (e.features[0].properties.core_details) {
           const core_details = JSON.parse(
-            e.features[0].properties.core_details
+            e.features[0].properties.core_details,
           );
           description += `<ul class="usa-list usa-list--unstyled">
+        <li>ID: ${e.features[0].id} </li>
         <li>Event Type: ${core_details.event_type}</li>
         <li>Roads: ${core_details.road_names}</li>
         <li>Direction: ${core_details.direction}</li>
@@ -258,6 +293,7 @@ async function makeEventsMap(container, feeds) {
         `;
         } else {
           description += `<ul class="usa-list usa-list--unstyled">
+        <li>ID: ${e.features[0].id} </li>        
         <li>Event Type: ${e.features[0].properties.event_type}</li>
         <li>Roads: ${e.features[0].properties.road_names}</li>
         <li>Direction: ${e.features[0].properties.direction}</li>
