@@ -5,6 +5,7 @@ from shared.schema_check import VERSION_TO_SCHEMA
 
 class SchemaForm(forms.Form):
     version = forms.ChoiceField(
+        # TODO: Update to CWZ 1.0 not WZDx 1.0
         choices=((key, f"WZDx {key}") for key in VERSION_TO_SCHEMA.keys()),
         label=_("WZDx Version"),
         required=True,
