@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load static %} 
+{% block title %}
+    Schema Checker
+{% endblock title %}
+
+{% block content %}
+    <div class="usa-section">
+        <div class="grid-container">
+            <div class="grid-row grid-gap">
+                <main class="grid-col" id="main-content">
+                    <form method="post" class="usa-form usa-form--large">
+                        {% csrf_token %}
+                        <fieldset class="usa-fieldset">
+                            <legend class="usa-legend usa-legend--large">WZDx Schema Checker</legend>
+                            <p>Use this form to validate a feed against a schema.</p>
+                            {% if form.non_field_errors %}
+                                <div class="usa-alert usa-alert--error">
+                                    <div class="usa-alert__body">
+                                        <p class="usa-alert__text">Form submission errors were found!</p>
+                                        <ul class="usa-list usa-alert__text">
+                                            {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            {% for field in form %}
+                                <label class="usa-label" for="{{ field.auto_id }}">{{ field.label }}</label>
+                                {{ field }}
+                            {% endfor %}
+                        </fieldset>
+                        <input type="submit"  class="usa-button" value="Submit">
+                    </form>
+
+                    {% if feed_data %}
+                        <h2 class="usa-heading">Validation Map</h2>
+                        
+                        {% if general_errors %}
+                            <div class="usa-alert usa-alert--warning" style="margin-bottom: 1rem;">
+                                <div class="usa-alert__body">
+                                    <ul class="usa-list">
+                                        {% for error in general_errors %}<li>{{ error }}</li>{% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                        {% endif %}
+
+                        <div id="validation-map" style="width: 100%; height: 600px; border: 1px solid #ccc;"></div>
+
+                        {{ feed_data|json_script:"map-data" }}
+                        {{ structured_errors|json_script:"map-errors" }}
+
+                        <link href="https://unpkg.com/maplibre-gl@3.x/dist/maplibre-gl.css" rel="stylesheet" />
+                        <script src="https://unpkg.com/maplibre-gl@3.x/dist/maplibre-gl.js"></script>
+                        
+                        <script src="{% static 'js/schema_map.js' %}"></script>
+                        <script>
+                            // Initialize the map once the DOM loads
+                            document.addEventListener('DOMContentLoaded', () => {
+                                makeValidationMap('validation-map');
+                            });
+                        </script>
+                    {% endif %}
+                </main>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

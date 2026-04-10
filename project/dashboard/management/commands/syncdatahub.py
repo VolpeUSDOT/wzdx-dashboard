@@ -177,15 +177,32 @@ class Command(BaseCommand):
                 feed.datafeed_frequency_update = parse_time(
                     feed_requested.get("datafeed_frequency_update")
                 )
-                feed.version = (
-                    str(
-                        semver.Version.parse(
-                            feed_requested.get("version"), optional_minor_and_patch=True
+
+                # CHECK VERSION - including CWZ
+                # 1. Grab the raw string
+                raw_version = feed_requested.get("version", "") or ""
+
+                # 2. Extract just the numbers (e.g., "CWZ 1.0" -> "1.0", "v4.1.2" -> "4.1.2")
+                version_match = re.search(r"(\d+\.\d+(?:\.\d+)?)", raw_version)
+                clean_version = version_match.group(1) if version_match else raw_version
+
+                # 3. Parse with semver safely
+                if clean_version:
+                    try:
+                        feed.version = str(
+                            semver.Version.parse(
+                                clean_version, optional_minor_and_patch=True
+                            )
+                        )[0:3]
+                    except ValueError:
+                        self.stdout.write(
+                            self.style.WARNING(
+                                f"Could not parse version: {raw_version}"
+                            )
                         )
-                    )[0:3]
-                    if "version" in feed_requested
-                    else ""
-                )
+                        feed.version = ""
+                else:
+                    feed.version = ""
 
                 feed.sdate = (
                     datetime.fromisoformat(feed_requested.get("sdate"))
@@ -230,7 +247,7 @@ class Command(BaseCommand):
                 )
                 api_key = get_api_key(feed_requested.get("feedname"))
                 if feed_requested.get("needapikey") and "url" in feed_requested:
-                    if feed.feedname == "mdot_4":
+                    if feed.feedname in ["mdot_4", "massdot__cwz"]:
                         feed_data_url = feed_requested.get("url", {}).get("url", None)
                     else:
                         feed_data_url = get_feed_full_url(
@@ -263,6 +280,14 @@ class Command(BaseCommand):
                     if feed.feedname == "mdot_4":
                         header = {"api_key": api_key[1]}
                         feed_data_request = requests.get(feed_data_url, headers=header)
+                    elif feed.feedname == "massdot__cwz":
+                        header = {
+                            "accept": "application/json",
+                            "Authorization": f"Bearer {api_key[1]}",
+                        }
+                        feed_data_request = requests.get(
+                            feed_data_url, headers=header, timeout=60
+                        )
                     else:
                         feed_data_request = requests.get(
                             feed_data_url, timeout=60, verify=False
@@ -292,11 +317,37 @@ class Command(BaseCommand):
                             )
 
             feed_data_model.response_code = request_status
+
+            # --- NEW CODE: Helper to copy top-level ID to properties ---
+            def inject_dashboard_id(geojson_data):
+                # Ensure the data is actually a GeoJSON dict with a "features" list
+                if isinstance(geojson_data, dict) and "features" in geojson_data:
+                    for index, feature in enumerate(geojson_data.get("features", [])):
+                        if "properties" not in feature or not isinstance(
+                            feature["properties"], dict
+                        ):
+                            feature["properties"] = {}
+
+                        original_id = feature.get("id")
+
+                        if original_id is not None:
+                            # Forces uniqueness by appending the index (e.g., "XYZ-123_0", "XYZ-123_1")
+                            feature["properties"][
+                                "ID_for_dashboard"
+                            ] = f"{original_id}_{index}"
+
+                return geojson_data
+
+            # -----------------------------------------------------------
+
             if feed.feedname == "mdot_4":
-                feed_data_model.feed_data = feed_data[0]
+                if feed_data_request.status_code == requests.codes.ok:
+                    feed_data_model.feed_data = inject_dashboard_id(feed_data[0])
+                else:
+                    feed_data_model.feed_data = {}
             else:
-                feed_data_model.feed_data = feed_data
-            feed_data_model.feed_data = feed_data
+                feed_data_model.feed_data = inject_dashboard_id(feed_data)
+
             feed_data_model.save()
 
             if feed_requested.get("needapikey") and api_key[0] is None:
