@@ -10,6 +10,18 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+from django.contrib.staticfiles.storage import ManifestStaticFilesStorage
+
+
+class ForgivingManifestStaticFilesStorage(ManifestStaticFilesStorage):
+    """
+    A manifest storage class that ignores missing files rather than crashing
+    the collectstatic build process.
+    """
+
+    manifest_strict = False
+
+
 import os
 from pathlib import Path
 
@@ -143,7 +155,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
     "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+        "BACKEND": "src.settings.ForgivingManifestStaticFilesStorage"  # <-- Point to your new class!
     },
 }
 
