@@ -17,7 +17,7 @@ VERSION_TO_SCHEMA = {
     "3.1": "https://raw.githubusercontent.com/usdot-jpo-ode/wzdx/main/schemas/3.1/WZDxFeed.json",
     "3.0": "https://raw.githubusercontent.com/usdot-jpo-ode/wzdx/main/schemas/3.0/WZDxFeed.json",
     "2.0": "https://raw.githubusercontent.com/usdot-jpo-ode/wzdx/main/schemas/2.0/WZDxFeed.json",
-    # TODO: HANDLE NON-WZDX FEEDS (CWZ)
+    "1.0": "https://raw.githubusercontent.com/ite-org/cwz/main/schemas/1.0/WorkZoneFeed.json",  # CWZ 1.0
 }
 
 
