@@ -36,7 +36,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# This looks for the environment variable string and allows DEBUG to be true
+# if it's set as such with an environment variable on the server
+DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
