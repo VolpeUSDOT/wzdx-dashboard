@@ -1,12 +1,12 @@
-Django==5.2.11
-requests==2.32.5
+Django==5.2.13
+requests==2.33.1
 psycopg[binary]==3.2.12
 tzdata==2025.2
 markdown==3.10.2
 djangorestframework==3.16.1
 djangorestframework-gis==1.2.0
 django-filter==25.2
-Pygments==2.19.2
+Pygments==2.20.0
 humanize==4.15.0
 jsonschema==4.26.0
 semver==3.0.4
@@ -14,7 +14,7 @@ iso8601==2.1.0
 docutils==0.22.4
 django-localflavor==5.0
 gunicorn==25.3.0
-uvicorn==0.41.0
+uvicorn==0.44.0
 uvicorn-worker==0.4.0
 django-tables2==3.0.0
 django-admin-interface==0.32.0
