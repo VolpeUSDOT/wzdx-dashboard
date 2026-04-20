@@ -14,7 +14,7 @@ iso8601==2.1.0
 docutils==0.22.4
 django-localflavor==5.0
 gunicorn==25.3.0
-uvicorn==0.41.0
+uvicorn==0.44.0
 uvicorn-worker==0.4.0
 django-tables2==3.0.0
 django-admin-interface==0.32.0
