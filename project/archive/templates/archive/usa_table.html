@@ -12,7 +12,7 @@
                                 {% for column in table.columns %}
                                     <th {{ column.attrs.th.as_html }}>
                                         {% if column.orderable %}
-                                            <a href="{% querystring table.prefixed_order_by_field=column.order_by_alias.next %}"
+                                            <a href="{% querystring_replace table.prefixed_order_by_field=column.order_by_alias.next %}"
                                                class="usa-link">{{ column.header }}</a>
                                         {% else %}
                                             {{ column.header }}
@@ -72,11 +72,11 @@
                                         {% if table.page.has_previous %}
                                             {% block pagination.previous %}
                                                 <li class="usa-pagination__item usa-pagination__arrow">
-                                                    <a href="{% querystring table.prefixed_page_field=table.page.previous_page_number %}"
+                                                    <a href="{% querystring_replace table.prefixed_page_field=table.page.previous_page_number %}"
                                                        class="usa-pagination__link usa-pagination__previous-page"
                                                        aria-label="Previous page">
                                                         <svg class="usa-icon" aria-hidden="true" role="img">
-                                                            <use xlink:href="{% static '/uswds/img/sprite.svg' %}#navigate_before"></use>
+                                                            <use xlink:href="{% static 'uswds/img/sprite.svg' %}#navigate_before"></use>
                                                         </svg>
                                                         <span class="usa-pagination__link-text">Previous</span>
                                                     </a>
@@ -93,7 +93,7 @@
                                                         </li>
                                                     {% else %}
                                                         <li class="usa-pagination__item usa-pagination__page-no">
-                                                            <a href="{% querystring table.prefixed_page_field=p %}"
+                                                            <a href="{% querystring_replace table.prefixed_page_field=p %}"
                                                                class="usa-pagination__button{% if p == table.page.number %} usa-current{% endif %}"
                                                                aria-label="Page {{ p }}"
                                                                {% if p == table.page.number %}aria-current="page"{% endif %}>{{ p }}</a>
@@ -105,12 +105,12 @@
                                         {% if table.page.has_next %}
                                             {% block pagination.next %}
                                                 <li class="usa-pagination__item usa-pagination__arrow">
-                                                    <a href="{% querystring table.prefixed_page_field=table.page.next_page_number %}"
+                                                    <a href="{% querystring_replace table.prefixed_page_field=table.page.next_page_number %}"
                                                        class="usa-pagination__link usa-pagination__next-page"
                                                        aria-label="next page">
                                                         <span class="usa-pagination__link-text">Next</span>
                                                         <svg class="usa-icon" aria-hidden="true" role="img">
-                                                            <use xlink:href="{% static '/uswds/img/sprite.svg' %}#navigate_next"></use>
+                                                            <use xlink:href="{% static 'uswds/img/sprite.svg' %}#navigate_next"></use>
                                                         </svg>
                                                     </a>
                                                 </li>
