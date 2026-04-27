@@ -1,7 +1,7 @@
 Django==5.2.13
 requests==2.33.1
 psycopg[binary]==3.2.12
-tzdata==2026.1
+tzdata==2026.2
 markdown==3.10.2
 djangorestframework==3.16.1
 djangorestframework-gis==1.2.0
