@@ -1,6 +1,6 @@
 Django==5.2.13
 requests==2.33.1
-psycopg[binary]==3.2.12
+psycopg[binary]==3.3.3
 tzdata==2026.1
 markdown==3.10.2
 djangorestframework==3.16.1
