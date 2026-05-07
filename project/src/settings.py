@@ -10,6 +10,18 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+from django.contrib.staticfiles.storage import ManifestStaticFilesStorage
+
+
+class ForgivingManifestStaticFilesStorage(ManifestStaticFilesStorage):
+    """
+    A manifest storage class that ignores missing files rather than crashing
+    the collectstatic build process.
+    """
+
+    manifest_strict = False
+
+
 import os
 from pathlib import Path
 
@@ -24,10 +36,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# This looks for the environment variable string and allows DEBUG to be true
+# if it's set as such with an environment variable on the server
+DEBUG = os.environ.get("DEBUG", "False").lower() == "true"
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
-
+ALLOWED_HOSTS = ["pathways1.volpe.dot.gov", "localhost", "127.0.0.1"]
+CSRF_TRUSTED_ORIGINS = ["https://pathways1.volpe.dot.gov"]
 
 # Application definition
 
@@ -140,6 +154,13 @@ STATICFILES_DIRS = [
 ]
 
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {
+        "BACKEND": "src.settings.ForgivingManifestStaticFilesStorage"  # <-- Point to your new class!
+    },
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
